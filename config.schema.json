@@ -1,0 +1,140 @@
+{
+    "pluginAlias": "samsungtvht",
+    "pluginType": "platform",
+    "singular": true,
+    "headerDisplay": "Homebridge plugin for Samsung TV (D5000 series) and Home Theater (D5500 series) from ca 2011.",
+    "footerDisplay": "For a detailed description, see the [README](https://www.npmjs.com/package/homebridge-samsungtvht).",
+    "schema": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "title": "Name",
+          "type": "string",
+          "description": "Plugin name as displayed in the homebridge log. Default: samsungtvht",
+          "default": "samsungtvht",
+          "placeholder": "samsungtvht",
+          "minLength": 1,
+          "required": true
+        },
+        "pingCommand": {
+            "title": "Ping Command",
+            "type": "string",
+            "description": "Ping command to use to detect device power state.",
+            "default": "ping -c 1 -w 1",
+            "placeholder": "ping -c 1 -w 1",
+            "minLength": 1,
+            "required": true
+          },
+  
+
+        "devices": {
+            "type": "array",
+            "title": "Devices",
+            "description": "Each TV or HT is a device. This plugin supports multiple devices.",
+            "items": {
+                "title": "Devices",
+                "type": "object",
+                "properties": {
+                    "name": {
+                        "title": "Name",
+                        "type": "string",
+                        "description": "The device name.",
+                        "pattern": "^[0-9A-Za-zÀ-ÖØ-öø-ÿ](?:[0-9A-Za-zÀ-ÖØ-öø-ÿ '’,.-]+)*[0-9A-Za-zÀ-ÖØ-öø-ÿ.]$",
+                        "minLength": 1,
+                        "maxLength": 32,
+                        "required": true
+                    },
+                    "ipAddress": {
+                        "title": "IP Address",
+                        "type": "string",
+                        "description": "The IP address of the device",
+                        "maxLength": 15,
+                        "required": true
+                    },
+
+                    "type": {
+                        "title": "Device Type",
+                        "type": "string",
+                        "description": "Controls the icon displayed on the tile in Home app. Default: Television",
+                        "default": "television",
+                        "oneOf": [
+                            { "title": "Television", "enum": ["television"] },
+                            { "title": "Audio Receiver", "enum": ["receiver"] }
+                        ],
+                        "required": true
+                    },
+
+
+                    "manufacturer": {
+                        "title": "Manufacturer",
+                        "type": "string",
+                        "description": "The manufacturer name to display in the Home app. Default: Samsung.",
+                        "default": "Samsung",
+                        "placeholder": "Samsung",
+                        "maxLength": 32
+                    },
+                    "modelName": {
+                        "title": "Model",
+                        "type": "string",
+                        "description": "The model name to display in the Home app.",
+                        "placeholder": "Model Name",
+                        "maxLength": 32
+                    },
+                    "serialNumber": {
+                        "title": "Serial Number",
+                        "type": "string",
+                        "description": "The serial number to display in the Home app.",
+                        "placeholder": "Serial Number",
+                        "maxLength": 32
+                    },
+                    "firmwareRevision": {
+                        "title": "Firmware",
+                        "type": "string",
+                        "description": "The firmware version to display in the Home app. Numbers only eg 1.2.3",
+                        "placeholder": "1.2.3",
+                        "pattern": "^(\\d+)((\\.{1}\\d+)*)(\\.{0})$"
+                    }
+                    
+                }
+            }
+        }
+    }
+},
+
+
+
+
+"layout": [
+    {
+        "type": "section",
+        "title": "Platform Config *",
+        "description": "The minimum config items that must be configured.",
+        "items": [
+            "name",
+            "pingCommand"
+        ]
+    },
+
+    {
+        "key": "devices",
+        "type": "array",
+        "items": [
+            {
+                "key": "devices[]",
+                "type": "section",
+                "title": "Device",
+                "expandable": true,
+                "items": [
+                    "devices[].name",
+                    "devices[].type",
+                    "devices[].ipAddress",
+                    "devices[].manufacturer",
+                    "devices[].serialNumber",
+                    "devices[].modelName",
+                    "devices[].firmwareRevision"
+                ]
+            }
+        ]
+    }
+    ]
+}
