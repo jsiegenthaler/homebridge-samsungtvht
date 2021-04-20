@@ -129,6 +129,7 @@ class samsungTvHtPlatform {
 
 	powerStateWatchdog() {
 		// ping the devices regularly to check their power state
+		this.log("powerStateWatchdog ---START-----------------------------------------")
 
 		// for linux:
 		//var pingCmd = 'ping -c 1 -w 1 ' + this.config.devices[0].ipAddress;
@@ -140,38 +141,89 @@ class samsungTvHtPlatform {
 		for (let i = 0; i < this.devices.length; i++) {
 			let device = this.devices[i];
 
-			/*
-			let powerStateTransitionInProgressUntil = new Date(device.powerStateTransitionInProgressUntil);
-			this.log("powerStateTransitionInProgressUntil = ", powerStateTransitionInProgressUntil.toLocaleString())
-			if (Date.now() > powerStateTransitionInProgressUntil) {
-				this.log("power state is in transition, use target power state ")
+			//let lastKeyPress = this.devices[i].powerLastKeyPress;
+			//this.log("device powerLastKeyPress: ", this.devices[i].powerLastKeyPress.toLocaleString())
+
+			let secondsSinceLastPowerKeyPress = (Date.now() - this.devices[i].powerLastKeyPress) / 1000;
+			this.log("secondsSinceLastPowerKeyPress: ", secondsSinceLastPowerKeyPress)
+
+			const powerStateMaxTransitionTimeSeconds = 20;
+
+			if (secondsSinceLastPowerKeyPress < powerStateMaxTransitionTimeSeconds) {
+				this.log("power state is in transition, use target power state. Transition duration:", secondsSinceLastPowerKeyPress)
 			} else {
-				this.log("power state not in transition, ping will occur")
+				this.log("power state not in transition, use current power state")
 			}
-			*/
 
 			var pingCmd = this.config.pingCommand || 'ping -c 1 -w 1'; // default linux
 			pingCmd = pingCmd.trim() + ' ' + device.config.ipAddress;
 			this.log.warn('powerStateWatchdog: Pinging %s with %s', device.name, pingCmd);
 	
 			var self = this;
+			var devicePowerState;
 			exec(pingCmd, function (error, stdout, stderr) {
-				if (stdout.includes('Sent = 1, Received = 1,')) {
+
+				self.log.warn("powerStateWatchdog: Evaluating ping responce", device.name);
+				// get the current device power state from the ping results
+				// linux: 	1 packets transmitted, 0 received, 100% packet loss, time 0ms
+				// windows: 
+				if (stdout.includes('Sent = 1, Received = 1,') || stdout.includes('1 packets transmitted, 1 received')) {
 					self.log.warn("powerStateWatchdog: Device %s is responding to ping, power is ON", device.name);
+					devicePowerState = Characteristic.Active.ACTIVE;
+				} else if (stdout.includes('Sent = 1, Received = 0,') || stdout.includes('1 packets transmitted, 0 received')) {
+					self.log.warn("powerStateWatchdog: Device %s is not responding to ping, power is OFF", device.name);
+					devicePowerState = Characteristic.Active.INACTIVE;
+				} else {
+					self.log.warn("powerStateWatchdog: ERROR Ping result cannot be parsed! stdout:", stdout);
+					devicePowerState = null;
+				}
 
-					// device is ON, check if it is transitioning
-					if (device.currentPowerTransitionState == powerStateTransition.TRANSITIONING_ON_TO_OFF) {
-						self.log("Power state is ON in transition from ON to OFF, setting to OFF")
-						// device is transitioning from ON to OFF, but is not yet OFF, so return OFF
-						device.currentPowerState = Characteristic.Active.INACTIVE;
-						// but do not change the transitioning state
 
-					} else if (device.currentPowerTransitionState == powerStateTransition.TRANSITIONING_OFF_TO_ON) {
-						self.log("Power state is ON in transition from OFF to ON, setting to ON")
-						// device is transitioning from OFF to ON, must have just turned ON, so return ON
-						device.currentPowerState = Characteristic.Active.ACTIVE;
-						// and set the transitioning state to not transitioning
-						device.currentPowerTransitionState = powerStateTransition.NOT_TRANSITIONING;
+				// evaluate the current vs target power states
+				self.log.warn("powerStateWatchdog: Evaluating device power state", device.name);
+				if (device.currentPowerState != device.targetPowerState) {
+					self.log.warn("powerStateWatchdog: Device %s is transiitoning from %s to %s", device.name, device.currentPowerState, device.targetPowerState);
+					// change in power state was requested
+					if (secondsSinceLastPowerKeyPress < powerStateMaxTransitionTimeSeconds) {
+						// device is currently undergoing a power state transition
+						// check if target power state has been reached, if so, set current power state to target power state
+						self.log.warn("powerStateWatchdog: Device %s is still within the allowed transiiton time", device.name);
+						if (devicePowerState == device.targetPowerState) {
+							device.currentPowerState = device.targetPowerState;
+						}
+					} else {
+						// transition time has timed out, cancel the target power state, leave current power state unchanged
+						self.log.warn("powerStateWatchdog: Device %s transiiton time has timed out, no power state change occured, resetting power state to %s", device.name, device.currentPowerState);
+						device.targetPowerState = device.currentPowerState;
+					}
+
+				} else {
+					device.currentPowerState = devicePowerState;
+				}
+
+				/*
+				self.log.warn("powerStateWatchdog: Device %s is responding to ping, power is ON", device.name);
+					if (millisecondsSinceLastPowerKeyPress < powerStateMaxTransitionTime) {
+						// device is currently undergoing a power state transition
+
+						// device is ON, check if it is transitioning
+						if (device.currentPowerTransitionState == powerStateTransition.TRANSITIONING_ON_TO_OFF) {
+							// device is transitioning from ON to OFF, but is not yet OFF, so return OFF
+							self.log("Power state is ON in transition from ON to OFF, setting to OFF")
+							device.currentPowerState = Characteristic.Active.INACTIVE;
+							// but do not change the transitioning state
+
+						} else if (device.currentPowerTransitionState == powerStateTransition.TRANSITIONING_OFF_TO_ON) {
+							// device is transitioning from OFF to ON, must have just turned ON, so return ON
+							self.log("Power state is ON in transition from OFF to ON, setting to ON")
+							device.currentPowerState = Characteristic.Active.ACTIVE;
+							// and set the transitioning state to not transitioning
+							device.currentPowerTransitionState = powerStateTransition.NOT_TRANSITIONING;
+						} else {
+							// device is not transitioning, so return ON
+							self.log("Power state not in transition, setting to ON")
+							device.currentPowerState = Characteristic.Active.ACTIVE;
+						}
 
 					} else {
 						// device is not transitioning, so return ON
@@ -179,42 +231,49 @@ class samsungTvHtPlatform {
 						device.currentPowerState = Characteristic.Active.ACTIVE;
 					};
 
-				} else if (stdout.includes('Sent = 1, Received = 0,')) {
 					self.log.warn("powerStateWatchdog: Device %s is not responding to ping, power is OFF", device.name);
+					if (millisecondsSinceLastPowerKeyPress < powerStateMaxTransitionTime) {
+						// device is currently undergoing a power state transition
 
-					// device is OFF, check if it is transitioning
-					if (device.currentPowerTransitionState == powerStateTransition.TRANSITIONING_ON_TO_OFF) {
-						self.log("Power state is OFF in transition from ON to OFF, setting to OFF")
-						// device is transitioning from ON to OFF, and has just turned OFF, so return OFF
-						device.currentPowerState = Characteristic.Active.INACTIVE;
-						// and set the transitioning state to not transitioning
-						device.currentPowerTransitionState = powerStateTransition.NOT_TRANSITIONING;
+						// device is OFF, check if it is transitioning
+						if (device.currentPowerTransitionState == powerStateTransition.TRANSITIONING_ON_TO_OFF) {
+							// device is transitioning from ON to OFF, and has just turned OFF, so return OFF
+							self.log("Power state is OFF in transition from ON to OFF, setting to OFF")
+							device.currentPowerState = Characteristic.Active.INACTIVE;
+							// and set the transitioning state to not transitioning
+							device.currentPowerTransitionState = powerStateTransition.NOT_TRANSITIONING;
 
-					} else if (device.currentPowerTransitionState == powerStateTransition.TRANSITIONING_OFF_TO_ON) {
-						self.log("Power state is OFF in transition from OFF to ON, setting to ON")
-						// device is transitioning from OFF to ON, but is not yet ON, so return ON
-						device.currentPowerState = Characteristic.Active.ACTIVE;
-						// but do not change the transitioning state
+						} else if (device.currentPowerTransitionState == powerStateTransition.TRANSITIONING_OFF_TO_ON) {
+							// device is transitioning from OFF to ON, but is not yet ON, so return ON
+							self.log("Power state is OFF in transition from OFF to ON, setting to ON")
+							device.currentPowerState = Characteristic.Active.ACTIVE;
+							// but do not change the transitioning state
+
+						} else {
+							// device is not transitioning, so return OFF
+							self.log("Power state not in transition, setting to OFF")
+							device.currentPowerState = Characteristic.Active.INACTIVE;
+						}
 
 					} else {
-						self.log("Power state not in transition, setting to OFF")
 						// device is not transitioning, so return OFF
+						self.log("Power state not in transition, setting to OFF")
 						device.currentPowerState = Characteristic.Active.INACTIVE;
-					};
+					}
+					*/
 
-				} else {
-					self.log.warn("powerStateWatchdog: Ping result cannot be parsed! stdout:", stdout);
-				}
 			});
 
 			this.log("Calling device.updateDeviceState with %s currentPowerState %s", device.name, device.currentPowerState);
-			//device.updateDeviceState(device.currentPowerState);
+			device.updateDeviceState(device.currentPowerState);
 
-			// or uüdate it directly... but then we cannot log the change
-			device.televisionService.getCharacteristic(Characteristic.Active).updateValue(device.currentPowerState);
+			// or update it directly... but then we cannot log the change
+			//device.televisionService.getCharacteristic(Characteristic.Active).updateValue(device.currentPowerState);
 
 
 		}
+		this.log("powerStateWatchdog ---END-------------------------------------------")
+
 	}
 	
 
@@ -255,9 +314,11 @@ class samsungTvHtDevice {
 
 		// initial states. Will be updated by code
 		this.currentPowerState = Characteristic.Active.INACTIVE;
+		this.targetPowerState = this.currentPowerState;
 		this.currentInputId = NO_INPUT_ID;
 		this.currentMediaState = Characteristic.CurrentMediaState.STOP;
-		this.targetMediaState = Characteristic.CurrentMediaState.STOP;
+		this.targetMediaState = this.currentMediaState;
+		this.powerLastKeyPress = 0;
 
 		// use defaults of plugin/platform name & version
 		// until device is discovered
@@ -305,7 +366,7 @@ class samsungTvHtDevice {
 		this.prepareAccessoryInformationService();	// service 1 of 100
 		this.prepareTelevisionService();			// service 2 of 100
 		this.prepareTelevisionSpeakerService();		// service 3 of 100
-		//this.prepareInputSourceServices();			// service 4...100 of 100
+		this.prepareInputSourceServices();			// service 4...10
 
 		this.api.publishExternalAccessories(PLUGIN_NAME, [this.accessory]);
 		this.accessoryConfigured = true;
@@ -401,37 +462,72 @@ class samsungTvHtDevice {
 			this.log.warn('prepareInputSourceServices');
 		}
 
-		
+		let inputService;
 
-		// loop MAX_INPUT_SOURCES times to get the first MAX_INPUT_SOURCES inputs
-		// absolute max 99 services (less those already loaded)
-		let maxSources = Math.min(this.config.maxInputs || MAX_INPUT_SOURCES, MAX_INPUT_SOURCES, 96);
-		for (let i = 0; i < maxSources; i++) {
-			if (this.debugLevel > 2) {
-				this.log.warn('prepareInputSourceServices Adding service',i);
-			}
+		// HDMI 1
+		inputService = new Service.InputSource(1, "input_1");
+		inputService
+			.setCharacteristic(Characteristic.Identifier, 1)
+			.setCharacteristic(Characteristic.ConfiguredName, "HDMI 1")
+			.setCharacteristic(Characteristic.InputSourceType, Characteristic.InputSourceType.HDMI)
+			.setCharacteristic(Characteristic.InputDeviceType, Characteristic.InputDeviceType.TV)
+			.setCharacteristic(Characteristic.IsConfigured, Characteristic.IsConfigured.CONFIGURED)
+			.setCharacteristic(Characteristic.CurrentVisibilityState, Characteristic.CurrentVisibilityState.SHOWN)
+			.setCharacteristic(Characteristic.TargetVisibilityState, Characteristic.TargetVisibilityState.SHOWN);
 
-			const inputService = new Service.InputSource(i, `inputSource_${i}`);
+			/*
+		inputService.getCharacteristic(Characteristic.ConfiguredName)
+			.on('get', (callback) => { this.getInputName(1, callback); })
+			.on('set', (value, callback) => { this.setInputName(1, value, callback); });
+			*/
 
-			inputService
-				// setup the input source as not configured and hidden initially until loaded by ????
-				.setCharacteristic(Characteristic.Identifier, i)
-				.setCharacteristic(Characteristic.ConfiguredName, `Input ${i < 9 ? `0${i + 1}` : i + 1}`) // store Input 01...Input 99.
-				.setCharacteristic(Characteristic.InputSourceType, Characteristic.InputSourceType.TUNER)
-				//.setCharacteristic(Characteristic.InputDeviceType, Characteristic.InputDeviceType.TUNER)
-				.setCharacteristic(Characteristic.IsConfigured, Characteristic.IsConfigured.NOT_CONFIGURED) // initially not configured NOT_CONFIGURED. Testing with CONFIGURED
-				.setCharacteristic(Characteristic.CurrentVisibilityState, Characteristic.CurrentVisibilityState.HIDDDEN) // SHOWN or HIDDDEN
-				//.setCharacteristic(Characteristic.TargetVisibilityState, Characteristic.TargetVisibilityState.SHOWN);
+		this.inputServices.push(inputService);
+		this.accessory.addService(inputService);
+		this.televisionService.addLinkedService(inputService);
 
-			inputService.getCharacteristic(Characteristic.ConfiguredName)
-				.on('get', (callback) => { this.getInputName(i, callback); })
-				.on('set', (value, callback) => { this.setInputName(i, value, callback); });
 
-			this.inputServices.push(inputService);
-			this.accessory.addService(inputService);
-			this.televisionService.addLinkedService(inputService);
+		// HDMI 2
+		inputService = new Service.InputSource(2, "input_2");
+		inputService
+			.setCharacteristic(Characteristic.Identifier, 1)
+			.setCharacteristic(Characteristic.ConfiguredName, "HDMI 2")
+			.setCharacteristic(Characteristic.InputSourceType, Characteristic.InputSourceType.HDMI)
+			.setCharacteristic(Characteristic.InputDeviceType, Characteristic.InputDeviceType.TV)
+			.setCharacteristic(Characteristic.IsConfigured, Characteristic.IsConfigured.CONFIGURED)
+			.setCharacteristic(Characteristic.CurrentVisibilityState, Characteristic.CurrentVisibilityState.SHOWN)
+			.setCharacteristic(Characteristic.TargetVisibilityState, Characteristic.TargetVisibilityState.SHOWN);
 
-		} // end of for loop getting the inputSource
+			/*
+		inputService.getCharacteristic(Characteristic.ConfiguredName)
+			.on('get', (callback) => { this.getInputName(2, callback); })
+			.on('set', (value, callback) => { this.setInputName(2, value, callback); });
+			*/
+
+		this.inputServices.push(inputService);
+		this.accessory.addService(inputService);
+		this.televisionService.addLinkedService(inputService);
+
+		// Analog / AUX-IN
+		inputService = new Service.InputSource(3, "input_3");
+		inputService
+			.setCharacteristic(Characteristic.Identifier, 1)
+			.setCharacteristic(Characteristic.ConfiguredName, "Analog AUX IN")
+			.setCharacteristic(Characteristic.InputSourceType, Characteristic.InputSourceType.OTHER)
+			.setCharacteristic(Characteristic.InputDeviceType, Characteristic.InputDeviceType.AUDIO_SYSTEM)
+			.setCharacteristic(Characteristic.IsConfigured, Characteristic.IsConfigured.CONFIGURED)
+			.setCharacteristic(Characteristic.CurrentVisibilityState, Characteristic.CurrentVisibilityState.SHOWN)
+			.setCharacteristic(Characteristic.TargetVisibilityState, Characteristic.TargetVisibilityState.SHOWN);
+
+			/*
+		inputService.getCharacteristic(Characteristic.ConfiguredName)
+			.on('get', (callback) => { this.getInputName(3, callback); })
+			.on('set', (value, callback) => { this.setInputName(3, value, callback); });
+*/
+
+		this.inputServices.push(inputService);
+		this.accessory.addService(inputService);
+		this.televisionService.addLinkedService(inputService);
+
 	}
   	//+++++++++++++++++++++++++++++++++++++++++++++++++++++
 	// END of preparing accessory and services
@@ -582,7 +678,6 @@ class samsungTvHtDevice {
 		// currentPowerState is updated by the polling mechanisn
 		//this.log('getPowerState current power state:', currentPowerState);
 		if (this.debugLevel > 1) { 
-			this.log.warn('%s: getPower', this.name); 
 			this.log.warn('%s: getPower returning %s [%s]', this.name, this.currentPowerState, powerStateName[this.currentPowerState]); 
 		}
 		callback(null, this.currentPowerState); // return current state: 0=off, 1=on
@@ -596,21 +691,21 @@ class samsungTvHtDevice {
 		// wantedPowerState is the wanted power state: 0=off, 1=on
 		if (this.debugLevel > 1) { this.log.warn('%s: setPower targetPowerState:', this.name, targetPowerState, powerStateName[targetPowerState]); }
 		callback(null); // for rapid response
-		Characteristic.Active.INACTIVE
+		this.targetPowerState = targetPowerState;
 
 		// only take action if the target state is different to the current state
-		if (targetPowerState != this.currentPowerState) {
-			// check if currently ON or OFF
-			//this.powerStateTransitionInProgressUntil = Date.now() + 5000;
-			if (this.currentPowerState == Characteristic.Active.ACTIVE){
-				// if ON, and want to turn OFF, then we can turn it off with a sendKey
+		if (this.currentPowerState != this.targetPowerState) {
+			// check what we want to do
+			this.powerLastKeyPress = Date.now();
+			if (this.targetPowerState == Characteristic.Active.INACTIVE){
+				// we want to turn OFF, then we can turn it off with a sendKey
 				// avr: BD_KEY_POWER, tv: KEY_POWER
 				let keyName = 'KEY_POWEROFF';
 				if (this.config.type == 'avr') {keyName='BD_KEY_POWER'}
 				this.sendKey(keyName);
 				this.currentPowerTransitionState = powerStateTransition.TRANSITIONING_ON_TO_OFF;
 			} else {
-				// if OFF, can turn on only via HDMI-CEC
+				// we want to turn ON, can turn on only via HDMI-CEC
 				this.log("%s: Request to turn ON: we can only do this with HDMI-CEC", this.name);
 				this.currentPowerTransitionState = powerStateTransition.TRANSITIONING_OFF_TO_ON;
 			}
@@ -681,9 +776,6 @@ class samsungTvHtDevice {
 		// fired when the icon is clicked in HomeKit and HomeKit requests a refresh
 		// currentInputId is updated by the polling mechanisn
 		// must return a valid index, and must never return null
-		if (this.debugLevel > 0) {
-			this.log.warn('getInput');
-		}
 
 		// find the currentInputId in the inputs and return the currentActiveInput once found
 		// this allows HomeKit to show the selected current input
@@ -748,7 +840,6 @@ class samsungTvHtDevice {
 		// fired by ??
 		// cannot be controlled by Apple Home app, but could be controlled by other HomeKit apps
 		if (this.debugLevel > 0) {
-			this.log.warn('%s: getCurrentMediaState', this.name); 
 			this.log.warn('%s: getCurrentMediaState returning %s [%s]', this.name, this.currentMediaState, mediaStateName[this.currentMediaState]);
 		}
 		callback(null, this.currentMediaState);
@@ -760,7 +851,6 @@ class samsungTvHtDevice {
 		// cannot be controlled by Apple Home app, but could be controlled by other HomeKit apps
 		// must never return null, so send STOP as default value
 		if (this.debugLevel > 0) {
-			this.log.warn('%s: getTargetMediaState', this.name); 
 			this.log.warn('%s: getTargetMediaState returning %s [%s]', this.name, this.targetMediaState, mediaStateName[this.targetMediaState]);
 		}
 		callback(null, this.currentMediaState);
