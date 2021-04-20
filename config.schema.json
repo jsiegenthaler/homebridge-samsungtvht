@@ -10,9 +10,9 @@
         "name": {
           "title": "Name",
           "type": "string",
-          "description": "Plugin name as displayed in the homebridge log. Default: samsungtvht",
-          "default": "samsungtvht",
-          "placeholder": "samsungtvht",
+          "description": "Plugin name as displayed in the homebridge log. Default: Samsung TV HT",
+          "default": "Samsung TV HT",
+          "placeholder": "Samsung TV HT",
           "minLength": 1,
           "required": true
         },
@@ -39,6 +39,7 @@
                         "title": "Name",
                         "type": "string",
                         "description": "The device name.",
+                        "default": "Samsung TV",
                         "pattern": "^[0-9A-Za-zÀ-ÖØ-öø-ÿ](?:[0-9A-Za-zÀ-ÖØ-öø-ÿ '’,.-]+)*[0-9A-Za-zÀ-ÖØ-öø-ÿ.]$",
                         "minLength": 1,
                         "maxLength": 32,
@@ -48,6 +49,7 @@
                         "title": "IP Address",
                         "type": "string",
                         "description": "The IP address of the device",
+                        "default": "192.168.0.xxx",
                         "maxLength": 15,
                         "required": true
                     },
