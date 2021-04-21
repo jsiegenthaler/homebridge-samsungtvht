@@ -6,5 +6,5 @@ All notable changes to this project will be documented in this file.
 
 ### Initial Release
 
-## 0.0.1 (2020-04-19)
-* Initial release
+## 0.0.4 (2020-04-21)
+* Alpha release for experimentation
