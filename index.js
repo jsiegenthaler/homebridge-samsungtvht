@@ -31,7 +31,7 @@ const exec = require("child_process").exec;
 const NO_INPUT_ID = 999; // an input id that does not exist. Must be > 0 as a uint32 is expected
 const NO_INPUT_NAME = 'UNKNOWN'; // an input name that does not exist
 const MAX_INPUT_SOURCES = 3; // max input services. Default = 3. Cannot be more than 97 (100 - all other services)
-const POWER_STATE_POLLING_INTERVAL_MS = 5000; // pollling interval in millisec. Default = 1000
+const POWER_STATE_POLLING_INTERVAL_MS = 10000; // pollling interval in millisec. Default = 1000
 const mediaStateName = ["PLAY", "PAUSE", "STOP", "UNKNOWN3", "LOADING", "INTERRUPTED"];
 const powerStateName = ["OFF", "ON"];
 const powerStateTransition = { NOT_TRANSITIONING: 0, TRANSITIONING_ON_TO_OFF: 1, TRANSITIONING_OFF_TO_ON: 2 };
@@ -140,139 +140,64 @@ class samsungTvHtPlatform {
 		// ping all devices in the config
 		for (let i = 0; i < this.devices.length; i++) {
 			let device = this.devices[i];
-
-			//let lastKeyPress = this.devices[i].powerLastKeyPress;
-			//this.log("device powerLastKeyPress: ", this.devices[i].powerLastKeyPress.toLocaleString())
-
-			let secondsSinceLastPowerKeyPress = (Date.now() - this.devices[i].powerLastKeyPress) / 1000;
-			this.log("secondsSinceLastPowerKeyPress: ", secondsSinceLastPowerKeyPress)
-
-			const powerStateMaxTransitionTimeSeconds = 20;
-
-			if (secondsSinceLastPowerKeyPress < powerStateMaxTransitionTimeSeconds) {
-				this.log("power state is in transition, use target power state. Transition duration:", secondsSinceLastPowerKeyPress)
-			} else {
-				this.log("power state not in transition, use current power state")
-			}
+			let secondsSinceLastPowerKeyPress = (Date.now() - device.powerLastKeyPress) / 1000;
+			const powerStateMaxTransitionTimeSeconds = 30;
+			//this.log("secondsSinceLastPowerKeyPress: ", secondsSinceLastPowerKeyPress)
 
 			var pingCmd = this.config.pingCommand || 'ping -c 1 -w 1'; // default linux
 			pingCmd = pingCmd.trim() + ' ' + device.config.ipAddress;
-			this.log.warn('powerStateWatchdog: Pinging %s with %s', device.name, pingCmd);
+			this.log.debug('powerStateWatchdog: %s pinging device with %s', device.name, pingCmd);
 	
 			var self = this;
-			var devicePowerState;
+			var deviceRealPowerState;
 			exec(pingCmd, function (error, stdout, stderr) {
-
-				self.log.warn("powerStateWatchdog: Evaluating ping responce", device.name);
+				self.log.debug("powerStateWatchdog: %s evaluating ping responce", device.name);
 				// get the current device power state from the ping results
+				// win10:	Packets: Sent = 1, Received = 0, Lost = 1 (100% loss),
 				// linux: 	1 packets transmitted, 0 received, 100% packet loss, time 0ms
-				// windows: 
-				if (stdout.includes('Sent = 1, Received = 1,') || stdout.includes('1 packets transmitted, 1 received')) {
-					self.log.warn("powerStateWatchdog: Device %s is responding to ping, power is ON", device.name);
-					devicePowerState = Characteristic.Active.ACTIVE;
-				} else if (stdout.includes('Sent = 1, Received = 0,') || stdout.includes('1 packets transmitted, 0 received')) {
-					self.log.warn("powerStateWatchdog: Device %s is not responding to ping, power is OFF", device.name);
-					devicePowerState = Characteristic.Active.INACTIVE;
+				if (stdout.includes('100%')) { // 100% packet loss or 100% loss
+					self.log.debug("powerStateWatchdog: %s is not responding to ping, power is currently OFF", device.name);
+					deviceRealPowerState = Characteristic.Active.INACTIVE;
+				} else if (stdout.includes('0%')) { // 0% packet loss or 0% loss
+					self.log.debug("powerStateWatchdog: %s is responding to ping, power is currently ON", device.name);
+					deviceRealPowerState = Characteristic.Active.ACTIVE;
 				} else {
-					self.log.warn("powerStateWatchdog: ERROR Ping result cannot be parsed! stdout:", stdout);
-					devicePowerState = null;
+					self.log.warn("powerStateWatchdog: WARNING %s ping result cannot be parsed! stdout:", device.name, stdout);
+					deviceRealPowerState = null;
 				}
 
 
-				// evaluate the current vs target power states
-				self.log.warn("powerStateWatchdog: Evaluating device power state", device.name);
-				if (device.currentPowerState != device.targetPowerState) {
-					self.log.warn("powerStateWatchdog: Device %s is transiitoning from %s to %s", device.name, device.currentPowerState, device.targetPowerState);
+				// evaluate the real vs target power states
+				self.log.warn("powerStateWatchdog: %s evaluating power state. deviceRealPowerState %s, currentPowerState %s, targetPowerState %s", device.name, deviceRealPowerState, device.currentPowerState, device.targetPowerState);
+				if (deviceRealPowerState != device.targetPowerState) {
+					self.log.warn("powerStateWatchdog: %s is currently transitioning from %s to %s. Transition time so far: %s seconds", device.name, deviceRealPowerState, device.targetPowerState, secondsSinceLastPowerKeyPress);
 					// change in power state was requested
 					if (secondsSinceLastPowerKeyPress < powerStateMaxTransitionTimeSeconds) {
-						// device is currently undergoing a power state transition
-						// check if target power state has been reached, if so, set current power state to target power state
-						self.log.warn("powerStateWatchdog: Device %s is still within the allowed transiiton time", device.name);
-						if (devicePowerState == device.targetPowerState) {
-							device.currentPowerState = device.targetPowerState;
-						}
+						// device is currently undergoing a power state transition to the targetPowerState, set currentPowerState to targetPowerState
+						self.log.warn("powerStateWatchdog: %s is still within the allowed transition time of %s seconds, setting currentPowerState to targetPowerState %s", device.name, powerStateMaxTransitionTimeSeconds, device.targetPowerState);
+						device.currentPowerState = device.targetPowerState;
 					} else {
-						// transition time has timed out, cancel the target power state, leave current power state unchanged
-						self.log.warn("powerStateWatchdog: Device %s transiiton time has timed out, no power state change occured, resetting power state to %s", device.name, device.currentPowerState);
-						device.targetPowerState = device.currentPowerState;
+						// transition time has timed out, cancel the targetPowerState, reset current and target to deviceRealPowerState
+						self.log.warn("powerStateWatchdog: %s transition time longer than %s seconds, transition has timed out, no power state change occured, resetting currentPowerState to %s", device.name, powerStateMaxTransitionTimeSeconds, deviceRealPowerState);
+						device.targetPowerState = deviceRealPowerState;
+						device.currentPowerState = deviceRealPowerState;
 					}
 
 				} else {
-					device.currentPowerState = devicePowerState;
+					device.currentPowerState = deviceRealPowerState || device.currentPowerState; // handle null if a parse error occured
+					self.log.warn("powerStateWatchdog: %s currentPowerState stays unchanged at %s", device.name, device.currentPowerState);
 				}
 
-				/*
-				self.log.warn("powerStateWatchdog: Device %s is responding to ping, power is ON", device.name);
-					if (millisecondsSinceLastPowerKeyPress < powerStateMaxTransitionTime) {
-						// device is currently undergoing a power state transition
 
-						// device is ON, check if it is transitioning
-						if (device.currentPowerTransitionState == powerStateTransition.TRANSITIONING_ON_TO_OFF) {
-							// device is transitioning from ON to OFF, but is not yet OFF, so return OFF
-							self.log("Power state is ON in transition from ON to OFF, setting to OFF")
-							device.currentPowerState = Characteristic.Active.INACTIVE;
-							// but do not change the transitioning state
-
-						} else if (device.currentPowerTransitionState == powerStateTransition.TRANSITIONING_OFF_TO_ON) {
-							// device is transitioning from OFF to ON, must have just turned ON, so return ON
-							self.log("Power state is ON in transition from OFF to ON, setting to ON")
-							device.currentPowerState = Characteristic.Active.ACTIVE;
-							// and set the transitioning state to not transitioning
-							device.currentPowerTransitionState = powerStateTransition.NOT_TRANSITIONING;
-						} else {
-							// device is not transitioning, so return ON
-							self.log("Power state not in transition, setting to ON")
-							device.currentPowerState = Characteristic.Active.ACTIVE;
-						}
-
-					} else {
-						// device is not transitioning, so return ON
-						self.log("Power state not in transition, setting to ON")
-						device.currentPowerState = Characteristic.Active.ACTIVE;
-					};
-
-					self.log.warn("powerStateWatchdog: Device %s is not responding to ping, power is OFF", device.name);
-					if (millisecondsSinceLastPowerKeyPress < powerStateMaxTransitionTime) {
-						// device is currently undergoing a power state transition
-
-						// device is OFF, check if it is transitioning
-						if (device.currentPowerTransitionState == powerStateTransition.TRANSITIONING_ON_TO_OFF) {
-							// device is transitioning from ON to OFF, and has just turned OFF, so return OFF
-							self.log("Power state is OFF in transition from ON to OFF, setting to OFF")
-							device.currentPowerState = Characteristic.Active.INACTIVE;
-							// and set the transitioning state to not transitioning
-							device.currentPowerTransitionState = powerStateTransition.NOT_TRANSITIONING;
-
-						} else if (device.currentPowerTransitionState == powerStateTransition.TRANSITIONING_OFF_TO_ON) {
-							// device is transitioning from OFF to ON, but is not yet ON, so return ON
-							self.log("Power state is OFF in transition from OFF to ON, setting to ON")
-							device.currentPowerState = Characteristic.Active.ACTIVE;
-							// but do not change the transitioning state
-
-						} else {
-							// device is not transitioning, so return OFF
-							self.log("Power state not in transition, setting to OFF")
-							device.currentPowerState = Characteristic.Active.INACTIVE;
-						}
-
-					} else {
-						// device is not transitioning, so return OFF
-						self.log("Power state not in transition, setting to OFF")
-						device.currentPowerState = Characteristic.Active.INACTIVE;
-					}
-					*/
-
+				// update device status
+				self.log.warn("powerStateWatchdog: %s Calling device.updateDeviceState with device.currentPowerState %s", device.name, device.currentPowerState);
+				device.updateDeviceState(device.currentPowerState);
+				self.log("powerStateWatchdog ---END-------------------------------------------")
+		
 			});
-
-			this.log("Calling device.updateDeviceState with %s currentPowerState %s", device.name, device.currentPowerState);
-			device.updateDeviceState(device.currentPowerState);
-
-			// or update it directly... but then we cannot log the change
-			//device.televisionService.getCharacteristic(Characteristic.Active).updateValue(device.currentPowerState);
 
 
 		}
-		this.log("powerStateWatchdog ---END-------------------------------------------")
 
 	}
 	
@@ -697,21 +622,21 @@ class samsungTvHtDevice {
 		if (this.currentPowerState != this.targetPowerState) {
 			// check what we want to do
 			this.powerLastKeyPress = Date.now();
+			this.currentPowerState = this.targetPowerState; // to ensure HomeKit gets the correct state at next poll, regardless
+
 			if (this.targetPowerState == Characteristic.Active.INACTIVE){
 				// we want to turn OFF, then we can turn it off with a sendKey
 				// avr: BD_KEY_POWER, tv: KEY_POWER
 				let keyName = 'KEY_POWEROFF';
 				if (this.config.type == 'avr') {keyName='BD_KEY_POWER'}
 				this.sendKey(keyName);
-				this.currentPowerTransitionState = powerStateTransition.TRANSITIONING_ON_TO_OFF;
 			} else {
 				// we want to turn ON, can turn on only via HDMI-CEC
 				this.log("%s: Request to turn ON: we can only do this with HDMI-CEC", this.name);
-				this.currentPowerTransitionState = powerStateTransition.TRANSITIONING_OFF_TO_ON;
 			}
 
 		} else {
-			// if OFF, can turn on only via HDMI-CEC
+			// if current is already same as target
 			this.log("%s: Current power state is already %s [%s], doing nothing", this.name, this.currentPowerState, powerStateName[this.currentPowerState]);
 		}
 
