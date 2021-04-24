@@ -837,9 +837,9 @@ class samsungTvHtDevice {
 			case Characteristic.RemoteKey.EXIT: // 10
 				keyName = 'KEY_EXIT'; break;
 			case Characteristic.RemoteKey.PLAY_PAUSE: // 11
-				keyName = 'KEY_PAUSE'; break; // KEY_PLAY
+				keyName = 'KEY_PLAY'; break; // KEY_PLAY KEY_PAUSE
 			case Characteristic.RemoteKey.INFORMATION: // 15
-				keyName = 'KEY_MENU'; break; // KEY_INFO
+				keyName = 'KEY_INFO'; break; // KEY_INFO KEY_MENU
 			}
 
 		if (keyName) {

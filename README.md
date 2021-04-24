@@ -1,6 +1,6 @@
 # homebridge-samsunghttv
 
-`homebridge-samsunghttv` is a Homebridge plugin allowing you to control your Samsung TV and Home Theater with Apple HomeKit using the Home app and the Apple TV Remote in the Control Center.
+`homebridge-samsunghttv` is a Homebridge plugin allowing you to control your Samsung D-series TV and Home Theater with Apple HomeKit using the Home app and the Apple TV Remote in the Control Center.
 
 This plugin displays your Samsung devie as a TV or Audio Receiver Accessory with Power, Input & Remote Control capabilities in your iOS device (iPhone, iPad, iMac, etc.).
 
@@ -9,12 +9,19 @@ Supports multiple devices, allowing you to create an accessory for each TV or Ho
 [![donate](https://badgen.net/badge/donate/paypal/91BE09)](https://www.paypal.com/donate?hosted_button_id=CNEDGHRUER468)
 
 ## Made in Switzerland
-This plugin was written and tested on the author's Samsung TV and Home heater system in Switzerland.
+This plugin was written and tested on the author's Samsung D-series TV and D-series Home Theater system in Switzerland.
 
 ## Requirements
 * An Apple iPhone or iPad with iOS 14.0 (or later). Developed on iOS 14.1...14.4, earlier versions not tested.
 * [Homebridge](https://homebridge.io/) v1.2.5 (or later). Developed on Homebridge 1.1.116....1.2.5, earlier versions not tested.
 * A Samsung TV or Home Theater system from around 2011
+
+## Decode your Samsung TV model Number
+https://www.samsung.com/uk/support/tv-audio-video/what-do-samsung-tv-model-numbers-actually-mean-why-are-they-so-long/
+
+## Remote Control KeyCodes
+https://wiki.samygo.tv/index.php?title=Key_codes
+
 
 ## Installation
 Homebridge UI: the easiest way to install is seach for "samsung tv" or "samsung ht" in the Homebridge UI, and then click INSTALL.
