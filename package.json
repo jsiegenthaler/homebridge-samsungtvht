@@ -39,10 +39,10 @@
   "preferGlobal": true,
   "repository": {
     "type": "git",
-    "url": ""
+    "url": "git+https://github.com/jsiegenthaler/homebridge-samsungtvht.git"
   },
   "bugs": {
-    "url": ""
+    "url": "https://github.com/jsiegenthaler/homebridge-samsungtvht/issues"
   },
   "funding": [
     {
