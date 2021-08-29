@@ -59,14 +59,11 @@ The following keys are supported by in the **Apple TV Remote** in the Control Ce
 * OK
 * Play/Pause
 * Back
-* Info (i)
+* Info (i) (Menu)
 * Volume Up
-* Volume Down
+* Volume Down (triple-press for Mute)
 
-You can configure the (i) button to be Info, Help, Guide, ContextMenu or MediaTopMenu.
-Most useful is MediaTopMenu, which is the default.
-
-The volume controls do not control the EOS set-top box directly, as the EOS box has no volume capability. The EOS physical remote actually sends IR commands to your TV. If you can control your TV volume via a network connection then the volume controls can be used to send volume commands to your TV via the raspberry pi. This is what the author uses.
+A triple-press of Volume Down will send the Mute command.
 
 
 ## Limitations
@@ -76,7 +73,6 @@ Services used in this EOS box accessory are:
 2. Television service (for controlling the TV accessory)
 3. Speaker service (for the controlling the TV accessory volume)
 4. Input service. The input (TV channels) utilise one service per input. The maximum possible channels (inputs) are thus 100 - 3 = 97.
-However, the more services you have, the slower the plugin loads. So I have limited the inputs to maximum 50, but you can override this in the config.
 
 
 ## Configuration
