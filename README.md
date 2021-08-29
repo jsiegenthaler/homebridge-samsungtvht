@@ -66,9 +66,6 @@ The following keys are supported by in the **Apple TV Remote** in the Control Ce
 You can configure the (i) button to be Info, Help, Guide, ContextMenu or MediaTopMenu.
 Most useful is MediaTopMenu, which is the default.
 
-The volume controls do not control the EOS set-top box directly, as the EOS box has no volume capability. The EOS physical remote actually sends IR commands to your TV. If you can control your TV volume via a network connection then the volume controls can be used to send volume commands to your TV via the raspberry pi. This is what the author uses.
-
-
 ## Limitations
 Due to HomeKit limitations, the maximum services for a single accessory is 100. Over this value the Home app will no longer respond. 
 Services used in this EOS box accessory are:
