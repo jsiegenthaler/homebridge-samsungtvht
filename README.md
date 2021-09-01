@@ -48,6 +48,8 @@ Each Samsung device is exposed as a separate external accessory and each device 
 11. **TV Automations**: Switch on any suggested automations if you wish (you can change these in the Home app later) and tap **Continue**.
 12. **TV Added to (Home Name)**: Tap **Done** to finish the setup.
 
+If adding a Home Theater, the icon displayed will be an Audio Receiver and some text in the setup screens will show Audio Receiver instead of TV.
+
 Your new accessory will appear shortly in the room that you selected. It may show **Updating...** for a while. You can force a Home app refresh by displaying a different room and then going back again to the previous room.
 
 ## Remote Control Supported Keys
