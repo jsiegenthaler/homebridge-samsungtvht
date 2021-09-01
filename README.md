@@ -41,12 +41,12 @@ Each Samsung device is exposed as a separate external accessory and each device 
 4. **Add Accessory**: tap **I Don't Have a Code or Cannot Scan**.
 5. **Select an Accessory to Add to (Home Name)**: Select the accessory you want to add. You should see your Samsung device here. If not, check your Homebridge config.
 6. Accept the **Uncertified Accesory** warning by tapping **Add Anyway**.
-7. **Enter HomeKit Setup Code**: Enter the **HomeKit Setup Code** (displayed in Homebridge under the QR code, format XXX-XX-XXX), or use the device's camera to scan the QR code in Homebridge.
-8. **Set-Top Box Location**: Select a room for your Samsung accessory and tap **Continue**.
-9. **Set-Top Box Name**: Give your Samsung device a different name if you wish (you can change this in the Home app later) and tap **Continue**.
+7. **Enter HomeKit Setup Code**: Enter the **HomeKit Setup Code** (displayed in Homebridge under the QR code, format XXX-XX-XXX), or use the device's camera to scan the QR code in Homebridge and tap **Continue**.
+8. **TV Location**: Select a room for your Samsung accessory and tap **Continue**.
+9. **TV Name**: Give your Samsung device a different name if you wish (you can change this in the Home app later) and tap **Continue**.
 10. **Name TV Input Sources**: Name your TV input sources if you wish (you can change these in the Home app later) and tap **Continue**.
-11. **Set-Top Box Automations**: Switch on any suggested automations if you wish (you can change these in the Home app later) and tap **Continue**.
-12. **Set-Top Box Added to (Home Name)**: Tap **Done** to finish the setup.
+11. **TV Automations**: Switch on any suggested automations if you wish (you can change these in the Home app later) and tap **Continue**.
+12. **TV Added to (Home Name)**: Tap **Done** to finish the setup.
 
 Your new accessory will appear shortly in the room that you selected. It may show **Updating...** for a while. You can force a Home app refresh by displaying a different room and then going back again to the previous room.
 
