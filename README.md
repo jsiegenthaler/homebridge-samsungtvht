@@ -2,7 +2,7 @@
 
 `homebridge-samsunghttv` is a Homebridge plugin allowing you to control your Samsung D-series TV and Home Theater with Apple HomeKit using the Home app and the Apple TV Remote in the Control Center.
 
-This plugin displays your Samsung devie as a TV or Audio Receiver Accessory with Power, Input & Remote Control capabilities in your iOS device (iPhone, iPad, iMac, etc.).
+This plugin displays your Samsung device as a TV or Audio Receiver Accessory with Power, Input & Remote Control capabilities in your iOS device (iPhone, iPad, iMac, etc.).
 
 Supports multiple devices, allowing you to create an accessory for each TV or Home Theater system (should you have more than one).
 
