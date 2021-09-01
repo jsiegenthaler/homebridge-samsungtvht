@@ -95,10 +95,10 @@ class samsungTvHtPlatform {
 			}
 
 			if (this.config.devices.length == 0) {
-				this.log.warn('No devices found in configuration for %s', PLUGIN_NAME)
+				this.log.warn('No devices found in config for %s', PLUGIN_NAME)
 			} else {
 				// check all devices in config
-				this.log.warn('Checking devices found in configuration for %s', PLUGIN_NAME)
+				this.log('Checking devices found in config for %s', PLUGIN_NAME)
 				for (let i = 0, len = this.config.devices.length; i < len; i++) {
 					//this.log("Checking device %s %s", i, this.config.devices[i]);
 

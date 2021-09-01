@@ -19,7 +19,7 @@
         "pingCommand": {
             "title": "Ping Command",
             "type": "string",
-            "description": "Ping command to use to detect device power state. Linux: ping -c 1 -w 10  Windows: ping -n 1 -w 10",
+            "description": "Ping command to use to detect device power state. Linux: \"ping -c 1 -w 10\"  Windows: \"ping -n 1 -w 10\"",
             "default": "ping -c 1 -w 10",
             "placeholder": "ping -c 1 -w 10",
             "minLength": 1,
@@ -28,7 +28,7 @@
         "pingResponseOn": {
             "title": "Ping Response Power On",
             "type": "string",
-            "description": "Ping response to detect device ON state. Linux: (0% loss)  Windows: (0% loss)",
+            "description": "Ping response to detect device ON state. Linux: \"received, 0% packet loss\"  Windows: \"(0% loss)\"",
             "default": "(0% loss)",
             "placeholder": "(0% loss)",
             "minLength": 1,
@@ -37,7 +37,7 @@
         "pingResponseOff": {
             "title": "Ping Response Power Off",
             "type": "string",
-            "description": "Ping response to detect device OFF state. Linux: (100% loss)  Windows: (100% loss)",
+            "description": "Ping response to detect device OFF state. Linux: \"received, 100% packet loss\"  Windows: \"(100% loss)\"",
             "default": "(100% loss)",
             "placeholder": "(100% loss)",
             "minLength": 1,
@@ -143,153 +143,153 @@
                     "arrowUpButton": {
                         "title": "Arrow Up (single tap)",
                         "type": "string",
-                        "descriptionxx": "The key to send when the (Arrow Up) button is tapped once on the iOS remote.<br>See the <a href=\"https://github.com/jsiegenthaler/homebridge-eosstb/wiki/KeyEvents\">Wiki KeyEvents</a> for a description of all keys. Default: KEY_UP",
+                        "descriptionxx": "The key to send when the (Arrow Up) button is tapped once on the iOS remote.<br>See the <a href=\"https://github.com/jsiegenthaler/homebridge-samsung-tvht/wiki\">Wiki KeyEvents</a> for a description of all keys. Default: KEY_UP",
                         "default": "KEY_UP"
 
                     },
                     "arrowUpButtonDoubleTap": {
                         "title": "Arrow Up (double tap)",
                         "type": "string",
-                        "descriptionxx": "The key to send when the (Arrow Up) button is double-tapped on the iOS remote.<br>See the <a href=\"https://github.com/jsiegenthaler/homebridge-eosstb/wiki/KeyEvents\">Wiki KeyEvents</a> for a description of all keys. Default: KEY_CHUP",
+                        "descriptionxx": "The key to send when the (Arrow Up) button is double-tapped on the iOS remote.<br>See the <a href=\"https://github.com/jsiegenthaler/homebridge-samsung-tvht/wiki\">Wiki KeyEvents</a> for a description of all keys. Default: KEY_CHUP",
                         "default": "KEY_CHUP"
                     },
                     "arrowUpButtonTripleTap": {
                         "title": "Arrow Up (triple tap)",
                         "type": "string",
-                        "descriptionxx": "The key to send when the (Arrow Up) button is triple-tapped on the iOS remote.<br>See the <a href=\"https://github.com/jsiegenthaler/homebridge-eosstb/wiki/KeyEvents\">Wiki KeyEvents</a> for a description of all keys. Default: KEY_UP",
+                        "descriptionxx": "The key to send when the (Arrow Up) button is triple-tapped on the iOS remote.<br>See the <a href=\"https://github.com/jsiegenthaler/homebridge-samsung-tvht/wiki\">Wiki KeyEvents</a> for a description of all keys. Default: KEY_UP",
                         "default": "KEY_UP"
                     },
 
                     "arrowDownButton": {
                         "title": "Arrow Down (single tap)",
                         "type": "string",
-                        "descriptionxx": "The key to send when the (Arrow Down) button is tapped once on the iOS remote.<br>See the <a href=\"https://github.com/jsiegenthaler/homebridge-eosstb/wiki/KeyEvents\">Wiki KeyEvents</a> for a description of all keys. Default: KEY_DOWN",
+                        "descriptionxx": "The key to send when the (Arrow Down) button is tapped once on the iOS remote.<br>See the <a href=\"https://github.com/jsiegenthaler/homebridge-samsung-tvht/wiki\">Wiki KeyEvents</a> for a description of all keys. Default: KEY_DOWN",
                         "default": "KEY_DOWN"
                     },
                     "arrowDownButtonDoubleTap": {
                         "title": "Arrow Down (double tap)",
                         "type": "string",
-                        "descriptionxx": "The key to send when the (Arrow Down) button is double-tapped on the iOS remote.<br>See the <a href=\"https://github.com/jsiegenthaler/homebridge-eosstb/wiki/KeyEvents\">Wiki KeyEvents</a> for a description of all keys. Default: KEY_CHDOWN",
+                        "descriptionxx": "The key to send when the (Arrow Down) button is double-tapped on the iOS remote.<br>See the <a href=\"https://github.com/jsiegenthaler/homebridge-samsung-tvht/wiki\">Wiki KeyEvents</a> for a description of all keys. Default: KEY_CHDOWN",
                         "default": "KEY_CHDOWN"
                     },
                     "arrowDownButtonTripleTap": {
                         "title": "Arrow Down (triple tap)",
                         "type": "string",
-                        "descriptionxx": "The key to send when the (Arrow Down) button is triple-tapped on the iOS remote.<br>See the <a href=\"https://github.com/jsiegenthaler/homebridge-eosstb/wiki/KeyEvents\">Wiki KeyEvents</a> for a description of all keys. Default: KEY_DOWN",
+                        "descriptionxx": "The key to send when the (Arrow Down) button is triple-tapped on the iOS remote.<br>See the <a href=\"https://github.com/jsiegenthaler/homebridge-samsung-tvht/wiki\">Wiki KeyEvents</a> for a description of all keys. Default: KEY_DOWN",
                         "default": "KEY_DOWN"
                     },
 
                     "arrowLeftButton": {
                         "title": "Arrow Left (single tap)",
                         "type": "string",
-                        "descriptionxx": "The key to send when the (Arrow Left) button is tapped once on the iOS remote.<br>See the <a href=\"https://github.com/jsiegenthaler/homebridge-eosstb/wiki/KeyEvents\">Wiki KeyEvents</a> for a description of all keys. Default: KEY_LEFT",
+                        "descriptionxx": "The key to send when the (Arrow Left) button is tapped once on the iOS remote.<br>See the <a href=\"https://github.com/jsiegenthaler/homebridge-samsung-tvht/wiki\">Wiki KeyEvents</a> for a description of all keys. Default: KEY_LEFT",
                         "default": "KEY_LEFT"
                     },
                     "arrowLeftButtonDoubleTap": {
                         "title": "Arrow Left (double tap)",
                         "type": "string",
-                        "descriptionxx": "The key to send when the (Arrow Left) button is double-tapped on the iOS remote.<br>See the <a href=\"https://github.com/jsiegenthaler/homebridge-eosstb/wiki/KeyEvents\">Wiki KeyEvents</a> for a description of all keys. Default: KEY_REWIND",
+                        "descriptionxx": "The key to send when the (Arrow Left) button is double-tapped on the iOS remote.<br>See the <a href=\"https://github.com/jsiegenthaler/homebridge-samsung-tvht/wiki\">Wiki KeyEvents</a> for a description of all keys. Default: KEY_REWIND",
                         "default": "KEY_REWIND"
                     },
                     "arrowLeftButtonTripleTap": {
                         "title": "Arrow Left (triple tap)",
                         "type": "string",
-                        "descriptionxx": "The key to send when the (Arrow Left) button is triple-tapped on the iOS remote.<br>See the <a href=\"https://github.com/jsiegenthaler/homebridge-eosstb/wiki/KeyEvents\">Wiki KeyEvents</a> for a description of all keys. Default: KEY_LEFT",
+                        "descriptionxx": "The key to send when the (Arrow Left) button is triple-tapped on the iOS remote.<br>See the <a href=\"https://github.com/jsiegenthaler/homebridge-samsung-tvht/wiki\">Wiki KeyEvents</a> for a description of all keys. Default: KEY_LEFT",
                         "default": "KEY_LEFT"
                     },
 
                     "arrowRightButton": {
                         "title": "Arrow Right (single tap)",
                         "type": "string",
-                        "descriptionxx": "The key to send when the (Arrow Right) button is tapped once on the iOS remote.<br>See the <a href=\"https://github.com/jsiegenthaler/homebridge-eosstb/wiki/KeyEvents\">Wiki KeyEvents</a> for a description of all keys. Default: KEY_RIGHT",
+                        "descriptionxx": "The key to send when the (Arrow Right) button is tapped once on the iOS remote.<br>See the <a href=\"https://github.com/jsiegenthaler/homebridge-samsung-tvht/wiki\">Wiki KeyEvents</a> for a description of all keys. Default: KEY_RIGHT",
                         "default": "KEY_RIGHT"
                     },
                     "arrowRightButtonDoubleTap": {
                         "title": "Arrow Right (double tap)",
                         "type": "string",
-                        "descriptionxx": "The key to send when the (Arrow Right) button is double-tapped on the iOS remote.<br>See the <a href=\"https://github.com/jsiegenthaler/homebridge-eosstb/wiki/KeyEvents\">Wiki KeyEvents</a> for a description of all keys. Default: KEY_FF",
+                        "descriptionxx": "The key to send when the (Arrow Right) button is double-tapped on the iOS remote.<br>See the <a href=\"https://github.com/jsiegenthaler/homebridge-samsung-tvht/wiki\">Wiki KeyEvents</a> for a description of all keys. Default: KEY_FF",
                         "default": "KEY_FF"
                     },
                     "arrowRightButtonTripleTap": {
                         "title": "Arrow Right (triple tap)",
                         "type": "string",
-                        "descriptionxx": "The key to send when the (Arrow Right) button is triple-tapped on the iOS remote.<br>See the <a href=\"https://github.com/jsiegenthaler/homebridge-eosstb/wiki/KeyEvents\">Wiki KeyEvents</a> for a description of all keys. Default: KEY_RIGHT",
+                        "descriptionxx": "The key to send when the (Arrow Right) button is triple-tapped on the iOS remote.<br>See the <a href=\"https://github.com/jsiegenthaler/homebridge-samsung-tvht/wiki\">Wiki KeyEvents</a> for a description of all keys. Default: KEY_RIGHT",
                         "default": "KEY_RIGHT"
                     },
 
                     "selectButton": {
                         "title": "Select (single tap)",
                         "type": "string",
-                        "descriptionxx": "The key to send when the (Select) button is tapped once on the iOS remote.<br>See the <a href=\"https://github.com/jsiegenthaler/homebridge-eosstb/wiki/KeyEvents\">Wiki KeyEvents</a> for a description of all keys. Default: KEY_ENTER",
+                        "descriptionxx": "The key to send when the (Select) button is tapped once on the iOS remote.<br>See the <a href=\"https://github.com/jsiegenthaler/homebridge-samsung-tvht/wiki\">Wiki KeyEvents</a> for a description of all keys. Default: KEY_ENTER",
                         "default": "KEY_ENTER"
                     },
                     "selectButtonDoubleTap": {
                         "title": "Select (double tap)",
                         "type": "string",
-                        "descriptionxx": "The key to send when the (Select) button is double-tapped on the iOS remote.<br>See the <a href=\"https://github.com/jsiegenthaler/homebridge-eosstb/wiki/KeyEvents\">Wiki KeyEvents</a> for a description of all keys. Default: KEY_SOURCE",
+                        "descriptionxx": "The key to send when the (Select) button is double-tapped on the iOS remote.<br>See the <a href=\"https://github.com/jsiegenthaler/homebridge-samsung-tvht/wiki\">Wiki KeyEvents</a> for a description of all keys. Default: KEY_SOURCE",
                         "default": "KEY_SOURCE"
                     },
                     "selectButtonTripleTap": {
                         "title": "Select (triple tap)",
                         "type": "string",
-                        "descriptionxx": "The key to send when the (Select) button is triple-tapped on the iOS remote.<br>See the <a href=\"https://github.com/jsiegenthaler/homebridge-eosstb/wiki/KeyEvents\">Wiki KeyEvents</a> for a description of all keys. Default: KEY_HDMI",
+                        "descriptionxx": "The key to send when the (Select) button is triple-tapped on the iOS remote.<br>See the <a href=\"https://github.com/jsiegenthaler/homebridge-samsung-tvht/wiki\">Wiki KeyEvents</a> for a description of all keys. Default: KEY_HDMI",
                         "default": "KEY_HDMI"
                     },
 
                     "playPauseButton": {
                         "title": "Play/Pause (single tap)",
                         "type": "string",
-                        "descriptionxx": "The key to send when the (Play/Pause) button is tapped once on the iOS remote.<br>See the <a href=\"https://github.com/jsiegenthaler/homebridge-eosstb/wiki/KeyEvents\">Wiki KeyEvents</a> for a description of all keys. Default: KEY_PLAY",
+                        "descriptionxx": "The key to send when the (Play/Pause) button is tapped once on the iOS remote.<br>See the <a href=\"https://github.com/jsiegenthaler/homebridge-samsung-tvht/wiki\">Wiki KeyEvents</a> for a description of all keys. Default: KEY_PLAY",
                         "default": "KEY_PLAY"
                     },
                     "playPauseButtonDoubleTap": {
                         "title": "Play/Pause (double tap)",
                         "type": "string",
-                        "descriptionxx": "The key to send when the (Play/Pause) button is double-tapped on the iOS remote.<br>See the <a href=\"https://github.com/jsiegenthaler/homebridge-eosstb/wiki/KeyEvents\">Wiki KeyEvents</a> for a description of all keys. Default: KEY_PAUSE",
+                        "descriptionxx": "The key to send when the (Play/Pause) button is double-tapped on the iOS remote.<br>See the <a href=\"https://github.com/jsiegenthaler/homebridge-samsung-tvht/wiki\">Wiki KeyEvents</a> for a description of all keys. Default: KEY_PAUSE",
                         "default": "KEY_PAUSE"
                     },
                     "playPauseButtonTripleTap": {
                         "title": "Play/Pause (triple tap)",
                         "type": "string",
-                        "descriptionxx": "The key to send when the (Play/Pause) button is triple-tapped on the iOS remote.<br>See the <a href=\"https://github.com/jsiegenthaler/homebridge-eosstb/wiki/KeyEvents\">Wiki KeyEvents</a> for a description of all keys. Default: KEY_STOP",
+                        "descriptionxx": "The key to send when the (Play/Pause) button is triple-tapped on the iOS remote.<br>See the <a href=\"https://github.com/jsiegenthaler/homebridge-samsung-tvht/wiki\">Wiki KeyEvents</a> for a description of all keys. Default: KEY_STOP",
                         "default": "KEY_STOP"
                     },
 
                     "backButton": {
                         "title": "Back (single tap)",
                         "type": "string",
-                        "descriptionxx": "The key to send when the (BACK) button is tapped once on the iOS remote.<br>See the <a href=\"https://github.com/jsiegenthaler/homebridge-eosstb/wiki/KeyEvents\">Wiki KeyEvents</a> for a description of all keys. Default: KEY_RETURN",
+                        "descriptionxx": "The key to send when the (BACK) button is tapped once on the iOS remote.<br>See the <a href=\"https://github.com/jsiegenthaler/homebridge-samsung-tvht/wiki\">Wiki KeyEvents</a> for a description of all keys. Default: KEY_RETURN",
                         "default": "KEY_RETURN"
                     },
                     "backButtonDoubleTap": {
                         "title": "Back (double tap)",
                         "type": "string",
-                        "descriptionxx": "The key to send when the (BACK) button is double-tapped on the iOS remote.<br>See the <a href=\"https://github.com/jsiegenthaler/homebridge-eosstb/wiki/KeyEvents\">Wiki KeyEvents</a> for a description of all keys. Default: KEY_EXIT",
+                        "descriptionxx": "The key to send when the (BACK) button is double-tapped on the iOS remote.<br>See the <a href=\"https://github.com/jsiegenthaler/homebridge-samsung-tvht/wiki\">Wiki KeyEvents</a> for a description of all keys. Default: KEY_EXIT",
                         "default": "KEY_EXIT"
                     },
                     "backButtonTripleTap": {
                         "title": "Back (triple tap)",
                         "type": "string",
-                        "descriptionxx": "The key to send when the (BACK) button is triple-tapped on the iOS remote.<br>See the <a href=\"https://github.com/jsiegenthaler/homebridge-eosstb/wiki/KeyEvents\">Wiki KeyEvents</a> for a description of all keys. Default: KEY_RETURN",
+                        "descriptionxx": "The key to send when the (BACK) button is triple-tapped on the iOS remote.<br>See the <a href=\"https://github.com/jsiegenthaler/homebridge-samsung-tvht/wiki\">Wiki KeyEvents</a> for a description of all keys. Default: KEY_RETURN",
                         "default": "KEY_RETURN"
                     },
 
                     "infoButton": {
                         "title": "Info (single tap)",
                         "type": "string",
-                        "descriptionxx": "The key to send when the (i) button is tapped once on the iOS remote.<br>See the <a href=\"https://github.com/jsiegenthaler/homebridge-eosstb/wiki/KeyEvents\">Wiki KeyEvents</a> for a description of all keys. Default: KEY_MENU",
+                        "descriptionxx": "The key to send when the (i) button is tapped once on the iOS remote.<br>See the <a href=\"https://github.com/jsiegenthaler/homebridge-samsung-tvht/wiki\">Wiki KeyEvents</a> for a description of all keys. Default: KEY_MENU",
                         "default": "KEY_MENU"
                     },
                     "infoButtonDoubleTap": {
                         "title": "Info (double tap)",
                         "type": "string",
-                        "descriptionxx": "The key to send when the (i) button is double-tapped on the iOS remote.<br>See the <a href=\"https://github.com/jsiegenthaler/homebridge-eosstb/wiki/KeyEvents\">Wiki KeyEvents</a> for a description of all keys. Default: KEY_INFO",
+                        "descriptionxx": "The key to send when the (i) button is double-tapped on the iOS remote.<br>See the <a href=\"https://github.com/jsiegenthaler/homebridge-samsung-tvht/wiki\">Wiki KeyEvents</a> for a description of all keys. Default: KEY_INFO",
                         "default": "KEY_INFO"
                     },
                     "infoButtonTripleTap": {
                         "title": "Info (triple tap)",
                         "type": "string",
-                        "descriptionxx": "The key to send when the (i) button is triple-tapped on the iOS remote.<br>See the <a href=\"https://github.com/jsiegenthaler/homebridge-eosstb/wiki/KeyEvents\">Wiki KeyEvents</a> for a description of all keys. Default: KEY_TOOLS",
+                        "descriptionxx": "The key to send when the (i) button is triple-tapped on the iOS remote.<br>See the <a href=\"https://github.com/jsiegenthaler/homebridge-samsung-tvht/wiki\">Wiki KeyEvents</a> for a description of all keys. Default: KEY_TOOLS",
                         "default": "KEY_TOOLS"
                     }                    
                     
@@ -380,7 +380,7 @@
                                     {
                                         "type": "flex",
                                         "flex-flow": "row wrap",
-                                        "title": "The key to send when the <b>(Arrow Up)</b> button is tapped on the iOS remote.<br>See the <a href=\"https://github.com/jsiegenthaler/homebridge-eosstb/wiki/KeyEvents\">Wiki KeyEvents</a> for a description of all keys.",
+                                        "title": "The key to send when the <b>(Arrow Up)</b> button is tapped on the iOS remote.<br>See the <a href=\"https://github.com/jsiegenthaler/homebridge-samsung-tvht/wiki\">Wiki KeyEvents</a> for a description of all keys.",
                                         "items": [
                                             "devices[].arrowUpButton",
                                             "devices[].arrowUpButtonDoubleTap",
@@ -398,7 +398,7 @@
                                     {
                                         "type": "flex",
                                         "flex-flow": "row wrap",
-                                        "title": "The key to send when the <b>(Arrow Down)</b> button is tapped on the iOS remote.<br>See the <a href=\"https://github.com/jsiegenthaler/homebridge-eosstb/wiki/KeyEvents\">Wiki KeyEvents</a> for a description of all keys.",
+                                        "title": "The key to send when the <b>(Arrow Down)</b> button is tapped on the iOS remote.<br>See the <a href=\"https://github.com/jsiegenthaler/homebridge-samsung-tvht/wiki\">Wiki KeyEvents</a> for a description of all keys.",
                                         "items": [
                                             "devices[].arrowDownButton",
                                             "devices[].arrowDownButtonDoubleTap",
@@ -416,7 +416,7 @@
                                     {
                                         "type": "flex",
                                         "flex-flow": "row wrap",
-                                        "title": "The key to send when the <b>(Arrow Left)</b> button is tapped on the iOS remote.<br>See the <a href=\"https://github.com/jsiegenthaler/homebridge-eosstb/wiki/KeyEvents\">Wiki KeyEvents</a> for a description of all keys.",
+                                        "title": "The key to send when the <b>(Arrow Left)</b> button is tapped on the iOS remote.<br>See the <a href=\"https://github.com/jsiegenthaler/homebridge-samsung-tvht/wiki\">Wiki KeyEvents</a> for a description of all keys.",
                                         "items": [
                                             "devices[].arrowLeftButton",
                                             "devices[].arrowLeftButtonDoubleTap",
@@ -434,7 +434,7 @@
                                     {
                                         "type": "flex",
                                         "flex-flow": "row wrap",
-                                        "title": "The key to send when the <b>(Arrow Right)</b> button is tapped on the iOS remote.<br>See the <a href=\"https://github.com/jsiegenthaler/homebridge-eosstb/wiki/KeyEvents\">Wiki KeyEvents</a> for a description of all keys.",
+                                        "title": "The key to send when the <b>(Arrow Right)</b> button is tapped on the iOS remote.<br>See the <a href=\"https://github.com/jsiegenthaler/homebridge-samsung-tvht/wiki\">Wiki KeyEvents</a> for a description of all keys.",
                                         "items": [
                                             "devices[].arrowRightButton",
                                             "devices[].arrowRightButtonDoubleTap",
@@ -452,7 +452,7 @@
                                     {
                                         "type": "flex",
                                         "flex-flow": "row wrap",
-                                        "title": "The key to send when the <b>(Select)</b> button is tapped on the iOS remote.<br>See the <a href=\"https://github.com/jsiegenthaler/homebridge-eosstb/wiki/KeyEvents\">Wiki KeyEvents</a> for a description of all keys.",
+                                        "title": "The key to send when the <b>(Select)</b> button is tapped on the iOS remote.<br>See the <a href=\"https://github.com/jsiegenthaler/homebridge-samsung-tvht/wiki\">Wiki KeyEvents</a> for a description of all keys.",
                                         "items": [
                                             "devices[].selectButton",
                                             "devices[].selectButtonDoubleTap",
@@ -472,7 +472,7 @@
                                     {
                                         "type": "flex",
                                         "flex-flow": "row wrap",
-                                        "title": "The key to send when the <b>(Play/Pause)</b> button is tapped on the iOS remote.<br>See the <a href=\"https://github.com/jsiegenthaler/homebridge-eosstb/wiki/KeyEvents\">Wiki KeyEvents</a> for a description of all keys.",
+                                        "title": "The key to send when the <b>(Play/Pause)</b> button is tapped on the iOS remote.<br>See the <a href=\"https://github.com/jsiegenthaler/homebridge-samsung-tvht/wiki\">Wiki KeyEvents</a> for a description of all keys.",
                                         "items": [
                                             "devices[].playPauseButton",
                                             "devices[].playPauseButtonDoubleTap",
@@ -490,7 +490,7 @@
                                     {
                                         "type": "flex",
                                         "flex-flow": "row wrap",
-                                        "title": "The key to send when the <b>(BACK)</b> button is tapped on the iOS remote.<br>See the <a href=\"https://github.com/jsiegenthaler/homebridge-eosstb/wiki/KeyEvents\">Wiki KeyEvents</a> for a description of all keys.",
+                                        "title": "The key to send when the <b>(BACK)</b> button is tapped on the iOS remote.<br>See the <a href=\"https://github.com/jsiegenthaler/homebridge-samsung-tvht/wiki\">Wiki KeyEvents</a> for a description of all keys.",
                                         "items": [
                                             "devices[].backButton",
                                             "devices[].backButtonDoubleTap",
@@ -508,7 +508,7 @@
                                     {
                                         "type": "flex",
                                         "flex-flow": "row wrap",
-                                        "title": "The key to send when the <b>(i)</b> info button is tapped on the iOS remote.<br>See the <a href=\"https://github.com/jsiegenthaler/homebridge-eosstb/wiki/KeyEvents\">Wiki KeyEvents</a> for a description of all keys.",
+                                        "title": "The key to send when the <b>(i)</b> info button is tapped on the iOS remote.<br>See the <a href=\"https://github.com/jsiegenthaler/homebridge-samsung-tvht/wiki\">Wiki KeyEvents</a> for a description of all keys.",
                                         "items": [
                                             "devices[].infoButton",
                                             "devices[].infoButtonDoubleTap",
