@@ -28,10 +28,9 @@ const exec = require("child_process").exec;
 
 
 // general constants
-const NO_INPUT_ID = 999; // an input id that does not exist. Must be > 0 as a uint32 is expected
+const NO_INPUT_ID = 1; // default to input 1
 const NO_INPUT_NAME = 'UNKNOWN'; // an input name that does not exist
-const MAX_INPUT_SOURCES = 3; // max input services. Default = 3. Cannot be more than 97 (100 - all other services)
-const POWER_STATE_POLLING_INTERVAL_MS = 10000; // pollling interval in millisec. Default = 1000
+const POWER_STATE_POLLING_INTERVAL_MS = 2000; // pollling interval in millisec. Default = 2000
 const mediaStateName = ["PLAY", "PAUSE", "STOP", "UNKNOWN3", "LOADING", "INTERRUPTED"];
 const powerStateName = ["OFF", "ON"];
 const powerStateTransition = { NOT_TRANSITIONING: 0, TRANSITIONING_ON_TO_OFF: 1, TRANSITIONING_OFF_TO_ON: 2 };
@@ -41,9 +40,6 @@ Object.freeze(powerStateName);
 
 
 // global variables (urgh)
-
-
-let deviceId;
 let currentInputId;
 let currentPowerState;
 let currentMediaState;
@@ -104,11 +100,14 @@ class samsungTvHtPlatform {
 				// check all devices in config
 				this.log.warn('Checking devices found in configuration for %s', PLUGIN_NAME)
 				for (let i = 0, len = this.config.devices.length; i < len; i++) {
-					this.log("Checking device %s %s", i, this.config.devices[i]);
+					//this.log("Checking device %s %s", i, this.config.devices[i]);
 
-					this.log("Device %s: %s", i+1, this.config.devices[i].name);
-					this.devices[i] = new samsungTvHtDevice(this.log, this.config.devices[i], this.api, this, this.devices[i], i);
-					}
+					this.log("Loading device %s: %s", i+1, this.config.devices[i].name, this.config.devices[i].ipAddress);
+					//                                  	constructor(log, config, api, parent, device, deviceIndex) {
+					//	constructor(log, config, api, platform, device, deviceIndex, pingCommand, pingResponseOn, pingResponseOff) {
+					let newTvHtDevice = new samsungTvHtDevice(this.log, this.config, this.api, this, i);
+					this.devices.push(newTvHtDevice);
+				}
 				}
 				// start the regular ping
 				this.checkPowerInterval = setInterval(this.powerStateWatchdog.bind(this), POWER_STATE_POLLING_INTERVAL_MS);
@@ -129,70 +128,67 @@ class samsungTvHtPlatform {
 
 	powerStateWatchdog() {
 		// ping the devices regularly to check their power state
-		this.log("powerStateWatchdog ---START-----------------------------------------")
+		this.log.debug("powerStateWatchdog ---START-----------------------------------------")
 
-		// for linux:
-		//var pingCmd = 'ping -c 1 -w 1 ' + this.config.devices[0].ipAddress;
-
-		// for win
-		// var pingCmd = 'ping -n 1 -w 10 ' + this.config.devices[0].ipAddress;
+		// for linux: 	pingCmd = 'ping -c 1 -w 10' + ' ' + this.config.devices[0].ipAddress;
+		// for win: 	pingCmd = 'ping -n 1 -w 10' + ' ' + this.config.devices[0].ipAddress;
 
 		// ping all devices in the config
-		for (let i = 0; i < this.devices.length; i++) {
+		for (let i = 0; i < this.config.devices.length; i++) {
 			let device = this.devices[i];
 			let secondsSinceLastPowerKeyPress = (Date.now() - device.powerLastKeyPress) / 1000;
 			const powerStateMaxTransitionTimeSeconds = 30;
 			//this.log("secondsSinceLastPowerKeyPress: ", secondsSinceLastPowerKeyPress)
 
-			var pingCmd = this.config.pingCommand || 'ping -c 1 -w 1'; // default linux
-			pingCmd = pingCmd.trim() + ' ' + device.config.ipAddress;
+			var pingCmd = this.config.pingCommand || 'ping -c 1 -w 10'; // default linux
+			pingCmd = pingCmd.trim() + ' ' + this.config.devices[i].ipAddress;
 			this.log.debug('powerStateWatchdog: %s pinging device with %s', device.name, pingCmd);
 	
 			var self = this;
 			var deviceRealPowerState;
 			exec(pingCmd, function (error, stdout, stderr) {
-				self.log.debug("powerStateWatchdog: %s evaluating ping responce", device.name);
+				self.log.debug("powerStateWatchdog: %s ping response: %s", device.name, stdout);
 				// get the current device power state from the ping results
 				// win10:	Packets: Sent = 1, Received = 0, Lost = 1 (100% loss),
 				// linux: 	1 packets transmitted, 0 received, 100% packet loss, time 0ms
-				if (stdout.includes('100%')) { // 100% packet loss or 100% loss
+				if (stdout.includes(self.config.pingResponseOff || '100%')) { // 100% packet loss or 100% loss
 					self.log.debug("powerStateWatchdog: %s is not responding to ping, power is currently OFF", device.name);
 					deviceRealPowerState = Characteristic.Active.INACTIVE;
-				} else if (stdout.includes('0%')) { // 0% packet loss or 0% loss
+				} else if (stdout.includes(self.config.pingResponseOn || '0%')) { // 0% packet loss or 0% loss
 					self.log.debug("powerStateWatchdog: %s is responding to ping, power is currently ON", device.name);
 					deviceRealPowerState = Characteristic.Active.ACTIVE;
 				} else {
-					self.log.warn("powerStateWatchdog: WARNING %s ping result cannot be parsed! stdout:", device.name, stdout);
+					self.log.debug("powerStateWatchdog: WARNING %s ping result cannot be parsed! stdout:", device.name, stdout);
 					deviceRealPowerState = null;
 				}
 
 
 				// evaluate the real vs target power states
-				self.log.warn("powerStateWatchdog: %s evaluating power state. deviceRealPowerState %s, currentPowerState %s, targetPowerState %s", device.name, deviceRealPowerState, device.currentPowerState, device.targetPowerState);
+				self.log.debug("powerStateWatchdog: %s evaluating power state. deviceRealPowerState %s, currentPowerState %s, targetPowerState %s", device.name, deviceRealPowerState, device.currentPowerState, device.targetPowerState);
 				if (deviceRealPowerState != device.targetPowerState) {
-					self.log.warn("powerStateWatchdog: %s is currently transitioning from %s to %s. Transition time so far: %s seconds", device.name, deviceRealPowerState, device.targetPowerState, secondsSinceLastPowerKeyPress);
+					self.log.debug("powerStateWatchdog: %s is currently transitioning from %s to %s. Transition time so far: %s seconds", device.name, deviceRealPowerState, device.targetPowerState, secondsSinceLastPowerKeyPress);
 					// change in power state was requested
 					if (secondsSinceLastPowerKeyPress < powerStateMaxTransitionTimeSeconds) {
 						// device is currently undergoing a power state transition to the targetPowerState, set currentPowerState to targetPowerState
-						self.log.warn("powerStateWatchdog: %s is still within the allowed transition time of %s seconds, setting currentPowerState to targetPowerState %s", device.name, powerStateMaxTransitionTimeSeconds, device.targetPowerState);
+						self.log.debug("powerStateWatchdog: %s is still within the allowed transition time of %s seconds, setting currentPowerState to targetPowerState %s", device.name, powerStateMaxTransitionTimeSeconds, device.targetPowerState);
 						device.currentPowerState = device.targetPowerState;
 					} else {
 						// transition time has timed out, cancel the targetPowerState, reset current and target to deviceRealPowerState
-						self.log.warn("powerStateWatchdog: %s transition time longer than %s seconds, transition has timed out, no power state change occured, resetting currentPowerState to %s", device.name, powerStateMaxTransitionTimeSeconds, deviceRealPowerState);
+						self.log.debug("powerStateWatchdog: %s transition time longer than %s seconds, transition has timed out, no power state change occured, resetting currentPowerState to %s", device.name, powerStateMaxTransitionTimeSeconds, deviceRealPowerState);
 						device.targetPowerState = deviceRealPowerState;
 						device.currentPowerState = deviceRealPowerState;
 					}
 
 				} else {
 					device.currentPowerState = deviceRealPowerState || device.currentPowerState; // handle null if a parse error occured
-					self.log.warn("powerStateWatchdog: %s currentPowerState stays unchanged at %s", device.name, device.currentPowerState);
+					self.log.debug("powerStateWatchdog: %s currentPowerState stays unchanged at %s", device.name, device.currentPowerState);
 				}
 
 
 				// update device status
-				self.log.warn("powerStateWatchdog: %s Calling device.updateDeviceState with device.currentPowerState %s", device.name, device.currentPowerState);
+				//self.log.warn("powerStateWatchdog: %s Calling device.updateDeviceState with device.currentPowerState %s", device.name, device.currentPowerState);
 				device.updateDeviceState(device.currentPowerState);
-				self.log("powerStateWatchdog ---END-------------------------------------------")
+				self.log.debug("powerStateWatchdog ---END-------------------------------------------")
 		
 			});
 
@@ -210,26 +206,33 @@ class samsungTvHtPlatform {
 
 class samsungTvHtDevice {
 	// build the device. Runs once on restart
-	constructor(log, config, api, parent, device, deviceIndex) {
+	constructor(log, config, api, platform, deviceIndex) {
 		this.log = log;
 		this.api = api;
-		this.config = config;
-		this.parent = parent;
-		this.device = device;
-		this.deviceIndex = deviceIndex;
-		this.debugLevel = this.parent.config.debugLevel;
+		this.config = config; // the entire platform config
+		this.platform = platform; // the entire platform
+		this.deviceIndex = deviceIndex; // the current device's index
+		this.debugLevel = this.config.debugLevel;
+		this.deviceConfig = this.config.devices[deviceIndex]; // the config for the current device
+		
 
 		// setup arrays
-		this.name = this.config.name 	// device name from config
+		this.name = this.deviceConfig.name 	// device name from config
+		this.ipAddress = this.deviceConfig.ipAddress // device ip address from config
 		this.debugLevel = this.debugLevel || 0; // debugLevel defaults to 0 (minimum)
 		this.inputServices = [];		// loaded input services, used by the accessory, as shown in the Home app. Limited to 96
 		this.configuredInputs = [];		// a list of inputs that have been renamed by the user. EXPERIMENTAL
-		this.volDownLastKeyPress = [];	// holds the values of the last vol down button presses
+		this.lastRemoteKeyPressed = -1;	// holds the last key pressed, -1 = no key
+		this.lastRemoteKeyPress0 = [];	// holds the time value of the last remote button press for key index i
+		this.lastRemoteKeyPress1 = [];	// holds the time value of the last-1 remote button press for key index i
+		this.lastRemoteKeyPress2 = [];	// holds the time value of the last-2 remote button press for key index i
 
 		this.inputList = [
-			{inputId: "HDMI1", inputName: "HDMI 1"},
-			{inputId: "HDMI2", inputName: "HDMI 2"},
-			{inputId: "AUX", inputName: "AUX"},
+			{inputId: "SOURCE", inputName: "SOURCE"},
+			{inputId: "NEXT SOURCE", inputName: "NEXT SOURCE"},
+			{inputId: "HDMI", inputName: "HDMI"},
+			{inputId: "NEXT HDMI", inputName: "NEXT HDMI"}
+			//{inputId: "AUX", inputName: "AUX"},
 		];
 
 		//setup variables
@@ -247,7 +250,7 @@ class samsungTvHtDevice {
 
 		// use defaults of plugin/platform name & version
 		// until device is discovered
-		this.manufacturer = this.config.manufacturer || PLUGIN_NAME;
+		this.manufacturer = this.config.manufacturer || "Samsung";
 		this.modelName = this.config.modelName || PLATFORM_NAME;
 		this.serialNumber = this.config.serialNumber || 'unknown';
 		this.firmwareRevision = this.config.firmwareRevision || PLUGIN_VERSION; // must be numeric. Non-numeric values are not displayed
@@ -277,14 +280,21 @@ class samsungTvHtDevice {
 		// exit immediately if already configured (runs from session watchdog)
 		if (this.accessoryConfigured) { return }
 
-		this.log("prepareAccessory", this.name, PLUGIN_NAME);
+		//this.log("prepareAccessory", this.name, PLUGIN_NAME);
+		//this.log("prepareAccessory this.ipAddress", this.ipAddress);
 
 		const accessoryName = this.name;
 		const accessoryUUID = UUID.generate(this.name + PLUGIN_NAME);
 
 		// default category is TV, allow also RECEIVER (avr)
 		let accessoryCategory = Categories.TELEVISION;
-		if (this.config.type == "receiver") { accessoryCategory = Categories.AUDIO_RECEIVER; }
+		switch (this.config.type) {
+			case "receiver":
+				accessoryCategory = Categories.AUDIO_RECEIVER;
+				break;
+			default:
+				accessoryCategory = Categories.TELEVISION;
+			}
 
 		this.accessory = new Accessory(accessoryName, accessoryUUID, accessoryCategory);
 
@@ -338,7 +348,7 @@ class samsungTvHtDevice {
 
 		this.televisionService.getCharacteristic(Characteristic.ActiveIdentifier)
 			.on('get', this.getInput.bind(this))
-			.on('set', (newInputIdentifier, callback) => { this.setInput(this.InputListHomeKit[newInputIdentifier], callback); });
+			.on('set', (newInputIdentifier, callback) => { this.setInput(this.inputList[newInputIdentifier], callback); });
 
 		this.televisionService.getCharacteristic(Characteristic.RemoteKey)
 			.on('set', this.setRemoteKey.bind(this));
@@ -389,50 +399,77 @@ class samsungTvHtDevice {
 
 		let inputService;
 
-		// HDMI 1
+		// For Release 1.0, I'll only support the source by sending the SOURCE key, which just goes to next source
+		// so diable HDMI 2 and Analog AUX. these need HDMI CEC support.
+
+		// SOURCE
 		inputService = new Service.InputSource(1, "input_1");
 		inputService
 			.setCharacteristic(Characteristic.Identifier, 1)
-			.setCharacteristic(Characteristic.ConfiguredName, "HDMI 1")
+			.setCharacteristic(Characteristic.ConfiguredName, "SOURCE")
 			.setCharacteristic(Characteristic.InputSourceType, Characteristic.InputSourceType.HDMI)
 			.setCharacteristic(Characteristic.InputDeviceType, Characteristic.InputDeviceType.TV)
 			.setCharacteristic(Characteristic.IsConfigured, Characteristic.IsConfigured.CONFIGURED)
 			.setCharacteristic(Characteristic.CurrentVisibilityState, Characteristic.CurrentVisibilityState.SHOWN)
 			.setCharacteristic(Characteristic.TargetVisibilityState, Characteristic.TargetVisibilityState.SHOWN);
 
-			/*
-		inputService.getCharacteristic(Characteristic.ConfiguredName)
-			.on('get', (callback) => { this.getInputName(1, callback); })
-			.on('set', (value, callback) => { this.setInputName(1, value, callback); });
-			*/
-
 		this.inputServices.push(inputService);
 		this.accessory.addService(inputService);
 		this.televisionService.addLinkedService(inputService);
 
 
-		// HDMI 2
-		inputService = new Service.InputSource(2, "input_2");
+		inputService = new Service.InputSource(1, "input_2");
 		inputService
 			.setCharacteristic(Characteristic.Identifier, 1)
-			.setCharacteristic(Characteristic.ConfiguredName, "HDMI 2")
+			.setCharacteristic(Characteristic.ConfiguredName, "NEXT SOURCE")
 			.setCharacteristic(Characteristic.InputSourceType, Characteristic.InputSourceType.HDMI)
 			.setCharacteristic(Characteristic.InputDeviceType, Characteristic.InputDeviceType.TV)
 			.setCharacteristic(Characteristic.IsConfigured, Characteristic.IsConfigured.CONFIGURED)
 			.setCharacteristic(Characteristic.CurrentVisibilityState, Characteristic.CurrentVisibilityState.SHOWN)
 			.setCharacteristic(Characteristic.TargetVisibilityState, Characteristic.TargetVisibilityState.SHOWN);
 
-			/*
-		inputService.getCharacteristic(Characteristic.ConfiguredName)
-			.on('get', (callback) => { this.getInputName(2, callback); })
-			.on('set', (value, callback) => { this.setInputName(2, value, callback); });
-			*/
-
 		this.inputServices.push(inputService);
 		this.accessory.addService(inputService);
 		this.televisionService.addLinkedService(inputService);
 
+
+		// HDMI
+		inputService = new Service.InputSource(2, "input_3");
+		inputService
+			.setCharacteristic(Characteristic.Identifier, 1)
+			.setCharacteristic(Characteristic.ConfiguredName, "HDMI")
+			.setCharacteristic(Characteristic.InputSourceType, Characteristic.InputSourceType.HDMI)
+			.setCharacteristic(Characteristic.InputDeviceType, Characteristic.InputDeviceType.TV)
+			.setCharacteristic(Characteristic.IsConfigured, Characteristic.IsConfigured.CONFIGURED)
+			.setCharacteristic(Characteristic.CurrentVisibilityState, Characteristic.CurrentVisibilityState.SHOWN)
+			.setCharacteristic(Characteristic.TargetVisibilityState, Characteristic.TargetVisibilityState.SHOWN);
+
+		
+		this.inputServices.push(inputService);
+		this.accessory.addService(inputService);
+		this.televisionService.addLinkedService(inputService);
+
+		// HDMI
+		inputService = new Service.InputSource(2, "input_4");
+		inputService
+			.setCharacteristic(Characteristic.Identifier, 1)
+			.setCharacteristic(Characteristic.ConfiguredName, "NEXT HDMI")
+			.setCharacteristic(Characteristic.InputSourceType, Characteristic.InputSourceType.HDMI)
+			.setCharacteristic(Characteristic.InputDeviceType, Characteristic.InputDeviceType.TV)
+			.setCharacteristic(Characteristic.IsConfigured, Characteristic.IsConfigured.CONFIGURED)
+			.setCharacteristic(Characteristic.CurrentVisibilityState, Characteristic.CurrentVisibilityState.SHOWN)
+			.setCharacteristic(Characteristic.TargetVisibilityState, Characteristic.TargetVisibilityState.SHOWN);
+
+		
+		this.inputServices.push(inputService);
+		this.accessory.addService(inputService);
+		this.televisionService.addLinkedService(inputService);
+
+
+
 		// Analog / AUX-IN
+		// DISABLED FOR RELEASE 1
+		/*
 		inputService = new Service.InputSource(3, "input_3");
 		inputService
 			.setCharacteristic(Characteristic.Identifier, 1)
@@ -445,13 +482,15 @@ class samsungTvHtDevice {
 
 			/*
 		inputService.getCharacteristic(Characteristic.ConfiguredName)
-			.on('get', (callback) => { this.getInputName(3, callback); })
-			.on('set', (value, callback) => { this.setInputName(3, value, callback); });
-*/
+			.on('get', (callback) => { this.getInputName(2, callback); })
+			.on('set', (value, callback) => { this.setInputName(2, value, callback); });
+			*/
 
+		/*
 		this.inputServices.push(inputService);
 		this.accessory.addService(inputService);
 		this.televisionService.addLinkedService(inputService);
+		*/
 
 	}
   	//+++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -473,7 +512,7 @@ class samsungTvHtDevice {
 
 		// make a new remote
 		const remote = new SamsungRemote({
-			ip: this.config.ipAddress
+			ip: this.deviceConfig.ipAddress
 		});
 		
 		// remote reports timeouts as errors
@@ -483,7 +522,6 @@ class samsungTvHtDevice {
 					// ignore, this is normal with SamsungRemote, some keys just do get a responce from the TV / AVR
 				} else {
 					this.log.warn("%s: sendKey: error %s", this.name, err);
-					// throw new Error(err);
 				}
 			}
 		});
@@ -491,6 +529,7 @@ class samsungTvHtDevice {
 
 
 	// get the device UI status
+	// incomplete, to be completed if I can ever figure out how
 	getUiStatus() {
 		if (this.debugLevel > 1) {
 			this.log.warn('getUiStatus');
@@ -509,7 +548,7 @@ class samsungTvHtDevice {
 	// START regular device update polling functions
   	//+++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-	// update the device state changed to async
+	// update the device state (async)
 	async updateDeviceState(powerState, mediaState, inputId, sourceType, callback) {
 		// doesn't get the data direct from the device box, but rather: gets it from the variables
 
@@ -628,7 +667,7 @@ class samsungTvHtDevice {
 				// we want to turn OFF, then we can turn it off with a sendKey
 				// avr: BD_KEY_POWER, tv: KEY_POWER
 				let keyName = 'KEY_POWEROFF';
-				if (this.config.type == 'avr') {keyName='BD_KEY_POWER'}
+				if (this.config.type == 'receiver') {keyName='BD_KEY_POWER'}
 				this.sendKey(keyName);
 			} else {
 				// we want to turn ON, can turn on only via HDMI-CEC
@@ -727,12 +766,25 @@ class samsungTvHtDevice {
 		if (this.debugLevel > 0) {
 			this.log.warn('setInput input:',input.inputId, input.InputName);
 		}
-		callback(null); // for rapid response
+		this.log('setInput input:',input.inputId, input.InputName);
+
+
+		//one day I'll implement the HDMI CEC input control, then I'll need these functions:
+		/*
 		var currentInputName = 'UNKNOWN';
 		var foundIndex = this.inputList.findIndex(input => input.inputId === currentInputId);
 		if (foundIndex > -1) { currentInputName = this.inputList[foundIndex].InputName; }
 		this.log('Change input from %s %s to %s %s', currentInputId, currentInputName, input.inputId, input.InputName);
-		//this.switchInput(input.inputId);
+		this.switchInput(input.inputId);
+		*/
+
+		//but currently, we're sending SOURCE and HDMI keys
+		if (input.inputId.includes('SOURCE')) {
+			this.sendKey('KEY_SOURCE');
+		} else {
+			this.sendKey('KEY_HDMI');
+		}		
+		callback(null); // for rapid response
 	}
 
 	// set input name
@@ -804,8 +856,8 @@ class samsungTvHtDevice {
 	}
 
 	// set remote key
-	async setRemoteKey(remoteKey, callback) {
-		if (this.debugLevel > 1) { this.log.warn('%s: setRemoteKey remoteKey:',this.name, remoteKey); }
+	async setRemoteKeyOld(remoteKey, callback) {
+		if (this.debugLevel > 1) { this.log.warn('%s: setRemoteKeyOld remoteKey:',this.name, remoteKey); }
 		callback(null); // for rapid response
 
 		let keyName;
@@ -839,13 +891,254 @@ class samsungTvHtDevice {
 			case Characteristic.RemoteKey.PLAY_PAUSE: // 11
 				keyName = 'KEY_PLAY'; break; // KEY_PLAY KEY_PAUSE
 			case Characteristic.RemoteKey.INFORMATION: // 15
-				keyName = 'KEY_INFO'; break; // KEY_INFO KEY_MENU
+				keyName = 'KEY_MENU'; break; // KEY_INFO KEY_MENU
 			}
 
 		if (keyName) {
 			this.sendKey(keyName);
 		}
 	}
+
+	// set remote key
+	async setRemoteKey(remoteKey, callback) {
+		if (this.config.debugLevel > 1) { this.log.warn('%s: setRemoteKey remoteKey:',this.name, remoteKey); }
+		callback(null); // for rapid response
+
+		// remoteKey is the key pressed on the Apple TV Remote in the Control Center
+		// keys 0...15 exist, but keys 12, 13 & 14 are not defined by Apple
+
+
+		// ------------- triple press function ---------------
+		// triple key presses triggers a second layer function
+		var tripleVolDownPress = 100000; // default high value to prevent a tripleVolDown detection when no triple key pressed
+
+		var lastKeyPressTime = this.lastRemoteKeyPress0[remoteKey] || 0; // find the time the current key was last pressed
+		this.log("setRemoteKey remoteKey %s, lastKeyPressTime %s",remoteKey, lastKeyPressTime);
+
+		// bump the array up one slot
+		/*
+		this.log("Shifting the array up one, and storing current time in index 0");
+		lastkeyPress[remoteKey][2] = lastkeyPress[remoteKey][1] || 0;
+		lastkeyPress[remoteKey][1] = lastkeyPress[remoteKey][0] || 0;
+		lastkeyPress[remoteKey][0] = Date.now();
+		*/
+
+		// bump the array up one level and store now in lastRemoteKeyPress0
+		this.log("setRemoteKey Shifting this.lastRemoteKeyPress array, and storing current time for key %s in index 0", remoteKey);
+		this.lastRemoteKeyPress2[remoteKey] = this.lastRemoteKeyPress1[remoteKey];
+		this.lastRemoteKeyPress1[remoteKey] = this.lastRemoteKeyPress0[remoteKey];
+		this.lastRemoteKeyPress0[remoteKey] = Date.now();
+		this.log("setRemoteKey Contents of lastRemoteKeyPress0 array:", this.lastRemoteKeyPress0);
+		this.log("setRemoteKey Contents of lastRemoteKeyPress1 array:", this.lastRemoteKeyPress1);
+		this.log("setRemoteKey Contents of lastRemoteKeyPress2 array:", this.lastRemoteKeyPress2);
+
+		var lastPressTime2 = (this.lastRemoteKeyPress2[remoteKey] || (Date.now() - 86400)); // default to same time yesterday if empty
+		var lastPressTime1 = this.lastRemoteKeyPress1[remoteKey] || Date.now() - 86400; // default to same time yesterday if empty
+		var lastPressTime0 = this.lastRemoteKeyPress0[remoteKey];
+
+		// write lastkeyPress to the array
+		//this.lastRemoteKeyPress0[remoteKey] = lastkeyPress;
+		//this.log("remoteKey %s, lastRemoteKeyPress has been updated, now:", remoteKey, this.lastRemoteKeyPress);
+
+
+		// check if same as previous key pressed, within the limits of the  triple press time
+		var buttonLayer=0; // default layer 0
+		if (this.lastRemoteKeyPressed == remoteKey) {
+			this.log("setRemoteKey current key %s same as last key %s",remoteKey, this.lastRemoteKeyPressed);
+
+			// if same key, check for double or triple press
+			// check timing, activating triple-press then double-press button layers
+			// if historical key presses exist in buffer
+			if (lastPressTime0 - lastPressTime2 < (this.config.triplePressTime || 450)) {
+				this.log('setRemoteKey remoteKey %s, triple press detected', remoteKey);
+				buttonLayer=2;
+				this.pendingKeyPress = -1; // clear any pending key press
+				this.sendRemoteKeyPressAfterDelay = false;	// disable send after delay
+				this.readyToSendRemoteKeyPress = true; // enable immediate send
+			} else if (lastPressTime0 - lastPressTime1 < (this.config.doublePressTime || 250)) {
+				this.log('setRemoteKey remoteKey %s, double press detected', remoteKey);
+				buttonLayer=1;
+				this.pendingKeyPress = -1; // clear any pending key press
+				this.sendRemoteKeyPressAfterDelay = false;	// disable send after delay
+				this.readyToSendRemoteKeyPress = true; // enable immediate send
+			} else {
+				// no historical key presses exist, queue as a pending press
+				this.log('setRemoteKey remoteKey %s, no historical key press detected', remoteKey);
+				this.pendingKeyPress = remoteKey;
+				this.sendRemoteKeyPressAfterDelay = true;	// enable send after delay
+				this.readyToSendRemoteKeyPress = false; // disable readyToSend, will send on cache timeout
+			}
+		} else {
+			this.log("setRemoteKey current key %s different to last key %s",remoteKey, this.lastRemoteKeyPressed);
+			// this key is different to last key, send after delay (may be start of another double or triple key press)
+			this.pendingKeyPress = remoteKey;
+			this.sendRemoteKeyPressAfterDelay = true;	// enable send after delay
+			this.readyToSendRemoteKeyPress = false; // disable readyToSend, will send on cache timeout
+		}; 
+
+		// check time difference between current keyPress and 2 keyPresses ago
+		this.log('setRemoteKey remoteKey %s, Timediff between lastRemoteKeyPress0 now and lastRemoteKeyPress1: %s ms', remoteKey, lastPressTime0 - lastPressTime1);
+		this.log('setRemoteKey remoteKey %s, Timediff between lastRemoteKeyPress0 now and lastRemoteKeyPress2: %s ms', remoteKey, lastPressTime0 - lastPressTime2);
+
+
+		this.log('setRemoteKey remoteKey %s, buttonLayer %s, pendingKeyPress %s, sendRemoteKeyPressAfterDelay %s, readyToSendRemoteKeyPress %s', remoteKey, buttonLayer, this.pendingKeyPress, this.sendRemoteKeyPressAfterDelay, this.readyToSendRemoteKeyPress);
+		this.log('setRemoteKey --------------------');
+
+
+
+		// do the button layer mapping
+		var keyNameDefault;
+		var keyName;
+		switch (remoteKey) {
+			case Characteristic.RemoteKey.REWIND: // 0
+				keyName = 'KEY_REWIND'; break;
+			case Characteristic.RemoteKey.FAST_FORWARD: // 1
+				keyName = 'KEY_FF'; break;
+			/*
+			case Characteristic.RemoteKey.NEXT_TRACK: // 2
+				keyName = ''; break;
+			case Characteristic.RemoteKey.PREVIOUS_TRACK: // 3
+				keyName = ''; break;
+			*/
+
+			case Characteristic.RemoteKey.ARROW_UP: // 4
+				keyNameDefault = "KEY_UP";
+				switch (buttonLayer) {
+					case 2: 	keyName = this.deviceConfig.arrowUpButtonTripleTap || keyNameDefault; 	break;
+					case 1: 	keyName = this.deviceConfig.arrowUpButtonDoubleTap || keyNameDefault; 	break;
+					default: 	keyName = this.deviceConfig.arrowUpButton || keyNameDefault; 			break;
+				}
+				break;
+
+			case Characteristic.RemoteKey.ARROW_DOWN: // 5
+				keyNameDefault = "KEY_DOWN";
+				switch (buttonLayer) {
+					case 2: 	keyName = this.deviceConfig.arrowDownButtonTripleTap || keyNameDefault; 	break;
+					case 1: 	keyName = this.deviceConfig.arrowDownButtonDoubleTap || keyNameDefault; 	break;
+					default: 	keyName = this.deviceConfig.arrowDownButton || keyNameDefault; 			break;
+				}
+				break;
+
+			case Characteristic.RemoteKey.ARROW_LEFT: // 6
+				keyNameDefault = "KEY_LEFT";
+				switch (buttonLayer) {
+					case 2: 	keyName = this.deviceConfig.arrowLeftButtonTripleTap || keyNameDefault; 	break;
+					case 1: 	keyName = this.deviceConfig.arrowLeftButtonDoubleTap || keyNameDefault; 	break;
+					default: 	keyName = this.deviceConfig.arrowLeftButton || keyNameDefault; 			break;
+				}
+				break;
+
+			case Characteristic.RemoteKey.ARROW_RIGHT: // 7
+				keyNameDefault = "KEY_RIGHT";
+				switch (buttonLayer) {
+					case 2: 	keyName = this.deviceConfig.arrowRightButtonTripleTap || keyNameDefault; 	break;
+					case 1: 	keyName = this.deviceConfig.arrowRightButtonDoubleTap || keyNameDefault; 	break;
+					default: 	keyName = this.deviceConfig.arrowRightButton || keyNameDefault; 				break;
+				}
+				break;
+
+			case Characteristic.RemoteKey.SELECT: // 8
+				keyNameDefault = "KEY_ENTER";
+				switch (buttonLayer) {
+					case 2: 	keyName = this.deviceConfig.selectButtonTripleTap || keyNameDefault; 	break;
+					case 1: 	keyName = this.deviceConfig.selectButtonDoubleTap || keyNameDefault; 	break;
+					default: 	keyName = this.deviceConfig.selectButton || keyNameDefault;	 			break;
+				}
+				break;
+
+			case Characteristic.RemoteKey.BACK: // 9
+				keyNameDefault = "KEY_RETURN";
+				switch (buttonLayer) {
+					case 2: 	keyName = this.deviceConfig.backButtonTripleTap || keyNameDefault; 	break;
+					case 1: 	keyName = this.deviceConfig.backButtonDoubleTap || keyNameDefault; 	break;
+					default: 	keyName = this.deviceConfig.backButton || keyNameDefault; 			break;
+				}
+				break;
+
+			case Characteristic.RemoteKey.EXIT: // 10
+				keyName = this.deviceConfig.backButton || "KEY_EXIT"; 
+				break;
+
+			case Characteristic.RemoteKey.PLAY_PAUSE: // 11
+				keyNameDefault = "KEY_PLAY";
+				switch (buttonLayer) {
+					case 2: 	keyName = this.deviceConfig.playPauseButtonTripleTap || keyNameDefault; 	break;
+					case 1: 	keyName = this.deviceConfig.playPauseButtonDoubleTap || keyNameDefault; 	break;
+					default: 	keyName = this.deviceConfig.playPauseButton || keyNameDefault; 			break;
+				}
+				break; 
+
+			case Characteristic.RemoteKey.INFORMATION: // 15
+				keyNameDefault = "KEY_MENU";
+				switch (buttonLayer) {
+					case 2: 	keyName = this.deviceConfig.infoButtonTripleTap || keyNameDefault; 	break;
+					case 1: 	keyName = this.deviceConfig.infoButtonDoubleTap || keyNameDefault; 	break;
+					default: 	keyName = this.deviceConfig.infoButton || keyNameDefault; 			break;
+				}
+				break;
+
+
+			}
+
+
+			// handle the macros or single key events
+			if (keyName.startsWith("KeyMacro")) {
+				var keyMacro;
+				switch (keyName) {
+					case 'KeyMacro1': keyMacro = this.deviceConfig.keyMacro1; break;
+					case 'KeyMacro2': keyMacro = this.deviceConfig.keyMacro2; break;
+					case 'KeyMacro3': keyMacro = this.deviceConfig.keyMacro3; break;
+					case 'KeyMacro4': keyMacro = this.deviceConfig.keyMacro4; break;
+					case 'KeyMacro5': keyMacro = this.deviceConfig.keyMacro5; break;
+				}
+
+				//var keyMacro = 'Back wait(500) Back wait(500) Back wait(500) MediaTopMenu wait(1000) ArrowDown wait(500) ArrowLeft wait(500) Enter wait(500) Enter'
+				this.log('processing macro ', keyMacro);
+				let keyArray = keyMacro.trim().split(' ');
+				for (let i = 0; i < keyArray.length; i++) {
+					this.log('remoteKey %s, sending key ', keyArray[i]);
+					if ( keyArray[i].startsWith('wait(')) {
+						// do a wait
+							let delay = keyArray[i].replace('wait(', '').replace(')','');
+							this.log('processing wait of %s ms', delay);
+							await waitprom(delay);
+							this.log('wait done');
+						} else {
+							// send the key
+							this.log('sending key %s', keyArray[i].trim());
+							this.sendKey(keyArray[i].trim() );
+						}
+					}
+			} else {
+				// single key event
+				// send if not pending
+				if (keyName)
+					if (this.readyToSendRemoteKeyPress){ 
+						// send immediately
+						this.log('setRemoteKey sending key %s immediately',keyName);
+						this.sendKey(keyName); 
+					} else {
+						// immediate send is not enabled. 
+						// start a delay equal to doublePressTime, then send only if the readyToSendRemoteKeyPress is true
+						var delayTime = this.config.doublePressTime * 1.5;
+						this.log('setRemoteKey sending key %s after delay of %s milliseconds',keyName, delayTime);
+						setTimeout(() => { 
+							// check if can be sent. Only send if sendRemoteKeyPressAfterDelay is still set. It may have been reset by another key press
+							this.log('setRemoteKey setTimeout delay completed, checking sendRemoteKeyPressAfterDelay for %s',keyName);
+							if (this.sendRemoteKeyPressAfterDelay){ 
+								this.log('setRemoteKey setTimeout delay completed, sending %s',keyName);
+								this.sendKey(keyName); 
+								this.log('setRemoteKey setTimeout delay completed, key %s sent, resetting readyToSendRemoteKeyPress',keyName);
+								this.readyToSendRemoteKeyPress = true; // reset the enable flag
+							} else {
+								this.log('setRemoteKey setTimeout delay completed, checking sendRemoteKeyPressAfterDelay for %s: sendRemoteKeyPressAfterDelay is false, doing nothing',keyName);
+							}
+						},
+						delayTime); // send after delayTime
+					}
+			}
+			this.lastRemoteKeyPressed = remoteKey; // store the current key as last key pressed
+		}	
 
   	//+++++++++++++++++++++++++++++++++++++++++++++++++++++
 	// END of accessory get/set charteristic handlers

@@ -3,3 +3,4 @@ node_modules/
 backups/
 package-lock.json.old
 TODO.txt
+.github/workflows/publish.yml
