@@ -33,7 +33,7 @@ sudo npm install -g homebridge-samsungtvht
 After installing, make sure you restart Homebridge.
 
 ## Adding your Samsung TV or HT to the Home app
-Each  Samsung devices is exposed as aseparate external accessory and each device needs to be manually paired as follows:
+Each Samsung device is exposed as a separate external accessory and each device needs to be manually paired as follows:
 
 1. Open the **Home** app on your device.
 2. Tap **+** in the top right corner of the screen to start the process of adding a new accessory or scene.
