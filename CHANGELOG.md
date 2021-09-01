@@ -6,6 +6,10 @@ All notable changes to this project will be documented in this file.
 
 ### Initial Release
 
+## 0.0.1-beta.11 (2020-09-01)
+* Fixed bug setting accesory icon for Home Theater
+* Fixed some more config.schema typos
+
 ## 0.0.1-beta.10 (2020-09-01)
 * Improved some logging text
 * Fixed some typos in the Readme

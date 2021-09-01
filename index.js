@@ -288,7 +288,7 @@ class samsungTvHtDevice {
 
 		// default category is TV, allow also RECEIVER (avr)
 		let accessoryCategory = Categories.TELEVISION;
-		switch (this.config.type) {
+		switch (this.deviceConfig.type) {
 			case "receiver":
 				accessoryCategory = Categories.AUDIO_RECEIVER;
 				break;
