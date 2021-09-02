@@ -6,6 +6,11 @@ All notable changes to this project will be documented in this file.
 
 ### Initial Release
 
+## 0.0.1-beta.13 (2020-09-02)
+* Added config.json doublePressDelayTime to help fine tune doublePress
+* Added ddefault values for doublePressTime and triplePressTime to config.json
+
+
 ## 0.0.1-beta.12 (2020-09-02)
 * Improved robustness if a user did not set a doublePressTime
 * Disabled remote control triplePress for now

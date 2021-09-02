@@ -1135,7 +1135,7 @@ class samsungTvHtDevice {
 					} else {
 						// immediate send is not enabled. 
 						// start a delay equal to doublePressTime, then send only if the readyToSendRemoteKeyPress is true
-						var delayTime = doublePressTime * 1.5;
+						var delayTime = this.config.doublePressDelayTime;
 						this.log('setRemoteKey sending key %s after delay of %s milliseconds',keyName, delayTime);
 						setTimeout(() => { 
 							// check if can be sent. Only send if sendRemoteKeyPressAfterDelay is still set. It may have been reset by another key press
