@@ -25,6 +25,9 @@ const SamsungRemote = require('samsung-remote');
 // exec spawns child process to run a bash script
 const exec = require("child_process").exec;
 
+// to detect dev env
+var PLUGIN_ENV = ''; // controls the development environment, appended to UUID to make unique device when developing
+
 
 
 // general constants
@@ -87,13 +90,19 @@ class samsungTvHtPlatform {
 		this.config = config;
 		this.api = api;
 		this.devices = [];
-		this.debugLevel = this.config.debugLevel;
+		this.debugLevel = this.config.debugLevel || 0;
 
 		this.api.on('didFinishLaunching', () => {
 			if (this.debugLevel > 0) {
 				this.log.warn('API event: didFinishLaunching');
 			}
 
+			this.log.warn('config',this.config);
+			// detect if running on development environment
+			//	customStoragePath: 'C:\\Users\\jochen\\.homebridge'
+			if ( this.api.user.customStoragePath.includes( 'jochen' ) ) { PLUGIN_ENV = ' DEV' }
+			if (PLUGIN_ENV) { this.log.warn('%s running in %s environment with debugLevel %s', PLUGIN_NAME, PLUGIN_ENV.trim(), this.debugLevel); }
+	
 			if (this.config.devices.length == 0) {
 				this.log.warn('No devices found in config for %s', PLUGIN_NAME)
 			} else {
@@ -212,14 +221,14 @@ class samsungTvHtDevice {
 		this.config = config; // the entire platform config
 		this.platform = platform; // the entire platform
 		this.deviceIndex = deviceIndex; // the current device's index
-		this.debugLevel = this.config.debugLevel;
+		this.debugLevel = this.debugLevel || 0; // debugLevel defaults to 0 (minimum)
 		this.deviceConfig = this.config.devices[deviceIndex]; // the config for the current device
+
+		this.name = this.deviceConfig.name 	// device name from config
+		this.ipAddress = this.deviceConfig.ipAddress // device ip address from config
 		
 
 		// setup arrays
-		this.name = this.deviceConfig.name 	// device name from config
-		this.ipAddress = this.deviceConfig.ipAddress // device ip address from config
-		this.debugLevel = this.debugLevel || 0; // debugLevel defaults to 0 (minimum)
 		this.inputServices = [];		// loaded input services, used by the accessory, as shown in the Home app. Limited to 96
 		this.configuredInputs = [];		// a list of inputs that have been renamed by the user. EXPERIMENTAL
 		this.lastRemoteKeyPressed = -1;	// holds the last key pressed, -1 = no key
@@ -284,7 +293,8 @@ class samsungTvHtDevice {
 		//this.log("prepareAccessory this.ipAddress", this.ipAddress);
 
 		const accessoryName = this.name;
-		const accessoryUUID = UUID.generate(this.name + PLUGIN_NAME);
+		const uuidSeed = this.ipAddress + PLUGIN_NAME + PLUGIN_ENV; // must be generated from a stable unchanging seed
+		const accessoryUUID = UUID.generate(uuidSeed); 
 
 		// default category is TV, allow also RECEIVER (avr)
 		let accessoryCategory = Categories.TELEVISION;
@@ -943,19 +953,24 @@ class samsungTvHtDevice {
 
 		// check if same as previous key pressed, within the limits of the  triple press time
 		var buttonLayer=0; // default layer 0
+		var doublePressTime = this.config.doublePressTime || 250;
+		var triplePressTime = this.config.triplePressTime || 450;
 		if (this.lastRemoteKeyPressed == remoteKey) {
 			this.log("setRemoteKey current key %s same as last key %s",remoteKey, this.lastRemoteKeyPressed);
 
 			// if same key, check for double or triple press
 			// check timing, activating triple-press then double-press button layers
 			// if historical key presses exist in buffer
-			if (lastPressTime0 - lastPressTime2 < (this.config.triplePressTime || 450)) {
+			/*
+			// disabled triplePress until I get doublePress working
+			if (lastPressTime0 - lastPressTime2 < triplePressTime) {
 				this.log('setRemoteKey remoteKey %s, triple press detected', remoteKey);
 				buttonLayer=2;
 				this.pendingKeyPress = -1; // clear any pending key press
 				this.sendRemoteKeyPressAfterDelay = false;	// disable send after delay
 				this.readyToSendRemoteKeyPress = true; // enable immediate send
-			} else if (lastPressTime0 - lastPressTime1 < (this.config.doublePressTime || 250)) {
+			*/
+			if (lastPressTime0 - lastPressTime1 < doublePressTime) {
 				this.log('setRemoteKey remoteKey %s, double press detected', remoteKey);
 				buttonLayer=1;
 				this.pendingKeyPress = -1; // clear any pending key press
@@ -978,7 +993,7 @@ class samsungTvHtDevice {
 
 		// check time difference between current keyPress and 2 keyPresses ago
 		this.log('setRemoteKey remoteKey %s, Timediff between lastRemoteKeyPress0 now and lastRemoteKeyPress1: %s ms', remoteKey, lastPressTime0 - lastPressTime1);
-		this.log('setRemoteKey remoteKey %s, Timediff between lastRemoteKeyPress0 now and lastRemoteKeyPress2: %s ms', remoteKey, lastPressTime0 - lastPressTime2);
+		//this.log('setRemoteKey remoteKey %s, Timediff between lastRemoteKeyPress0 now and lastRemoteKeyPress2: %s ms', remoteKey, lastPressTime0 - lastPressTime2);
 
 
 		this.log('setRemoteKey remoteKey %s, buttonLayer %s, pendingKeyPress %s, sendRemoteKeyPressAfterDelay %s, readyToSendRemoteKeyPress %s', remoteKey, buttonLayer, this.pendingKeyPress, this.sendRemoteKeyPressAfterDelay, this.readyToSendRemoteKeyPress);
@@ -1120,7 +1135,7 @@ class samsungTvHtDevice {
 					} else {
 						// immediate send is not enabled. 
 						// start a delay equal to doublePressTime, then send only if the readyToSendRemoteKeyPress is true
-						var delayTime = this.config.doublePressTime * 1.5;
+						var delayTime = doublePressTime * 1.5;
 						this.log('setRemoteKey sending key %s after delay of %s milliseconds',keyName, delayTime);
 						setTimeout(() => { 
 							// check if can be sent. Only send if sendRemoteKeyPressAfterDelay is still set. It may have been reset by another key press
