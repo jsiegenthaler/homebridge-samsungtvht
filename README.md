@@ -1,6 +1,6 @@
-# homebridge-samsunghttv
+# homebridge-samsungtvht
 
-`homebridge-samsunghttv` is a Homebridge plugin allowing you to control your Samsung D-series TV and Home Theater with Apple HomeKit using the Home app and the Apple TV Remote in the Control Center.
+`homebridge-samsungtvht` is a Homebridge plugin allowing you to control your Samsung D-series TV and Home Theater with Apple HomeKit using the Home app and the Apple TV Remote in the Control Center.
 
 This plugin displays your Samsung device as a TV or Audio Receiver Accessory with Power, Input & Remote Control capabilities in your iOS device (iPhone, iPad, iMac, etc.).
 
@@ -115,7 +115,7 @@ Example extended configuration as used on the author's Samsung TV (where 192.168
 ```js
     "platforms": [
         {
-            "platform": "samsunghttv",
+            "platform": "samsungtvht",
             "name": "samsungtvht",
             "pingCommand": "ping -n 1 -w 10",
             "pingResponseOn": "(0% loss)",
