@@ -12,15 +12,14 @@ Supports multiple devices, allowing you to create an accessory for each TV or Ho
 This plugin was written and tested on the author's Samsung D-series TV and D-series Home Theater system in Switzerland.
 
 ## Requirements
-* An Apple iPhone or iPad with iOS 14.0 (or later). Developed on iOS 14.1...14.7, earlier versions not tested.
-* [Homebridge](https://homebridge.io/) v1.2.5 (or later). Developed on Homebridge 1.1.116....1.2.5, earlier versions not tested.
-* A Samsung TV or Home Theater system from around 2011
+* An Apple iPhone or iPad with iOS 14.0 (or later). Developed on iOS 14.1...14.7.1, earlier versions not tested.
+* [Homebridge](https://homebridge.io/) v1.2.5 (or later). Developed on Homebridge 1.1.116....1.3.4, earlier versions not tested.
+* A Samsung TV or Home Theater system from around 2011 (non-Tizen system)
+* The TV or Home thearter system must be connected to your hme network via Ethernet LAN cable, or Wifi.
 
 ## Decode your Samsung TV model Number
 https://www.samsung.com/uk/support/tv-audio-video/what-do-samsung-tv-model-numbers-actually-mean-why-are-they-so-long/
 
-## Remote Control KeyCodes
-https://wiki.samygo.tv/index.php?title=Key_codes
 
 
 ## Installation
@@ -65,21 +64,15 @@ The following keys are supported by in the **Apple TV Remote** in the Control Ce
 * Volume Up
 * Volume Down (triple-press for Mute)
 
-REMOTE CONTROL DOUBLE-TAP AND TRIPLE-TAP ARE VERY MUCH WORK IN PROGRESS. TRIPLE-TAP IS EXPERIMENTAL.
-
 ## Accessory Supported Functions
-### Inputs
-WORK IN PROGRESS
-The plugin cannot read the current source, it can only send the SOURCE or HDMI commands. Two inputs are provided for each command, to allow you to send another SOURCE or another HDMI command as required.
-* SOURCE, NEXT SOURCE - same as the SOURCE button on the TV remote. Each press cycles to the next source.
-* HDMI, NEXT HDMI - same as the HDMI button on the TV remote. Each press cycles to the next HDMI source.
+### Power
+You can turn the device power on via HDMI-CEC, and off remote control commands. Power state is shown by pinging the device.
 
-NOTE:
-Currently the plugin only knows the remote key comand for the TV SOURCE button. Unfortunately, I do not know the remote command for the Home Theater SOURCE button. If you know the command, please let me know.
+### Inputs
+You can configure up to 20 inputs in the plugin config. The inputs can send any key code. Note that the plugin cannot currently read the current TV or HT source, it can only send the key codes. 
 
 ### View TV Settings
-The Accessory settings icon command **View TV Settings** will open the TV of Home Theater's menu.
-
+The Accessory settings icon command **View TV Settings** will open the TV or Home Theater's menu.
 
 ## Configuration
 Add a new platform to the platforms section of your homebridge `config.json`.
@@ -197,22 +190,8 @@ Example extended configuration as used on the author's Samsung TV (where 192.168
 
 * **xxxButtonTripleTap**: The key to send when button xxx is tapped in the iOS remote control. See supported button names below.
 
-#### Supported Remote Control Button Names
-
-The following button names are supported in the config:
-
-* arrowUpButton
-* arrowDownButton
-* arrowLeftButton
-* arrowRightButton
-* selectButton
-* playPauseButton
-* backButton
-* infoButton
-
-#### Supported Key Code Names
-
-See the [samsung-tvht wiki](https://github.com/jsiegenthaler/homebridge-samsungtvht/wiki) for a list of websites where you can find key code names.
+#### Supported Key Codes
+Commonly used remote control key codes are supplied as defaults, but you can customise the key codes as you wish. See the [samsung-tvht wiki](https://github.com/jsiegenthaler/homebridge-samsungtvht/wiki) for full details of all key codes.
 
 
 
