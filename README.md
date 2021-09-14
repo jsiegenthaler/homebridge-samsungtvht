@@ -186,10 +186,6 @@ Example configuration as used on the author's Samsung TV (where 192.168.0.x is t
 
 #### Device Config (array)
 
-                    "powerOnCommand": "echo 'on 0.0.0.0' | cec-client -s -d 1 RPI",
-                    "powerOnStartupTime": 4000,
-                    "powerOffButton": "KEY_POWEROFF",
-                    
 * **name**: The name of the device to display on the Home app tile. Mandatory.
 
 * **ipAddress**: the ip address of the device. Mandatory.
@@ -235,10 +231,11 @@ Commonly used remote control key codes are supplied as defaults, but you can cus
 
 
 ## Thanks to
-* All the people that documented the Samsung key code names
+* [samsung-remote](https://github.com/natalan/samsung-remote), the inspiration for this project
 
 * [homebridge-yamaha-avr](https://github.com/ACDR/homebridge-yamaha-avr)
 
 * https://openbase.io/js/homebridge-denon-tv/documentation
 
+* All the people that documented the Samsung key codes
 
