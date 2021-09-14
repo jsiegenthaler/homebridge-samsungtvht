@@ -22,7 +22,7 @@ This plugin was written and tested on the author's Samsung D-series TV and D-ser
 * A non-Tizen Samsung TV or Home Theater system. Tizen started in 2015, so TVs and HTs before 2015 generally work with this plugin.
 * The TV or Home Theater system must be connected to your hme network via Ethernet LAN cable, or Wifi.
 
-## Decode your Samsung TV model Number
+## Decode your Samsung TV Model Number
 https://www.samsung.com/uk/support/tv-audio-video/what-do-samsung-tv-model-numbers-actually-mean-why-are-they-so-long/
 
 
