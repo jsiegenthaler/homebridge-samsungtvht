@@ -198,7 +198,7 @@
                                     "title": "Input Source Type",
                                     "type": "string",
                                     "description": "The type of input source. Specified but not used by Apple as of iOS 14.7 but may be supported in the future. See the <a href=\"https://github.com/jsiegenthaler/homebridge-samsung-tvht/wiki\">Wiki</a> for more details",
-                                    "default": "HDMI",
+                                    "default": "3",
                                     "oneOf": [
                                         { "title": "Other", "enum": [0] },
                                         { "title": "Home Screen", "enum": [1] },
@@ -218,7 +218,7 @@
                                     "title": "Input Device Type",
                                     "type": "string",
                                     "description": "The type of input device. Specified but not used by Apple as of iOS 14.7 but may be supported in the future. See the <a href=\"https://github.com/jsiegenthaler/homebridge-samsung-tvht/wiki\">Wiki</a> for more  details",
-                                    "default": "TV",
+                                    "default": "1",
                                     "oneOf": [
                                         { "title": "Other", "enum": [0] },
                                         { "title": "TV", "enum": [1] },
