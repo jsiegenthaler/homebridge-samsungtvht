@@ -1,6 +1,11 @@
 # homebridge-samsungtvht
 
-`homebridge-samsungtvht` is a Homebridge plugin allowing you to control your Samsung D-series TV and Home Theater with Apple HomeKit using the Home app and the Apple TV Remote in the Control Center.
+`homebridge-samsungtvht` is a Homebridge plugin allowing you to control your non-Tizen Samsung TV and Home Theater with Apple HomeKit using the Home app and the Apple TV Remote in the Control Center.
+Suported TVs and HTs are:
+* D-series from 2011 (confirmed working)
+* E-series from 2012 (confirmed working)
+* F-series from 2013 (confirmation needed)
+* H-series from 2014 (confirmation needed)
 
 This plugin displays your Samsung device as a TV or Audio Receiver Accessory with Power, Input & Remote Control capabilities in your iOS device (iPhone, iPad, iMac, etc.).
 
@@ -14,8 +19,8 @@ This plugin was written and tested on the author's Samsung D-series TV and D-ser
 ## Requirements
 * An Apple iPhone or iPad with iOS 14.0 (or later). Developed on iOS 14.1...14.7.1, earlier versions not tested.
 * [Homebridge](https://homebridge.io/) v1.2.5 (or later). Developed on Homebridge 1.1.116....1.3.4, earlier versions not tested.
-* A Samsung TV or Home Theater system from around 2011 (non-Tizen system)
-* The TV or Home thearter system must be connected to your hme network via Ethernet LAN cable, or Wifi.
+* A non-Tizen Samsung TV or Home Theater system. Tizen started in 2015, so TVs and HTs before 2015 generally work with this plugin.
+* The TV or Home Theater system must be connected to your hme network via Ethernet LAN cable, or Wifi.
 
 ## Decode your Samsung TV model Number
 https://www.samsung.com/uk/support/tv-audio-video/what-do-samsung-tv-model-numbers-actually-mean-why-are-they-so-long/
@@ -75,55 +80,52 @@ You can configure up to 20 inputs in the plugin config. The inputs can send any 
 The Accessory settings icon command **View TV Settings** will open the TV or Home Theater's menu.
 
 ## Configuration
+### Config via Settings
+It is easiest to configure the plugin via Homebridge: Plugins > Homebridge Samsung TV HT > SETTINGS.
+
+### Manual Config
+You can also configure manually. 
 Add a new platform to the platforms section of your homebridge `config.json`.
 
-Example minimum (mandatory) configuration:
+Example configuration as used on the author's Samsung TV (where 192.168.0.x is the IP address of the TV):
 
 ```js
     "platforms": [
         {
-            "platform": "samsungtvht",
-            "name": "samsungtvht",
-            "pingCommand": "ping -n 1 -w 10",
-            "pingResponseOn": "(0% loss)",
-            "pingResponseOff": "(100% loss)",
-            "devices": [
-                {
-                    "name": "Samsung TV",
-                    "ipAddress": "192.168.0.x",
-                    "type": "television",
-                    "manufacturer": "Samsung",
-                    "modelName": "UE40D5000",
-                    "serialNumber": "T-MSV4DEUC-1005.0",
-                    "firmwareRevision": "1005.0"
-                }
-            ]
-        }
-    ]
-```
-
-
-Example extended configuration as used on the author's Samsung TV (where 192.168.0.x is the IP address of the TV):
-
-```js
-    "platforms": [
-        {
-            "platform": "samsungtvht",
-            "name": "samsungtvht",
-            "pingCommand": "ping -n 1 -w 10",
-            "pingResponseOn": "(0% loss)",
-            "pingResponseOff": "(100% loss)",
+           "name": "Samsung TV HT",
+            "pingCommand": "ping -c 1 -w 10",
+            "pingResponseOn": ", 0% packet loss",
+            "pingResponseOff": ", 100% packet loss",
             "doublePressTime": 250,
-            "triplePressTime": 400,            
+            "triplePressTime": 450,
+            "doublePressDelayTime": 300,
+            "debugLevel": 1,
             "devices": [
                 {
-                    "name": "Samsung TV",
-                    "type": "television",
+                    "name": "TV",
                     "ipAddress": "192.168.0.x",
+                    "type": "television",
                     "manufacturer": "Samsung",
                     "modelName": "UE40D5000",
                     "serialNumber": "T-MSV4DEUC-1005.0",
-                    "firmwareRevision": "1005.0"
+                    "firmwareRevision": "1005.0",
+                    "powerOnCommand": "echo 'on 0.0.0.0' | cec-client -s -d 1 RPI",
+                    "powerOnStartupTime": 4000,
+                    "powerOffButton": "KEY_POWEROFF",
+                    "inputs": [
+                        {
+                            "inputName": "Source",
+                            "inputKeyCode": "KEY_SOURCE",
+                            "inputSourceType": "3",
+                            "inputDeviceType": "1"
+                        },
+                        {
+                            "inputName": "HDMI",
+                            "inputKeyCode": "KEY_HDMI",
+                            "inputSourceType": "3",
+                            "inputDeviceType": "1"
+                        }
+                    ],
                     "arrowUpButton": "KEY_UP",
                     "arrowUpButtonDoubleTap": "KEY_CHUP",
                     "arrowUpButtonTripleTap": "KEY_UP",
@@ -147,7 +149,10 @@ Example extended configuration as used on the author's Samsung TV (where 192.168
                     "backButtonTripleTap": "KEY_RETURN",
                     "infoButton": "KEY_MENU",
                     "infoButtonDoubleTap": "KEY_INFO",
-                    "infoButtonTripleTap": "KEY_TOOLS"
+                    "infoButtonTripleTap": "KEY_TOOLS",
+                    "volupButton": "KEY_VOL_UP",
+                    "voldownButton": "KEY_VOLDOWN",
+                    "voldownButtonTriplePress": "KEY_MUTE"
                 }
             ]
         }
