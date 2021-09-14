@@ -2,7 +2,7 @@
 
 `homebridge-samsungtvht` is a Homebridge plugin allowing you to control your non-Tizen Samsung TV and Home Theater with Apple HomeKit using the Home app and the Apple TV Remote in the Control Center.
 Suported TVs and HTs are:
-* D-series from 2011 (confirmed working)
+* D-series from 2011 (confirmed working, as used by the author)
 * E-series from 2012 (confirmed working)
 * F-series from 2013 (confirmation needed)
 * H-series from 2014 (confirmation needed)
@@ -92,7 +92,8 @@ Example configuration as used on the author's Samsung TV (where 192.168.0.x is t
 ```js
     "platforms": [
         {
-           "name": "Samsung TV HT",
+            "platform": "samsungtvht",
+            "name": "Samsung TV HT",
             "pingCommand": "ping -c 1 -w 10",
             "pingResponseOn": ", 0% packet loss",
             "pingResponseOff": ", 100% packet loss",
@@ -161,9 +162,11 @@ Example configuration as used on the author's Samsung TV (where 192.168.0.x is t
 
 ### Configuration Items:
 
-#### Mandatory
+#### Platform Config
 
 * **platform**: the name of your platform. Mandatory, must be samsungtvht.
+
+* **name**: The displayed name of your device. Default is the plugin name. Mandatory.
 
 * **pingCommand**: the ping command to be used to ping the device to determine it's power state. For Linux, use "ping -c 1 -w 1" (the default>). For Windows, use "ping -n 1 -w 10". The ping options used are: Linux: -c 1 = ping once only; -w 1 = wait 1 millisecond before timing out.  Windows: -w 10 = wait 10 milliseconds before timing out.
 
@@ -171,29 +174,59 @@ Example configuration as used on the author's Samsung TV (where 192.168.0.x is t
 
 * **pingResponseOff**: the ping response that corresponds to no ping response, indicating that the device is turned off. For Linux, use "100% packet loss". For Windows use "(100% loss)"
 
-* **devices**: an array for each device's config
+* **doublePressTime**: the time in ms to detect a double key press (or tap). Default 250 ms. Mandatory.
 
-* **name**: The displayed name of your device. Default is the plugin name. Mandatory.
+* **triplePressTime**: the time in ms to detect a triple key press (or tap). Default 450 ms. Mandatory.
 
-* **type**: The device type, which sets the Home tile icon. Either Television ("television") or Audio Receiver ("receiver"). Default is television. Mandatory.
+* **doublePressDelayTime**: the time in ms to wait for another key press to detect a double key press. Must be greater than doublePressTime. Default 300 ms. Mandatory.
+
+* **debugLevel**: the level of debug info displayed by this plugin, from 0 (none) to 3 (Verbose). Default 0. Mandatory.
+
+* **devices**: an array for each device's config, See below.
+
+#### Device Config (array)
+
+                    "powerOnCommand": "echo 'on 0.0.0.0' | cec-client -s -d 1 RPI",
+                    "powerOnStartupTime": 4000,
+                    "powerOffButton": "KEY_POWEROFF",
+                    
+* **name**: The name of the device to display on the Home app tile. Mandatory.
 
 * **ipAddress**: the ip address of the device. Mandatory.
 
-#### Optional
+* **type**: The device type, which sets the Home tile icon. Either Television ("television") or Audio Receiver ("receiver"). Default is television. Mandatory.
 
-* **manufacturer**: You can set a manufacturer of your choice. Default = Samsung
+* **manufacturer**: You can set a manufacturer of your choice. Default = Samsung. Optional.
 
-* **modelName**: You can set a firmware revision of your choice. Default = platform name
+* **modelName**: You can set a firmware revision of your choice. Default = platform name. Optional.
 
-* **serialNumber**: You can set a serial number of your choice. Default = unknown
+* **serialNumber**: You can set a serial number of your choice. Default = unknown. Optional.
 
-* **firmwareRevision**: You can set a firmware revision of your choice. Must be numeric, ie 1.2.3. Default = plugin version
+* **firmwareRevision**: You can set a firmware revision of your choice. Must be numeric, ie 1.2.3. Default = plugin version. Optional.
 
-* **xxxButton**: The key to send when button xxx is tapped in the iOS remote control. See supported button names below.
+* **powerOnCommand**: the command to execute on your Homebridge system to turn the power on. HDMI-CEC commands work well here. Optional.
 
-* **xxxButtonDoubleTap**: The key to send when button xxx is tapped in the iOS remote control. See supported button names below.
+* **powerOnStartupTime**: the amount of time in ms to wait for the device to power up. Pings are asuppressed during this wait time. Default 4000 ms. Optional.
 
-* **xxxButtonTripleTap**: The key to send when button xxx is tapped in the iOS remote control. See supported button names below.
+* **powerOffButton**: the key code to send to turn the device off. Optional.
+
+* **xxxButton**: The key code to send when button xxx is tapped in the iOS remote control. See the example for supported button names.
+
+* **xxxButtonDoubleTap**: The key code to send when button xxx is tapped in the iOS remote control. See the example for supported button names.
+
+* **xxxButtonTripleTap**: The key code to send when button xxx is tapped in the iOS remote control. See the example for supported button names.
+
+#### Input Config (array per device)
+
+* **inputName**: the input name to display in the Home app. Optional.
+
+* **inputKeyCode**: the key code to send for this input. Optional.
+
+* **inputSourceType**: the input device type, as defined in the [Homebridge API Input Source Type](https://developers.homebridge.io/#/characteristic/InputSourceType). Default 3 (HDMI). Optional.
+
+* **inputDeviceType**: the input device type, as defined in the [Homebridge API Input Device Type](https://developers.homebridge.io/#/characteristic/InputDeviceType). Default 1 (TV). Optional.
+
+                            
 
 #### Supported Key Codes
 Commonly used remote control key codes are supplied as defaults, but you can customise the key codes as you wish. See the [samsung-tvht wiki](https://github.com/jsiegenthaler/homebridge-samsungtvht/wiki) for full details of all key codes.
