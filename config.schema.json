@@ -3,7 +3,7 @@
     "pluginType": "platform",
     "singular": true,
     "headerDisplay": "Homebridge plugin for Samsung TV (D5000 series) and Home Theater (D5500 series) from ca 2011.",
-    "footerDisplay": "For a detailed description, see the [README](https://www.npmjs.com/package/homebridge-samsungtvht).",
+    "footerDisplay": "For a detailed description, see the [README](https://www.npmjs.com/package/homebridge-samsungtvht) and the [Wiki](https://github.com/jsiegenthaler/homebridge-samsung-tvht/wiki).",
     "schema": {
       "type": "object",
       "properties": {
@@ -80,12 +80,12 @@
   
 
         "devices": {
-            "type": "array",
             "title": "Devices",
+            "type": "array",
             "description": "Each TV or HT is a device. This plugin supports multiple devices.",
             "items": {
-                "title": "Devices",
                 "type": "object",
+                "titlexxx": "Devices",
                 "properties": {
                     "name": {
                         "title": "Name",
@@ -103,7 +103,8 @@
                         "description": "The IP address of the device",
                         "default": "192.168.0.xxx",
                         "maxLength": 15,
-                        "required": true
+                        "required": true,
+                        "format": "ipv4"
                     },
 
                     "type": {
@@ -149,158 +150,278 @@
                         "pattern": "^(\\d+)((\\.{1}\\d+)*)(\\.{0})$"
                     },
 
+                    "powerOnCommand": {
+                        "title": "Power On Command",
+                        "type": "string",
+                        "description": "A command to issue to the OS to turn the device on. See the <a href=\"https://github.com/jsiegenthaler/homebridge-samsung-tvht/wiki\">Wiki</a> for full details",
+                        "placeholder": "echo 'on 0' | cec-client -s -d 1",
+                        "default": "echo 'on 0' | cec-client -s -d 1"
+                    },
+                    "powerOnStartupTime": {
+                        "title": "Startup Time",
+                        "type": "integer",
+                        "description": "Time in ms for the device to start up. Pings are suppressed during this time to avoid incorrect tile state in the Home app. Default: 4000",
+                        "minimum": 100,
+                        "maximum": 10000,
+                        "placeholder": 4000,
+                        "default": 4000
+                    },
+                    "powerOffButton": {
+                        "title": "Power Off Button",
+                        "type": "string",
+                        "description": "The key code to send to turn the device off. TV: KEY_POWEROFF, HT: BD_KEY_POWER. See the <a href=\"https://github.com/jsiegenthaler/homebridge-samsung-tvht/wiki\">Wiki</a> for all key codes",
+                        "placeholder": "Examples: TV: KEY_POWEROFF, HT: BD_KEY_POWER",
+                        "default": "KEY_POWEROFF"
+                    },
+
+
+                    "inputs": {
+                        "title": "Input Config",
+                        "type": "array",
+                        "description":"Each input can send any key code. Drag and drop to reorder. Maximum 20 inputs.",
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "inputName": {
+                                    "title": "Input Name",
+                                    "type": "string",
+                                    "description": "The name of the input",
+                                    "placeholder": "Examples: Source, HDMI, TV, PC"
+                                },
+                                "inputKeyCode": {
+                                    "title": "Input KeyCode",
+                                    "type": "string",
+                                    "description": "The key code to send for this input. See the <a href=\"https://github.com/jsiegenthaler/homebridge-samsung-tvht/wiki\">Wiki</a> for all key codes",
+                                    "placeholder": "Examples: KEY_SOURCE, KEY_HDMI, KEY_TV, KEY_PCMODE"
+                                },
+                                "inputSourceType": {
+                                    "title": "Input Source Type",
+                                    "type": "string",
+                                    "description": "The type of input source. Specified but not used by Apple as of iOS 14.7 but may be supported in the future. See the <a href=\"https://github.com/jsiegenthaler/homebridge-samsung-tvht/wiki\">Wiki</a> for more details",
+                                    "default": "HDMI",
+                                    "oneOf": [
+                                        { "title": "Other", "enum": [0] },
+                                        { "title": "Home Screen", "enum": [1] },
+                                        { "title": "Tuner", "enum": [2] },
+                                        { "title": "HDMI", "enum": [3] },
+                                        { "title": "Composite Video", "enum": [4] },
+                                        { "title": "S-Video", "enum": [5] },
+                                        { "title": "Component Video", "enum": [6] },
+                                        { "title": "DVI", "enum": [7] },
+                                        { "title": "AirPlay", "enum": [8] },
+                                        { "title": "USB", "enum": [9] },
+                                        { "title": "Application", "enum": [10] }
+                                    ],
+                                    "required": true
+                                },
+                                "inputDeviceType": {
+                                    "title": "Input Device Type",
+                                    "type": "string",
+                                    "description": "The type of input device. Specified but not used by Apple as of iOS 14.7 but may be supported in the future. See the <a href=\"https://github.com/jsiegenthaler/homebridge-samsung-tvht/wiki\">Wiki</a> for more  details",
+                                    "default": "TV",
+                                    "oneOf": [
+                                        { "title": "Other", "enum": [0] },
+                                        { "title": "TV", "enum": [1] },
+                                        { "title": "Recording", "enum": [2] },
+                                        { "title": "Tuner", "enum": [3] },
+                                        { "title": "Playback", "enum": [4] },
+                                        { "title": "Audio System", "enum": [5] }
+                                    ],
+                                    "required": true
+                                }                            }
+                        }
+                    },
+
+                            
+
+
+
                     "arrowUpButton": {
                         "title": "Arrow Up (single tap)",
                         "type": "string",
-                        "descriptionxx": "The key to send when the (Arrow Up) button is tapped once on the iOS remote.<br>See the <a href=\"https://github.com/jsiegenthaler/homebridge-samsung-tvht/wiki\">Wiki</a> for a description of all keys. Default: KEY_UP",
+                        "descriptionxx": "The key code to send when the (Arrow Up) button is tapped once on the iOS remote.<br>See the <a href=\"https://github.com/jsiegenthaler/homebridge-samsung-tvht/wiki\">Wiki</a> for all key codes. Default: KEY_UP",
+                        "placeholder": "KEY_UP",
                         "default": "KEY_UP"
-
                     },
                     "arrowUpButtonDoubleTap": {
                         "title": "Arrow Up (double tap)",
                         "type": "string",
-                        "descriptionxx": "The key to send when the (Arrow Up) button is double-tapped on the iOS remote.<br>See the <a href=\"https://github.com/jsiegenthaler/homebridge-samsung-tvht/wiki\">Wiki</a> for a description of all keys. Default: KEY_CHUP",
+                        "descriptionxx": "The key code to send when the (Arrow Up) button is double-tapped on the iOS remote.<br>See the <a href=\"https://github.com/jsiegenthaler/homebridge-samsung-tvht/wiki\">Wiki</a> for all key codes. Default: KEY_CHUP",
                         "default": "KEY_CHUP"
                     },
                     "arrowUpButtonTripleTap": {
                         "title": "Arrow Up (triple tap)",
                         "type": "string",
-                        "descriptionxx": "The key to send when the (Arrow Up) button is triple-tapped on the iOS remote.<br>See the <a href=\"https://github.com/jsiegenthaler/homebridge-samsung-tvht/wiki\">Wiki</a> for a description of all keys. Default: KEY_UP",
+                        "descriptionxx": "The key code to send when the (Arrow Up) button is triple-tapped on the iOS remote.<br>See the <a href=\"https://github.com/jsiegenthaler/homebridge-samsung-tvht/wiki\">Wiki</a> for all key codes. Default: KEY_UP",
                         "default": "KEY_UP"
                     },
 
                     "arrowDownButton": {
                         "title": "Arrow Down (single tap)",
                         "type": "string",
-                        "descriptionxx": "The key to send when the (Arrow Down) button is tapped once on the iOS remote.<br>See the <a href=\"https://github.com/jsiegenthaler/homebridge-samsung-tvht/wiki\">Wiki</a> for a description of all keys. Default: KEY_DOWN",
+                        "descriptionxx": "The key code to send when the (Arrow Down) button is tapped once on the iOS remote.<br>See the <a href=\"https://github.com/jsiegenthaler/homebridge-samsung-tvht/wiki\">Wiki</a> for all key codes. Default: KEY_DOWN",
+                        "placeholder": "KEY_DOWN",
                         "default": "KEY_DOWN"
                     },
                     "arrowDownButtonDoubleTap": {
                         "title": "Arrow Down (double tap)",
                         "type": "string",
-                        "descriptionxx": "The key to send when the (Arrow Down) button is double-tapped on the iOS remote.<br>See the <a href=\"https://github.com/jsiegenthaler/homebridge-samsung-tvht/wiki\">Wiki</a> for a description of all keys. Default: KEY_CHDOWN",
+                        "descriptionxx": "The key code to send when the (Arrow Down) button is double-tapped on the iOS remote.<br>See the <a href=\"https://github.com/jsiegenthaler/homebridge-samsung-tvht/wiki\">Wiki</a> for all key codes. Default: KEY_CHDOWN",
                         "default": "KEY_CHDOWN"
                     },
                     "arrowDownButtonTripleTap": {
                         "title": "Arrow Down (triple tap)",
                         "type": "string",
-                        "descriptionxx": "The key to send when the (Arrow Down) button is triple-tapped on the iOS remote.<br>See the <a href=\"https://github.com/jsiegenthaler/homebridge-samsung-tvht/wiki\">Wiki</a> for a description of all keys. Default: KEY_DOWN",
+                        "descriptionxx": "The key code to send when the (Arrow Down) button is triple-tapped on the iOS remote.<br>See the <a href=\"https://github.com/jsiegenthaler/homebridge-samsung-tvht/wiki\">Wiki</a> for all key codes. Default: KEY_DOWN",
                         "default": "KEY_DOWN"
                     },
 
                     "arrowLeftButton": {
                         "title": "Arrow Left (single tap)",
                         "type": "string",
-                        "descriptionxx": "The key to send when the (Arrow Left) button is tapped once on the iOS remote.<br>See the <a href=\"https://github.com/jsiegenthaler/homebridge-samsung-tvht/wiki\">Wiki</a> for a description of all keys. Default: KEY_LEFT",
+                        "descriptionxx": "The key code to send when the (Arrow Left) button is tapped once on the iOS remote.<br>See the <a href=\"https://github.com/jsiegenthaler/homebridge-samsung-tvht/wiki\">Wiki</a> for all key codes. Default: KEY_LEFT",
+                        "placeholder": "KEY_LEFT",
                         "default": "KEY_LEFT"
                     },
                     "arrowLeftButtonDoubleTap": {
                         "title": "Arrow Left (double tap)",
                         "type": "string",
-                        "descriptionxx": "The key to send when the (Arrow Left) button is double-tapped on the iOS remote.<br>See the <a href=\"https://github.com/jsiegenthaler/homebridge-samsung-tvht/wiki\">Wiki</a> for a description of all keys. Default: KEY_REWIND",
+                        "descriptionxx": "The key code to send when the (Arrow Left) button is double-tapped on the iOS remote.<br>See the <a href=\"https://github.com/jsiegenthaler/homebridge-samsung-tvht/wiki\">Wiki</a> for all key codes. Default: KEY_REWIND",
                         "default": "KEY_REWIND"
                     },
                     "arrowLeftButtonTripleTap": {
                         "title": "Arrow Left (triple tap)",
                         "type": "string",
-                        "descriptionxx": "The key to send when the (Arrow Left) button is triple-tapped on the iOS remote.<br>See the <a href=\"https://github.com/jsiegenthaler/homebridge-samsung-tvht/wiki\">Wiki</a> for a description of all keys. Default: KEY_LEFT",
+                        "descriptionxx": "The key code to send when the (Arrow Left) button is triple-tapped on the iOS remote.<br>See the <a href=\"https://github.com/jsiegenthaler/homebridge-samsung-tvht/wiki\">Wiki</a> for all key codes. Default: KEY_LEFT",
                         "default": "KEY_LEFT"
                     },
 
                     "arrowRightButton": {
                         "title": "Arrow Right (single tap)",
                         "type": "string",
-                        "descriptionxx": "The key to send when the (Arrow Right) button is tapped once on the iOS remote.<br>See the <a href=\"https://github.com/jsiegenthaler/homebridge-samsung-tvht/wiki\">Wiki</a> for a description of all keys. Default: KEY_RIGHT",
+                        "descriptionxx": "The key code to send when the (Arrow Right) button is tapped once on the iOS remote.<br>See the <a href=\"https://github.com/jsiegenthaler/homebridge-samsung-tvht/wiki\">Wiki</a> for all key codes. Default: KEY_RIGHT",
+                        "placeholder": "KEY_RIGHT",
                         "default": "KEY_RIGHT"
                     },
                     "arrowRightButtonDoubleTap": {
                         "title": "Arrow Right (double tap)",
                         "type": "string",
-                        "descriptionxx": "The key to send when the (Arrow Right) button is double-tapped on the iOS remote.<br>See the <a href=\"https://github.com/jsiegenthaler/homebridge-samsung-tvht/wiki\">Wiki</a> for a description of all keys. Default: KEY_FF",
+                        "descriptionxx": "The key code to send when the (Arrow Right) button is double-tapped on the iOS remote.<br>See the <a href=\"https://github.com/jsiegenthaler/homebridge-samsung-tvht/wiki\">Wiki</a> for all key codes. Default: KEY_FF",
                         "default": "KEY_FF"
                     },
                     "arrowRightButtonTripleTap": {
                         "title": "Arrow Right (triple tap)",
                         "type": "string",
-                        "descriptionxx": "The key to send when the (Arrow Right) button is triple-tapped on the iOS remote.<br>See the <a href=\"https://github.com/jsiegenthaler/homebridge-samsung-tvht/wiki\">Wiki</a> for a description of all keys. Default: KEY_RIGHT",
+                        "descriptionxx": "The key code to send when the (Arrow Right) button is triple-tapped on the iOS remote.<br>See the <a href=\"https://github.com/jsiegenthaler/homebridge-samsung-tvht/wiki\">Wiki</a> for all key codes. Default: KEY_RIGHT",
                         "default": "KEY_RIGHT"
                     },
 
                     "selectButton": {
                         "title": "Select (single tap)",
                         "type": "string",
-                        "descriptionxx": "The key to send when the (Select) button is tapped once on the iOS remote.<br>See the <a href=\"https://github.com/jsiegenthaler/homebridge-samsung-tvht/wiki\">Wiki</a> for a description of all keys. Default: KEY_ENTER",
+                        "descriptionxx": "The key code to send when the (Select) button is tapped once on the iOS remote.<br>See the <a href=\"https://github.com/jsiegenthaler/homebridge-samsung-tvht/wiki\">Wiki</a> for all key codes. Default: KEY_ENTER",
+                        "placeholder": "KEY_ENTER",
                         "default": "KEY_ENTER"
                     },
                     "selectButtonDoubleTap": {
                         "title": "Select (double tap)",
                         "type": "string",
-                        "descriptionxx": "The key to send when the (Select) button is double-tapped on the iOS remote.<br>See the <a href=\"https://github.com/jsiegenthaler/homebridge-samsung-tvht/wiki\">Wiki</a> for a description of all keys. Default: KEY_SOURCE",
+                        "descriptionxx": "The key code to send when the (Select) button is double-tapped on the iOS remote.<br>See the <a href=\"https://github.com/jsiegenthaler/homebridge-samsung-tvht/wiki\">Wiki</a> for all key codes. Default: KEY_SOURCE",
                         "default": "KEY_SOURCE"
                     },
                     "selectButtonTripleTap": {
                         "title": "Select (triple tap)",
                         "type": "string",
-                        "descriptionxx": "The key to send when the (Select) button is triple-tapped on the iOS remote.<br>See the <a href=\"https://github.com/jsiegenthaler/homebridge-samsung-tvht/wiki\">Wiki</a> for a description of all keys. Default: KEY_HDMI",
+                        "descriptionxx": "The key code to send when the (Select) button is triple-tapped on the iOS remote.<br>See the <a href=\"https://github.com/jsiegenthaler/homebridge-samsung-tvht/wiki\">Wiki</a> for all key codes. Default: KEY_HDMI",
                         "default": "KEY_HDMI"
                     },
 
                     "playPauseButton": {
                         "title": "Play/Pause (single tap)",
                         "type": "string",
-                        "descriptionxx": "The key to send when the (Play/Pause) button is tapped once on the iOS remote.<br>See the <a href=\"https://github.com/jsiegenthaler/homebridge-samsung-tvht/wiki\">Wiki</a> for a description of all keys. Default: KEY_PLAY",
+                        "descriptionxx": "The key code to send when the (Play/Pause) button is tapped once on the iOS remote.<br>See the <a href=\"https://github.com/jsiegenthaler/homebridge-samsung-tvht/wiki\">Wiki</a> for all key codes. Default: KEY_PLAY",
+                        "placeholder": "KEY_PLAY",
                         "default": "KEY_PLAY"
                     },
                     "playPauseButtonDoubleTap": {
                         "title": "Play/Pause (double tap)",
                         "type": "string",
-                        "descriptionxx": "The key to send when the (Play/Pause) button is double-tapped on the iOS remote.<br>See the <a href=\"https://github.com/jsiegenthaler/homebridge-samsung-tvht/wiki\">Wiki</a> for a description of all keys. Default: KEY_PAUSE",
+                        "descriptionxx": "The key code to send when the (Play/Pause) button is double-tapped on the iOS remote.<br>See the <a href=\"https://github.com/jsiegenthaler/homebridge-samsung-tvht/wiki\">Wiki</a> for all key codes. Default: KEY_PAUSE",
+                        "placeholder": "KEY_PAUSE",
                         "default": "KEY_PAUSE"
                     },
                     "playPauseButtonTripleTap": {
                         "title": "Play/Pause (triple tap)",
                         "type": "string",
-                        "descriptionxx": "The key to send when the (Play/Pause) button is triple-tapped on the iOS remote.<br>See the <a href=\"https://github.com/jsiegenthaler/homebridge-samsung-tvht/wiki\">Wiki</a> for a description of all keys. Default: KEY_STOP",
+                        "descriptionxx": "The key code to send when the (Play/Pause) button is triple-tapped on the iOS remote.<br>See the <a href=\"https://github.com/jsiegenthaler/homebridge-samsung-tvht/wiki\">Wiki</a> for all key codes. Default: KEY_STOP",
                         "default": "KEY_STOP"
                     },
 
                     "backButton": {
                         "title": "Back (single tap)",
                         "type": "string",
-                        "descriptionxx": "The key to send when the (BACK) button is tapped once on the iOS remote.<br>See the <a href=\"https://github.com/jsiegenthaler/homebridge-samsung-tvht/wiki\">Wiki</a> for a description of all keys. Default: KEY_RETURN",
+                        "descriptionxx": "The key code to send when the (BACK) button is tapped once on the iOS remote.<br>See the <a href=\"https://github.com/jsiegenthaler/homebridge-samsung-tvht/wiki\">Wiki</a> for all key codes. Default: KEY_RETURN",
+                        "placeholder": "KEY_RETURN",
                         "default": "KEY_RETURN"
                     },
                     "backButtonDoubleTap": {
                         "title": "Back (double tap)",
                         "type": "string",
-                        "descriptionxx": "The key to send when the (BACK) button is double-tapped on the iOS remote.<br>See the <a href=\"https://github.com/jsiegenthaler/homebridge-samsung-tvht/wiki\">Wiki</a> for a description of all keys. Default: KEY_EXIT",
+                        "descriptionxx": "The key code to send when the (BACK) button is double-tapped on the iOS remote.<br>See the <a href=\"https://github.com/jsiegenthaler/homebridge-samsung-tvht/wiki\">Wiki</a> for all key codes. Default: KEY_EXIT",
+                        "placeholder": "KEY_EXIT",
                         "default": "KEY_EXIT"
                     },
                     "backButtonTripleTap": {
                         "title": "Back (triple tap)",
                         "type": "string",
-                        "descriptionxx": "The key to send when the (BACK) button is triple-tapped on the iOS remote.<br>See the <a href=\"https://github.com/jsiegenthaler/homebridge-samsung-tvht/wiki\">Wiki</a> for a description of all keys. Default: KEY_RETURN",
+                        "descriptionxx": "The key code to send when the (BACK) button is triple-tapped on the iOS remote.<br>See the <a href=\"https://github.com/jsiegenthaler/homebridge-samsung-tvht/wiki\">Wiki</a> for all key codes. Default: KEY_RETURN",
                         "default": "KEY_RETURN"
                     },
 
                     "infoButton": {
                         "title": "Info (single tap)",
                         "type": "string",
-                        "descriptionxx": "The key to send when the (i) button is tapped once on the iOS remote.<br>See the <a href=\"https://github.com/jsiegenthaler/homebridge-samsung-tvht/wiki\">Wiki</a> for a description of all keys. Default: KEY_MENU",
+                        "descriptionxx": "The key code to send when the (i) button is tapped once on the iOS remote.<br>See the <a href=\"https://github.com/jsiegenthaler/homebridge-samsung-tvht/wiki\">Wiki</a> for all key codes. Default: KEY_MENU",
+                        "placeholder": "KEY_MENU",
                         "default": "KEY_MENU"
                     },
                     "infoButtonDoubleTap": {
                         "title": "Info (double tap)",
                         "type": "string",
-                        "descriptionxx": "The key to send when the (i) button is double-tapped on the iOS remote.<br>See the <a href=\"https://github.com/jsiegenthaler/homebridge-samsung-tvht/wiki\">Wiki</a> for a description of all keys. Default: KEY_INFO",
+                        "descriptionxx": "The key code to send when the (i) button is double-tapped on the iOS remote.<br>See the <a href=\"https://github.com/jsiegenthaler/homebridge-samsung-tvht/wiki\">Wiki</a> for all key codes. Default: KEY_INFO",
+                        "placeholder": "KEY_INFO",
                         "default": "KEY_INFO"
                     },
                     "infoButtonTripleTap": {
                         "title": "Info (triple tap)",
                         "type": "string",
-                        "descriptionxx": "The key to send when the (i) button is triple-tapped on the iOS remote.<br>See the <a href=\"https://github.com/jsiegenthaler/homebridge-samsung-tvht/wiki\">Wiki</a> for a description of all keys. Default: KEY_TOOLS",
+                        "descriptionxx": "The key code to send when the (i) button is triple-tapped on the iOS remote.<br>See the <a href=\"https://github.com/jsiegenthaler/homebridge-samsung-tvht/wiki\">Wiki</a> for all key codes. Default: KEY_TOOLS",
                         "default": "KEY_TOOLS"
-                    }                    
+                    },
+
+
+                    "volupButton": {
+                        "title": "Volume Up",
+                        "type": "string",
+                        "descriptionxx": "The key code to send when the volume up button is pressed on the iOS remote.<br>See the <a href=\"https://github.com/jsiegenthaler/homebridge-samsung-tvht/wiki\">Wiki</a> for all key codes. Default: KEY_VOLUP",
+                        "placeholder": "KEY_VOL_UP",
+                        "default": "KEY_VOL_UP"
+                    },
+                    "voldownButton": {
+                        "title": "Volume Up",
+                        "type": "string",
+                        "descriptionxx": "The key code to send when the volume down button is pressed on the iOS remote.<br>See the <a href=\"https://github.com/jsiegenthaler/homebridge-samsung-tvht/wiki\">Wiki</a> for all key codes. Default: KEY_VOLDOWN",
+                        "placeholder": "KEY_VOLDOWN",
+                        "default": "KEY_VOLDOWN"
+                    },
+                    "voldownButtonTriplePress": {
+                        "title": "Volume Up",
+                        "type": "string",
+                        "descriptionxx": "The key code to send when the volume down button is triple-pressed on the iOS remote.<br>See the <a href=\"https://github.com/jsiegenthaler/homebridge-samsung-tvht/wiki\">Wiki</a> for all key codes. Default: KEY_MUTE",
+                        "placeholder": "KEY_MUTE",
+                        "default": "KEY_MUTE"
+                    }
+
                     
                 }
             }
@@ -350,6 +471,7 @@
             {
                 "key": "devices",
                 "type": "array",
+                "buttonText": "Add device",
                 "items": [
                     {
                         "key": "devices[]",
@@ -377,6 +499,45 @@
                     {
                         "key": "devices[]",
                         "type": "section",
+                        "title": "Power Control",
+                        "expandable": true,
+                        "items": [
+                            "devices[].powerOnCommand",
+                            "devices[].powerOnStartupTime",
+                            "devices[].powerOffButton"
+                        ]
+                    },
+
+                    {
+                        "key": "devices[]",
+                        "type": "section",
+                        "title": "Inputs",
+                        "expandable": true,
+                        "items": [
+                            {
+                                "key": "devices[].inputs",
+                                "type": "array",
+                                "expandable": true,
+                                "expanded": true,
+                                "orderable": true,
+                                "buttonText": "Add input",
+                                "items": [
+                                    "devices[].inputs[].inputName",
+                                    "devices[].inputs[].inputKeyCode",
+                                    "devices[].inputs[].inputSourceType",
+                                    "devices[].inputs[].inputDeviceType"
+                                ]
+                            }
+                        ]
+                    },
+
+
+    
+
+                    
+                    {
+                        "key": "devices[]",
+                        "type": "section",
                         "title": "Remote Control Button Mapping",
                         "expandable": true,
                         "items": [
@@ -389,7 +550,7 @@
                                     {
                                         "type": "flex",
                                         "flex-flow": "row wrap",
-                                        "title": "The key to send when the <b>(Arrow Up)</b> button is tapped on the iOS remote.<br>See the <a href=\"https://github.com/jsiegenthaler/homebridge-samsung-tvht/wiki\">Wiki</a> for a description of all keys.",
+                                        "title": "The key to send when the <b>(Arrow Up)</b> button is tapped on the iOS remote.<br>See the <a href=\"https://github.com/jsiegenthaler/homebridge-samsung-tvht/wiki\">Wiki</a> for all key codes.",
                                         "items": [
                                             "devices[].arrowUpButton",
                                             "devices[].arrowUpButtonDoubleTap",
@@ -407,7 +568,7 @@
                                     {
                                         "type": "flex",
                                         "flex-flow": "row wrap",
-                                        "title": "The key to send when the <b>(Arrow Down)</b> button is tapped on the iOS remote.<br>See the <a href=\"https://github.com/jsiegenthaler/homebridge-samsung-tvht/wiki\">Wiki</a> for a description of all keys.",
+                                        "title": "The key to send when the <b>(Arrow Down)</b> button is tapped on the iOS remote.<br>See the <a href=\"https://github.com/jsiegenthaler/homebridge-samsung-tvht/wiki\">Wiki</a> for all key codes.",
                                         "items": [
                                             "devices[].arrowDownButton",
                                             "devices[].arrowDownButtonDoubleTap",
@@ -425,7 +586,7 @@
                                     {
                                         "type": "flex",
                                         "flex-flow": "row wrap",
-                                        "title": "The key to send when the <b>(Arrow Left)</b> button is tapped on the iOS remote.<br>See the <a href=\"https://github.com/jsiegenthaler/homebridge-samsung-tvht/wiki\">Wiki</a> for a description of all keys.",
+                                        "title": "The key to send when the <b>(Arrow Left)</b> button is tapped on the iOS remote.<br>See the <a href=\"https://github.com/jsiegenthaler/homebridge-samsung-tvht/wiki\">Wiki</a> for all key codes.",
                                         "items": [
                                             "devices[].arrowLeftButton",
                                             "devices[].arrowLeftButtonDoubleTap",
@@ -443,7 +604,7 @@
                                     {
                                         "type": "flex",
                                         "flex-flow": "row wrap",
-                                        "title": "The key to send when the <b>(Arrow Right)</b> button is tapped on the iOS remote.<br>See the <a href=\"https://github.com/jsiegenthaler/homebridge-samsung-tvht/wiki\">Wiki</a> for a description of all keys.",
+                                        "title": "The key to send when the <b>(Arrow Right)</b> button is tapped on the iOS remote.<br>See the <a href=\"https://github.com/jsiegenthaler/homebridge-samsung-tvht/wiki\">Wiki</a> for all key codes.",
                                         "items": [
                                             "devices[].arrowRightButton",
                                             "devices[].arrowRightButtonDoubleTap",
@@ -461,7 +622,7 @@
                                     {
                                         "type": "flex",
                                         "flex-flow": "row wrap",
-                                        "title": "The key to send when the <b>(Select)</b> button is tapped on the iOS remote.<br>See the <a href=\"https://github.com/jsiegenthaler/homebridge-samsung-tvht/wiki\">Wiki</a> for a description of all keys.",
+                                        "title": "The key to send when the <b>(Select)</b> button is tapped on the iOS remote.<br>See the <a href=\"https://github.com/jsiegenthaler/homebridge-samsung-tvht/wiki\">Wiki</a> for all key codes.",
                                         "items": [
                                             "devices[].selectButton",
                                             "devices[].selectButtonDoubleTap",
@@ -481,7 +642,7 @@
                                     {
                                         "type": "flex",
                                         "flex-flow": "row wrap",
-                                        "title": "The key to send when the <b>(Play/Pause)</b> button is tapped on the iOS remote.<br>See the <a href=\"https://github.com/jsiegenthaler/homebridge-samsung-tvht/wiki\">Wiki</a> for a description of all keys.",
+                                        "title": "The key to send when the <b>(Play/Pause)</b> button is tapped on the iOS remote.<br>See the <a href=\"https://github.com/jsiegenthaler/homebridge-samsung-tvht/wiki\">Wiki</a> for all key codes.",
                                         "items": [
                                             "devices[].playPauseButton",
                                             "devices[].playPauseButtonDoubleTap",
@@ -499,7 +660,7 @@
                                     {
                                         "type": "flex",
                                         "flex-flow": "row wrap",
-                                        "title": "The key to send when the <b>(BACK)</b> button is tapped on the iOS remote.<br>See the <a href=\"https://github.com/jsiegenthaler/homebridge-samsung-tvht/wiki\">Wiki</a> for a description of all keys.",
+                                        "title": "The key to send when the <b>(BACK)</b> button is tapped on the iOS remote.<br>See the <a href=\"https://github.com/jsiegenthaler/homebridge-samsung-tvht/wiki\">Wiki</a> for all key codes.",
                                         "items": [
                                             "devices[].backButton",
                                             "devices[].backButtonDoubleTap",
@@ -517,11 +678,29 @@
                                     {
                                         "type": "flex",
                                         "flex-flow": "row wrap",
-                                        "title": "The key to send when the <b>(i)</b> info button is tapped on the iOS remote.<br>See the <a href=\"https://github.com/jsiegenthaler/homebridge-samsung-tvht/wiki\">Wiki</a> for a description of all keys.",
+                                        "title": "The key to send when the <b>(i)</b> info button is tapped on the iOS remote.<br>See the <a href=\"https://github.com/jsiegenthaler/homebridge-samsung-tvht/wiki\">Wiki</a> for all key codes.",
                                         "items": [
                                             "devices[].infoButton",
                                             "devices[].infoButtonDoubleTap",
                                             "devices[].infoButtonTripleTap"
+                                        ]
+                                    } 
+                                ]
+                            },
+                            {
+                                "key": "devices[]",
+                                "type": "section",
+                                "title": "...Volume Control",
+                                "expandable": true,
+                                "items": [
+                                    {
+                                        "type": "flex",
+                                        "flex-flow": "row wrap",
+                                        "title": "The keys to send when the volume control buttons are used on the iOS remote.<br>See the <a href=\"https://github.com/jsiegenthaler/homebridge-samsung-tvht/wiki\">Wiki</a> for all key codes.",
+                                        "items": [
+                                            "devices[].volupButton",
+                                            "devices[].voldownButton",
+                                            "devices[].voldownButtonTriplePress"
                                         ]
                                     } 
                                 ]

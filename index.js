@@ -31,7 +31,7 @@ var PLUGIN_ENV = ''; // controls the development environment, appended to UUID t
 
 
 // general constants
-const NO_INPUT_ID = 1; // default to input 1
+const NO_INPUT_ID = 999; // default to input 999, no input
 const NO_INPUT_NAME = 'UNKNOWN'; // an input name that does not exist
 const POWER_STATE_POLLING_INTERVAL_MS = 2000; // pollling interval in millisec. Default = 2000
 const mediaStateName = ["PLAY", "PAUSE", "STOP", "UNKNOWN3", "LOADING", "INTERRUPTED"];
@@ -47,7 +47,6 @@ let currentInputId;
 let currentPowerState;
 let currentMediaState;
 let targetMediaState;
-let volDownLastKeyPress;
 let Accessory, Characteristic, Service, Categories, UUID;
 
 
@@ -118,8 +117,8 @@ class samsungTvHtPlatform {
 					this.devices.push(newTvHtDevice);
 				}
 				}
-				// start the regular ping
-				this.checkPowerInterval = setInterval(this.powerStateWatchdog.bind(this), POWER_STATE_POLLING_INTERVAL_MS);
+				// start the regular powerStateMonitor
+				this.checkPowerInterval = setInterval(this.powerStateMonitor.bind(this), POWER_STATE_POLLING_INTERVAL_MS);
 		
 		});
 	}
@@ -135,9 +134,9 @@ class samsungTvHtPlatform {
 		this.api.unregisterPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, [platformAccessory]);
 	}
 
-	powerStateWatchdog() {
+	powerStateMonitor() {
 		// ping the devices regularly to check their power state
-		this.log.debug("powerStateWatchdog ---START-----------------------------------------")
+		this.log.debug("powerStateMonitor ---START-----------------------------------------")
 
 		// for linux: 	pingCmd = 'ping -c 1 -w 10' + ' ' + this.config.devices[0].ipAddress;
 		// for win: 	pingCmd = 'ping -n 1 -w 10' + ' ' + this.config.devices[0].ipAddress;
@@ -151,53 +150,53 @@ class samsungTvHtPlatform {
 
 			var pingCmd = this.config.pingCommand || 'ping -c 1 -w 10'; // default linux
 			pingCmd = pingCmd.trim() + ' ' + this.config.devices[i].ipAddress;
-			this.log.debug('powerStateWatchdog: %s pinging device with %s', device.name, pingCmd);
+			this.log.debug('powerStateMonitor: %s pinging device with %s', device.name, pingCmd);
 	
 			var self = this;
 			var deviceRealPowerState;
 			exec(pingCmd, function (error, stdout, stderr) {
-				self.log.debug("powerStateWatchdog: %s ping response: %s", device.name, stdout);
+				self.log.debug("powerStateMonitor: %s ping response: %s", device.name, stdout);
 				// get the current device power state from the ping results
 				// win10:	Packets: Sent = 1, Received = 0, Lost = 1 (100% loss),
 				// linux: 	1 packets transmitted, 0 received, 100% packet loss, time 0ms
 				if (stdout.includes(self.config.pingResponseOff || '100%')) { // 100% packet loss or 100% loss
-					self.log.debug("powerStateWatchdog: %s is not responding to ping, power is currently OFF", device.name);
+					self.log.debug("powerStateMonitor: %s is not responding to ping, power is currently OFF", device.name);
 					deviceRealPowerState = Characteristic.Active.INACTIVE;
 				} else if (stdout.includes(self.config.pingResponseOn || '0%')) { // 0% packet loss or 0% loss
-					self.log.debug("powerStateWatchdog: %s is responding to ping, power is currently ON", device.name);
+					self.log.debug("powerStateMonitor: %s is responding to ping, power is currently ON", device.name);
 					deviceRealPowerState = Characteristic.Active.ACTIVE;
 				} else {
-					self.log.debug("powerStateWatchdog: WARNING %s ping result cannot be parsed! stdout:", device.name, stdout);
+					self.log.debug("powerStateMonitor: WARNING %s ping result cannot be parsed! stdout:", device.name, stdout);
 					deviceRealPowerState = null;
 				}
 
 
 				// evaluate the real vs target power states
-				self.log.debug("powerStateWatchdog: %s evaluating power state. deviceRealPowerState %s, currentPowerState %s, targetPowerState %s", device.name, deviceRealPowerState, device.currentPowerState, device.targetPowerState);
+				self.log.debug("powerStateMonitor: %s evaluating power state. deviceRealPowerState %s, currentPowerState %s, targetPowerState %s", device.name, deviceRealPowerState, device.currentPowerState, device.targetPowerState);
 				if (deviceRealPowerState != device.targetPowerState) {
-					self.log.debug("powerStateWatchdog: %s is currently transitioning from %s to %s. Transition time so far: %s seconds", device.name, deviceRealPowerState, device.targetPowerState, secondsSinceLastPowerKeyPress);
+					self.log.debug("powerStateMonitor: %s is currently transitioning from %s to %s. Transition time so far: %s seconds", device.name, deviceRealPowerState, device.targetPowerState, secondsSinceLastPowerKeyPress);
 					// change in power state was requested
 					if (secondsSinceLastPowerKeyPress < powerStateMaxTransitionTimeSeconds) {
 						// device is currently undergoing a power state transition to the targetPowerState, set currentPowerState to targetPowerState
-						self.log.debug("powerStateWatchdog: %s is still within the allowed transition time of %s seconds, setting currentPowerState to targetPowerState %s", device.name, powerStateMaxTransitionTimeSeconds, device.targetPowerState);
+						self.log.debug("powerStateMonitor: %s is still within the allowed transition time of %s seconds, setting currentPowerState to targetPowerState %s", device.name, powerStateMaxTransitionTimeSeconds, device.targetPowerState);
 						device.currentPowerState = device.targetPowerState;
 					} else {
 						// transition time has timed out, cancel the targetPowerState, reset current and target to deviceRealPowerState
-						self.log.debug("powerStateWatchdog: %s transition time longer than %s seconds, transition has timed out, no power state change occured, resetting currentPowerState to %s", device.name, powerStateMaxTransitionTimeSeconds, deviceRealPowerState);
+						self.log.debug("powerStateMonitor: %s transition time longer than %s seconds, transition has timed out, no power state change occured, resetting currentPowerState to %s", device.name, powerStateMaxTransitionTimeSeconds, deviceRealPowerState);
 						device.targetPowerState = deviceRealPowerState;
 						device.currentPowerState = deviceRealPowerState;
 					}
 
 				} else {
 					device.currentPowerState = deviceRealPowerState || device.currentPowerState; // handle null if a parse error occured
-					self.log.debug("powerStateWatchdog: %s currentPowerState stays unchanged at %s", device.name, device.currentPowerState);
+					self.log.debug("powerStateMonitor: %s currentPowerState stays unchanged at %s", device.name, device.currentPowerState);
 				}
 
 
 				// update device status
-				//self.log.warn("powerStateWatchdog: %s Calling device.updateDeviceState with device.currentPowerState %s", device.name, device.currentPowerState);
+				//self.log.warn("powerStateMonitor: %s Calling device.updateDeviceState with device.currentPowerState %s", device.name, device.currentPowerState);
 				device.updateDeviceState(device.currentPowerState);
-				self.log.debug("powerStateWatchdog ---END-------------------------------------------")
+				self.log.debug("powerStateMonitor ---END-------------------------------------------")
 		
 			});
 
@@ -221,7 +220,7 @@ class samsungTvHtDevice {
 		this.config = config; // the entire platform config
 		this.platform = platform; // the entire platform
 		this.deviceIndex = deviceIndex; // the current device's index
-		this.debugLevel = this.debugLevel || 0; // debugLevel defaults to 0 (minimum)
+		this.debugLevel = platform.debugLevel || 0; // debugLevel defaults to 0 (minimum)
 		this.deviceConfig = this.config.devices[deviceIndex]; // the config for the current device
 
 		this.name = this.deviceConfig.name 	// device name from config
@@ -235,14 +234,17 @@ class samsungTvHtDevice {
 		this.lastRemoteKeyPress0 = [];	// holds the time value of the last remote button press for key index i
 		this.lastRemoteKeyPress1 = [];	// holds the time value of the last-1 remote button press for key index i
 		this.lastRemoteKeyPress2 = [];	// holds the time value of the last-2 remote button press for key index i
+		this.lastVolDownKeyPress = [];  // holds the time value of the last button press for the volume down button
 
-		this.inputList = [
-			{inputId: "SOURCE", inputName: "SOURCE"},
-			{inputId: "NEXT SOURCE", inputName: "NEXT SOURCE"},
-			{inputId: "HDMI", inputName: "HDMI"},
-			{inputId: "NEXT HDMI", inputName: "NEXT HDMI"}
-			//{inputId: "AUX", inputName: "AUX"},
+
+		this.inputList = [];
+		/*
+			{inputId: "1", inputName: "SOURCE"},
+			{inputId: "2", inputName: "SOURCE2"},
+			{inputId: "2", inputName: "HDMI"},
+			{inputId: "3", inputName: "HDMI2"}
 		];
+		*/
 
 		//setup variables
 		this.accessoryConfigured = false;	// true when the accessory is configured
@@ -407,100 +409,34 @@ class samsungTvHtDevice {
 			this.log.warn('prepareInputSourceServices');
 		}
 
-		let inputService;
+		// add dummy entry at index 0 for the inputList
+		this.inputList.push({inputId: '0', inputName: 'Dummy'});
 
 		// For Release 1.0, I'll only support the source by sending the SOURCE key, which just goes to next source
 		// so diable HDMI 2 and Analog AUX. these need HDMI CEC support.
-
-		// SOURCE
-		inputService = new Service.InputSource(1, "input_1");
-		inputService
-			.setCharacteristic(Characteristic.Identifier, 1)
-			.setCharacteristic(Characteristic.ConfiguredName, "SOURCE")
-			.setCharacteristic(Characteristic.InputSourceType, Characteristic.InputSourceType.HDMI)
-			.setCharacteristic(Characteristic.InputDeviceType, Characteristic.InputDeviceType.TV)
-			.setCharacteristic(Characteristic.IsConfigured, Characteristic.IsConfigured.CONFIGURED)
-			.setCharacteristic(Characteristic.CurrentVisibilityState, Characteristic.CurrentVisibilityState.SHOWN)
-			.setCharacteristic(Characteristic.TargetVisibilityState, Characteristic.TargetVisibilityState.SHOWN);
-
-		this.inputServices.push(inputService);
-		this.accessory.addService(inputService);
-		this.televisionService.addLinkedService(inputService);
-
-
-		inputService = new Service.InputSource(1, "input_2");
-		inputService
-			.setCharacteristic(Characteristic.Identifier, 1)
-			.setCharacteristic(Characteristic.ConfiguredName, "NEXT SOURCE")
-			.setCharacteristic(Characteristic.InputSourceType, Characteristic.InputSourceType.HDMI)
-			.setCharacteristic(Characteristic.InputDeviceType, Characteristic.InputDeviceType.TV)
-			.setCharacteristic(Characteristic.IsConfigured, Characteristic.IsConfigured.CONFIGURED)
-			.setCharacteristic(Characteristic.CurrentVisibilityState, Characteristic.CurrentVisibilityState.SHOWN)
-			.setCharacteristic(Characteristic.TargetVisibilityState, Characteristic.TargetVisibilityState.SHOWN);
-
-		this.inputServices.push(inputService);
-		this.accessory.addService(inputService);
-		this.televisionService.addLinkedService(inputService);
-
-
-		// HDMI
-		inputService = new Service.InputSource(2, "input_3");
-		inputService
-			.setCharacteristic(Characteristic.Identifier, 1)
-			.setCharacteristic(Characteristic.ConfiguredName, "HDMI")
-			.setCharacteristic(Characteristic.InputSourceType, Characteristic.InputSourceType.HDMI)
-			.setCharacteristic(Characteristic.InputDeviceType, Characteristic.InputDeviceType.TV)
-			.setCharacteristic(Characteristic.IsConfigured, Characteristic.IsConfigured.CONFIGURED)
-			.setCharacteristic(Characteristic.CurrentVisibilityState, Characteristic.CurrentVisibilityState.SHOWN)
-			.setCharacteristic(Characteristic.TargetVisibilityState, Characteristic.TargetVisibilityState.SHOWN);
-
+		// see https://developers.homebridge.io/#/service/InputSource
+		// see https://developers.homebridge.io/#/characteristic/InputSourceType
+		// see https://developers.homebridge.io/#/characteristic/InputDeviceType
+		this.log.warn('prepareInputSourceServices inputs',this.deviceConfig.inputs);
+		if (this.deviceConfig.inputs){
+			for (let i = 0; i < Math.min(this.deviceConfig.inputs.length,20); i++) {
+				this.log.warn('prepareInputSourceServices loading input %s',i+1,this.deviceConfig.inputs[i]);
+				let inputService = new Service.InputSource(1, "input_" + (i+1).toString());
+				inputService
+					.setCharacteristic(Characteristic.Identifier, i+1)
+					.setCharacteristic(Characteristic.ConfiguredName, this.deviceConfig.inputs[i].inputName)
+					.setCharacteristic(Characteristic.InputSourceType, this.deviceConfig.inputs[i].inputSourceType || 0)
+					.setCharacteristic(Characteristic.InputDeviceType, this.deviceConfig.inputs[i].inputDeviceType || 0)
+					.setCharacteristic(Characteristic.IsConfigured, Characteristic.IsConfigured.CONFIGURED)
+					.setCharacteristic(Characteristic.CurrentVisibilityState, Characteristic.CurrentVisibilityState.SHOWN)
+					.setCharacteristic(Characteristic.TargetVisibilityState, Characteristic.TargetVisibilityState.SHOWN);
 		
-		this.inputServices.push(inputService);
-		this.accessory.addService(inputService);
-		this.televisionService.addLinkedService(inputService);
-
-		// HDMI
-		inputService = new Service.InputSource(2, "input_4");
-		inputService
-			.setCharacteristic(Characteristic.Identifier, 1)
-			.setCharacteristic(Characteristic.ConfiguredName, "NEXT HDMI")
-			.setCharacteristic(Characteristic.InputSourceType, Characteristic.InputSourceType.HDMI)
-			.setCharacteristic(Characteristic.InputDeviceType, Characteristic.InputDeviceType.TV)
-			.setCharacteristic(Characteristic.IsConfigured, Characteristic.IsConfigured.CONFIGURED)
-			.setCharacteristic(Characteristic.CurrentVisibilityState, Characteristic.CurrentVisibilityState.SHOWN)
-			.setCharacteristic(Characteristic.TargetVisibilityState, Characteristic.TargetVisibilityState.SHOWN);
-
-		
-		this.inputServices.push(inputService);
-		this.accessory.addService(inputService);
-		this.televisionService.addLinkedService(inputService);
-
-
-
-		// Analog / AUX-IN
-		// DISABLED FOR RELEASE 1
-		/*
-		inputService = new Service.InputSource(3, "input_3");
-		inputService
-			.setCharacteristic(Characteristic.Identifier, 1)
-			.setCharacteristic(Characteristic.ConfiguredName, "Analog AUX IN")
-			.setCharacteristic(Characteristic.InputSourceType, Characteristic.InputSourceType.OTHER)
-			.setCharacteristic(Characteristic.InputDeviceType, Characteristic.InputDeviceType.AUDIO_SYSTEM)
-			.setCharacteristic(Characteristic.IsConfigured, Characteristic.IsConfigured.CONFIGURED)
-			.setCharacteristic(Characteristic.CurrentVisibilityState, Characteristic.CurrentVisibilityState.SHOWN)
-			.setCharacteristic(Characteristic.TargetVisibilityState, Characteristic.TargetVisibilityState.SHOWN);
-
-			/*
-		inputService.getCharacteristic(Characteristic.ConfiguredName)
-			.on('get', (callback) => { this.getInputName(2, callback); })
-			.on('set', (value, callback) => { this.setInputName(2, value, callback); });
-			*/
-
-		/*
-		this.inputServices.push(inputService);
-		this.accessory.addService(inputService);
-		this.televisionService.addLinkedService(inputService);
-		*/
+				this.inputServices.push(inputService);
+				this.accessory.addService(inputService);
+				this.televisionService.addLinkedService(inputService);
+				this.inputList.push({inputId: inputService.getCharacteristic(Characteristic.Identifier), inputName: inputService.getCharacteristic(Characteristic.ConfiguredName)});
+			}
+		}	
 
 	}
   	//+++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -569,7 +505,7 @@ class samsungTvHtDevice {
 		if (sourceType != null) { this.currentSourceType = sourceType }
 
 		// debugging, helps a lot to see InputName
-		if (this.debugLevel > 0) {
+		if (this.debugLevel > 2) {
 			let currentInputName; // let is scopt to the current {} block
 			let curInput = this.inputList.find(Input => Input.inputId === this.currentInputId); 
 			if (curInput) { currentInputName = curInput.InputName; }
@@ -610,11 +546,14 @@ class samsungTvHtDevice {
 				if (currentActiveIdentifier == NO_INPUT_ID) {
 					newName = 'UNKNOWN';
 				}
+				/*
+				// cannot show current input as it is unknown
 				this.log('%s: Input changed from %s %s to %s %s', 
 					this.name,
 					oldActiveIdentifier + 1, oldName,
 					currentActiveIdentifier + 1, newName);
 				this.televisionService.getCharacteristic(Characteristic.ActiveIdentifier).updateValue(currentActiveIdentifier);
+				*/
 			}
 
 			// set current media state if changed
@@ -664,7 +603,6 @@ class samsungTvHtDevice {
 		// fired when the first key is pressed after opening the Remote Control
 		// wantedPowerState is the wanted power state: 0=off, 1=on
 		if (this.debugLevel > 1) { this.log.warn('%s: setPower targetPowerState:', this.name, targetPowerState, powerStateName[targetPowerState]); }
-		callback(null); // for rapid response
 		this.targetPowerState = targetPowerState;
 
 		// only take action if the target state is different to the current state
@@ -676,19 +614,24 @@ class samsungTvHtDevice {
 			if (this.targetPowerState == Characteristic.Active.INACTIVE){
 				// we want to turn OFF, then we can turn it off with a sendKey
 				// avr: BD_KEY_POWER, tv: KEY_POWER
-				let keyName = 'KEY_POWEROFF';
-				if (this.config.type == 'receiver') {keyName='BD_KEY_POWER'}
-				this.sendKey(keyName);
+				if (this.deviceConfig.powerOffButton) {this.sendKey(this.deviceConfig.powerOffButton)};
 			} else {
 				// we want to turn ON, can turn on only via HDMI-CEC
-				this.log("%s: Request to turn ON: we can only do this with HDMI-CEC", this.name);
+				this.log.warn("%s: setPower powerOnCommand %s", this.name, this.deviceConfig.powerOnCommand);
+				var self = this;
+				if (this.deviceConfig.powerOnCommand){
+					exec(this.deviceConfig.powerOnCommand, function (error, stdout, stderr) {
+						if (stderr){self.log.warn("%s: setPower powerOnCommand: %s", self.name, stderr);} // show any error if any generated
+						if (stdout){self.log.debug("%s: setPower powerOnCommand: %s", self.name, stdout);} // show any stdOut in debug mode
+					});
+				}
 			}
 
 		} else {
 			// if current is already same as target
 			this.log("%s: Current power state is already %s [%s], doing nothing", this.name, this.currentPowerState, powerStateName[this.currentPowerState]);
 		}
-
+		callback(null); 
 	}
 
 	// set mute state
@@ -720,17 +663,17 @@ class samsungTvHtDevice {
 		callback(null); // for rapid response
 
 		// volumeSelectorValue: only 2 values possible: INCREMENT: 0, DECREMENT: 1,
-		this.log.debug('Set volume: %s', (volumeSelectorValue === Characteristic.VolumeSelector.DECREMENT) ? 'Down' : 'Up');
+		this.log.debug('setVolume: Set volume: %s', (volumeSelectorValue === Characteristic.VolumeSelector.DECREMENT) ? 'Down' : 'Up');
 
 		// triple rapid VolDown presses triggers setMute
 		var tripleVolDownPress = 10000; // default high value to prevent a tripleVolDown detection when no triple key pressed
 		if (volumeSelectorValue === Characteristic.VolumeSelector.DECREMENT) {
-			this.volDownLastKeyPress[2] = this.volDownLastKeyPress[1] || 0;
-			this.volDownLastKeyPress[1] = this.volDownLastKeyPress[0] || 0;
-			this.volDownLastKeyPress[0] = Date.now();
-			tripleVolDownPress = this.volDownLastKeyPress[0] - this.volDownLastKeyPress[2];
+			this.lastVolDownKeyPress[2] = this.lastVolDownKeyPress[1] || 0;
+			this.lastVolDownKeyPress[1] = this.lastVolDownKeyPress[0] || 0;
+			this.lastVolDownKeyPress[0] = Date.now();
+			tripleVolDownPress = this.lastVolDownKeyPress[0] - this.lastVolDownKeyPress[2];
 			// check time difference between current keyPress and 2 keyPresses ago
-			this.log.debug('setVolume: Timediff between volDownKeyPress[0] now and volDownKeyPress[2]: %s ms', this.volDownLastKeyPress[0] - this.volDownLastKeyPress[2]);
+			this.log.debug('setVolume: Timediff between lastVolDownKeyPress[0] now and lastVolDownKeyPress[2]: %s ms', this.lastVolDownKeyPress[0] - this.lastVolDownKeyPress[2]);
 		}
 			
 		// check for triple press of volDown, send setmute if tripleVolDownPress less than 1000ms
@@ -774,11 +717,9 @@ class samsungTvHtDevice {
 	// set input
 	async setInput(input, callback) {
 		if (this.debugLevel > 0) {
-			this.log.warn('setInput input:',input.inputId, input.InputName);
+			this.log.warn('setInput input:',input.inputId.value, input.inputName.value);
 		}
-		this.log('setInput input:',input.inputId, input.InputName);
-
-
+		
 		//one day I'll implement the HDMI CEC input control, then I'll need these functions:
 		/*
 		var currentInputName = 'UNKNOWN';
@@ -789,11 +730,19 @@ class samsungTvHtDevice {
 		*/
 
 		//but currently, we're sending SOURCE and HDMI keys
-		if (input.inputId.includes('SOURCE')) {
-			this.sendKey('KEY_SOURCE');
-		} else {
+		if (input.inputName.value.toUpperCase().includes('HDMI')) {
 			this.sendKey('KEY_HDMI');
-		}		
+		} else if (input.inputName.value.toUpperCase().includes('PC')) {
+			this.sendKey('KEY_PCMODE');
+		} else if (input.inputName.value.toUpperCase().includes('EXT')) {
+			this.sendKey('KEY_AV1');
+		} else if (input.inputName.value.toUpperCase().includes('SOURCE')) {
+			this.sendKey('KEY_SOURCE');
+		} else if (input.inputName.value.toUpperCase().includes('TV')) {
+			this.sendKey('KEY_TV');
+		} else {
+			this.sendKey('KEY_SOURCE');
+		}
 		callback(null); // for rapid response
 	}
 
@@ -863,50 +812,6 @@ class samsungTvHtDevice {
 				this.setMediaState(this.currentInputId, 0)
 				break;
 			}
-	}
-
-	// set remote key
-	async setRemoteKeyOld(remoteKey, callback) {
-		if (this.debugLevel > 1) { this.log.warn('%s: setRemoteKeyOld remoteKey:',this.name, remoteKey); }
-		callback(null); // for rapid response
-
-		let keyName;
-		// remoteKey is the key pressed on the Apple TV Remote in the Control Center
-		// keys 12, 13 & 14 are not defined by Apple
-		switch (remoteKey) {
-			case Characteristic.RemoteKey.REWIND: // 0
-				keyName = 'KEY_REWIND'; break;
-			case Characteristic.RemoteKey.FAST_FORWARD: // 1
-				keyName = 'KEY_FF'; break;
-			/* // these keys are unknown for the AVR, so ignore them
-			case Characteristic.RemoteKey.NEXT_TRACK: // 2
-				keyName = 'DisplaySwap'; break;
-			case Characteristic.RemoteKey.PREVIOUS_TRACK: // 3
-				keyName = 'DisplaySwap'; break;
-				*/
-			case Characteristic.RemoteKey.ARROW_UP: // 4
-				keyName = 'KEY_UP'; break;
-			case Characteristic.RemoteKey.ARROW_DOWN: // 5
-				keyName = 'KEY_DOWN'; break;
-			case Characteristic.RemoteKey.ARROW_LEFT: // 6
-				keyName = 'KEY_LEFT'; break;
-			case Characteristic.RemoteKey.ARROW_RIGHT: // 7
-				keyName = 'KEY_RIGHT'; break;
-			case Characteristic.RemoteKey.SELECT: // 8
-				keyName = 'KEY_ENTER'; break;
-			case Characteristic.RemoteKey.BACK: // 9
-				keyName = 'KEY_RETURN'; break;
-			case Characteristic.RemoteKey.EXIT: // 10
-				keyName = 'KEY_EXIT'; break;
-			case Characteristic.RemoteKey.PLAY_PAUSE: // 11
-				keyName = 'KEY_PLAY'; break; // KEY_PLAY KEY_PAUSE
-			case Characteristic.RemoteKey.INFORMATION: // 15
-				keyName = 'KEY_MENU'; break; // KEY_INFO KEY_MENU
-			}
-
-		if (keyName) {
-			this.sendKey(keyName);
-		}
 	}
 
 	// set remote key
@@ -1135,7 +1040,7 @@ class samsungTvHtDevice {
 					} else {
 						// immediate send is not enabled. 
 						// start a delay equal to doublePressTime, then send only if the readyToSendRemoteKeyPress is true
-						var delayTime = this.config.doublePressDelayTime;
+						var delayTime = this.config.doublePressDelayTime || 300;
 						this.log('setRemoteKey sending key %s after delay of %s milliseconds',keyName, delayTime);
 						setTimeout(() => { 
 							// check if can be sent. Only send if sendRemoteKeyPressAfterDelay is still set. It may have been reset by another key press

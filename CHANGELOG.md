@@ -6,10 +6,34 @@ All notable changes to this project will be documented in this file.
 
 ### Initial Release
 
+## 0.0.2-beta.0 (2020-09-14)
+* Added fully configurable input lists
+
+
+## 0.0.2-beta.0 (2020-09-07)
+* Bumped dependencies
+* Removed unused dependencies
+* Added kofi funding to package.json
+
+## 0.0.1-beta.18 (2020-09-04)
+* Fixed a debug bug
+
+## 0.0.1-beta.17 (2020-09-04)
+* Got the channel list working, still not as flexible as I want, but you can select sources
+
+## 0.0.1-beta.16 (2020-09-04)
+* Added powerOffButton
+
+## 0.0.1-beta.15 (2020-09-03)
+* Added powerOnStartupTime, not yet implemented in code
+* Tuned logging for power state
+
+## 0.0.1-beta.14 (2020-09-03)
+* Added powerOnCommand, recommended is cec-client
+
 ## 0.0.1-beta.13 (2020-09-02)
 * Added config.json doublePressDelayTime to help fine tune doublePress
 * Added ddefault values for doublePressTime and triplePressTime to config.json
-
 
 ## 0.0.1-beta.12 (2020-09-02)
 * Improved robustness if a user did not set a doublePressTime
