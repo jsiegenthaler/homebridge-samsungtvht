@@ -6,6 +6,9 @@ All notable changes to this project will be documented in this file.
 
 ### Initial Release
 
+## 0.0.3 (2020-09-15)
+* Released as 0.0.3
+
 ## 0.0.2-beta.1 (2020-09-15)
 * Added vol up, vol down and mute as configurable buttons
 * Improved robustness of inputs to avoid HomeKit getting upset when quantity changes
