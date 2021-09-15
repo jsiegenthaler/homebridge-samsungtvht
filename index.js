@@ -413,23 +413,33 @@ class samsungTvHtDevice {
 		this.inputList.push({inputId: '0', inputName: 'Dummy'});
 
 		// For Release 1.0, I'll only support the source by sending the SOURCE key, which just goes to next source
-		// so diable HDMI 2 and Analog AUX. these need HDMI CEC support.
+		// so disable HDMI 2 and Analog AUX. these need HDMI CEC support.
 		// see https://developers.homebridge.io/#/service/InputSource
 		// see https://developers.homebridge.io/#/characteristic/InputSourceType
 		// see https://developers.homebridge.io/#/characteristic/InputDeviceType
+		// HomeKit gets upset when the number of inputs changes. So configure 20 always, set conf and vis states if a deviceconfig exists
 		this.log.warn('prepareInputSourceServices inputs',this.deviceConfig.inputs);
 		if (this.deviceConfig.inputs){
-			for (let i = 0; i < Math.min(this.deviceConfig.inputs.length,20); i++) {
-				this.log.warn('prepareInputSourceServices loading input %s',i+1,this.deviceConfig.inputs[i]);
+			for (let i = 0; i < 20; i++) {
+				this.log.warn('prepareInputSourceServices loading input %s',i+1,this.deviceConfig.inputs[i] || 'no config found');
+				// show only if the deviceConfig setting exists
+				var isConf = Characteristic.IsConfigured.NOT_CONFIGURED;
+				var curVisState = Characteristic.CurrentVisibilityState.HIDDEN;
+				var tarVisState = Characteristic.TargetVisibilityState.HIDDEN;
+				if (this.deviceConfig.inputs[i]) {
+					isConf = Characteristic.IsConfigured.CONFIGURED;
+					curVisState = Characteristic.CurrentVisibilityState.SHOWN;
+					tarVisState = Characteristic.TargetVisibilityState.HIDDEN;
+				}
 				let inputService = new Service.InputSource(1, "input_" + (i+1).toString());
 				inputService
 					.setCharacteristic(Characteristic.Identifier, i+1)
-					.setCharacteristic(Characteristic.ConfiguredName, this.deviceConfig.inputs[i].inputName)
-					.setCharacteristic(Characteristic.InputSourceType, this.deviceConfig.inputs[i].inputSourceType || 0)
-					.setCharacteristic(Characteristic.InputDeviceType, this.deviceConfig.inputs[i].inputDeviceType || 0)
-					.setCharacteristic(Characteristic.IsConfigured, Characteristic.IsConfigured.CONFIGURED)
-					.setCharacteristic(Characteristic.CurrentVisibilityState, Characteristic.CurrentVisibilityState.SHOWN)
-					.setCharacteristic(Characteristic.TargetVisibilityState, Characteristic.TargetVisibilityState.SHOWN);
+					.setCharacteristic(Characteristic.ConfiguredName, (this.deviceConfig.inputs[i] || {}).inputName || 'input_' + (i+1).toString())
+					.setCharacteristic(Characteristic.InputSourceType, (this.deviceConfig.inputs[i] || {}).inputSourceType || Characteristic.InputSourceType.HDMI)
+					.setCharacteristic(Characteristic.InputDeviceType, (this.deviceConfig.inputs[i] || {}).inputDeviceType || Characteristic.InputDeviceType.TV)
+					.setCharacteristic(Characteristic.IsConfigured, isConf)
+					.setCharacteristic(Characteristic.CurrentVisibilityState, curVisState)
+					.setCharacteristic(Characteristic.TargetVisibilityState, tarVisState);
 		
 				this.inputServices.push(inputService);
 				this.accessory.addService(inputService);
@@ -649,7 +659,11 @@ class samsungTvHtDevice {
 		// mute state is a boolean, either true or false
 		// const NOT_MUTED = 0, MUTED = 1;
 		this.log('Set mute: %s', (muteState) ? 'Muted' : 'Not muted');
-		this.sendKey('KEY_MUTE');
+		// send only if a keycode exists
+		const keyCode = this.deviceConfig.muteButton;
+		if (keyCode.length > 0) {
+			this.sendKey(keyCode);
+		}
 	}
 
 
@@ -677,13 +691,18 @@ class samsungTvHtDevice {
 		}
 			
 		// check for triple press of volDown, send setmute if tripleVolDownPress less than 1000ms
+		var keyCode;
 		if (tripleVolDownPress < 1000) {
-			this.log('Triple-press of volume down detected. Sending Mute');
-			this.sendKey('KEY_MUTE');
+			this.log('Triple-press of volume down detected');
+			keyCode = this.deviceConfig.voldownButtonTriplePress;
 		} else if (volumeSelectorValue === Characteristic.VolumeSelector.INCREMENT) {
-			this.sendKey('KEY_VOLUP');
+			keyCode = this.deviceConfig.volupButton;
 		} else if (volumeSelectorValue === Characteristic.VolumeSelector.DECREMENT) {
-			this.sendKey('KEY_VOLDOWN');
+			keyCode = this.deviceConfig.voldownButton;
+		}
+		// send only if a keycode exists
+		if ((keyCode || {}).length > 0) {
+			this.sendKey(keyCode);
 		}
 	}
 

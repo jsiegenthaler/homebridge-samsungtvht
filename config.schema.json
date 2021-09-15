@@ -408,14 +408,21 @@
                         "default": "KEY_VOL_UP"
                     },
                     "voldownButton": {
-                        "title": "Volume Up",
+                        "title": "Volume Down",
                         "type": "string",
                         "descriptionxx": "The key code to send when the volume down button is pressed on the iOS remote.<br>See the <a href=\"https://github.com/jsiegenthaler/homebridge-samsung-tvht/wiki\">Wiki</a> for all key codes. Default: KEY_VOLDOWN",
                         "placeholder": "KEY_VOLDOWN",
                         "default": "KEY_VOLDOWN"
                     },
-                    "voldownButtonTriplePress": {
-                        "title": "Volume Up",
+                    "voldownTriplePressButton": {
+                        "title": "Volume Down Triple Press",
+                        "type": "string",
+                        "descriptionxx": "The key code to send when the volume down button is triple-pressed on the iOS remote.<br>See the <a href=\"https://github.com/jsiegenthaler/homebridge-samsung-tvht/wiki\">Wiki</a> for all key codes. Default: KEY_MUTE",
+                        "placeholder": "KEY_MUTE",
+                        "default": "KEY_MUTE"
+                    },
+                    "muteButton": {
+                        "title": "Mute",
                         "type": "string",
                         "descriptionxx": "The key code to send when the volume down button is triple-pressed on the iOS remote.<br>See the <a href=\"https://github.com/jsiegenthaler/homebridge-samsung-tvht/wiki\">Wiki</a> for all key codes. Default: KEY_MUTE",
                         "placeholder": "KEY_MUTE",
@@ -700,7 +707,8 @@
                                         "items": [
                                             "devices[].volupButton",
                                             "devices[].voldownButton",
-                                            "devices[].voldownButtonTriplePress"
+                                            "devices[].voldownButtonTriplePress",
+                                            "devices[].muteButton"
                                         ]
                                     } 
                                 ]
