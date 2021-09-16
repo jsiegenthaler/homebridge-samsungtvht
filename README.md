@@ -92,39 +92,51 @@ Example configuration as used on the author's Samsung TV (where 192.168.0.x is t
 ```js
     "platforms": [
         {
-            "platform": "samsungtvht",
             "name": "Samsung TV HT",
-            "pingCommand": "ping -c 1 -w 10",
-            "pingResponseOn": ", 0% packet loss",
-            "pingResponseOff": ", 100% packet loss",
+            "pingCommand": "ping -n 1 -w 10",
+            "pingResponseOn": "(0% loss)",
+            "pingResponseOff": "(100% loss)",
             "doublePressTime": 250,
-            "triplePressTime": 450,
+            "triplePressTime": 500,
             "doublePressDelayTime": 300,
-            "debugLevel": 1,
+            "debugLevel": 2,
             "devices": [
                 {
-                    "name": "TV",
+                    "name": "Samsung TV DEV",
                     "ipAddress": "192.168.0.x",
                     "type": "television",
                     "manufacturer": "Samsung",
                     "modelName": "UE40D5000",
                     "serialNumber": "T-MSV4DEUC-1005.0",
                     "firmwareRevision": "1005.0",
-                    "powerOnCommand": "echo 'on 0.0.0.0' | cec-client -s -d 1 RPI",
-                    "powerOnStartupTime": 4000,
+                    "powerOnCommand": "echo 'on 0' | cec-client -s -d 1",
+                    "powerOnStartupTime": 4,
                     "powerOffButton": "KEY_POWEROFF",
+                    "viewTvSettingsCommand": "KEY_MENU",
                     "inputs": [
                         {
                             "inputName": "Source",
                             "inputKeyCode": "KEY_SOURCE",
                             "inputSourceType": "3",
-                            "inputDeviceType": "1"
+                            "inputDeviceType": "0"
                         },
                         {
                             "inputName": "HDMI",
                             "inputKeyCode": "KEY_HDMI",
                             "inputSourceType": "3",
-                            "inputDeviceType": "1"
+                            "inputDeviceType": "0"
+                        },
+                        {
+                            "inputName": "Ext AV1",
+                            "inputKeyCode": "KEY_AV1",
+                            "inputSourceType": "3",
+                            "inputDeviceType": "0"
+                        },
+                        {
+                            "inputName": "PC",
+                            "inputKeyCode": "KEY_PCMODE",
+                            "inputSourceType": "3",
+                            "inputDeviceType": "0"
                         }
                     ],
                     "arrowUpButton": "KEY_UP",
@@ -151,12 +163,14 @@ Example configuration as used on the author's Samsung TV (where 192.168.0.x is t
                     "infoButton": "KEY_MENU",
                     "infoButtonDoubleTap": "KEY_INFO",
                     "infoButtonTripleTap": "KEY_TOOLS",
-                    "volupButton": "KEY_VOL_UP",
+                    "volupButton": "KEY_VOLUP",
                     "voldownButton": "KEY_VOLDOWN",
-                    "voldownButtonTriplePress": "KEY_MUTE"
+                    "voldownButtonTriplePress": "KEY_MUTE",
+                    "muteButton": "KEY_MUTE"
                 }
-            ]
-        }
+            ],
+            "platform": "samsungtvht"
+        }    
     ]
 ```
 
