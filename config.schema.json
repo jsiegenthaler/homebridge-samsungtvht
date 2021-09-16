@@ -160,11 +160,11 @@
                     "powerOnStartupTime": {
                         "title": "Startup Time",
                         "type": "integer",
-                        "description": "Time in ms for the device to start up. Pings are suppressed during this time to avoid incorrect tile state in the Home app. Default: 4000",
-                        "minimum": 100,
-                        "maximum": 10000,
-                        "placeholder": 4000,
-                        "default": 4000
+                        "description": "Time in s for the device to start up. Pings are suppressed during this time to avoid incorrect tile state in the Home app. Default: 4",
+                        "minimum": 1,
+                        "maximum": 20,
+                        "placeholder": 4,
+                        "default": 4
                     },
                     "powerOffButton": {
                         "title": "Power Off Button",
@@ -173,6 +173,15 @@
                         "placeholder": "Examples: TV: KEY_POWEROFF, HT: BD_KEY_POWER",
                         "default": "KEY_POWEROFF"
                     },
+
+                    "viewTvSettingsCommand": {
+                        "title": "View TV Settings",
+                        "type": "string",
+                        "descriptionxx": "The key code to send when View TV Settings is selected in the accessory in the Home app. Default: KEY_MENU. See the <a href=\"https://github.com/jsiegenthaler/homebridge-samsung-tvht/wiki\">Wiki</a> for all key codes",
+                        "placeholder": "Examples: KEY_MENU",
+                        "default": "KEY_MENU"
+                    },
+
 
 
                     "inputs": {
@@ -185,19 +194,19 @@
                                 "inputName": {
                                     "title": "Input Name",
                                     "type": "string",
-                                    "description": "The name of the input",
+                                    "descriptionxx": "The name of the input",
                                     "placeholder": "Examples: Source, HDMI, TV, PC"
                                 },
                                 "inputKeyCode": {
                                     "title": "Input KeyCode",
                                     "type": "string",
-                                    "description": "The key code to send for this input. See the <a href=\"https://github.com/jsiegenthaler/homebridge-samsung-tvht/wiki\">Wiki</a> for all key codes",
+                                    "descriptionxx": "The key code to send for this input. See the <a href=\"https://github.com/jsiegenthaler/homebridge-samsung-tvht/wiki\">Wiki</a> for all key codes",
                                     "placeholder": "Examples: KEY_SOURCE, KEY_HDMI, KEY_TV, KEY_PCMODE"
                                 },
                                 "inputSourceType": {
                                     "title": "Input Source Type",
                                     "type": "string",
-                                    "description": "The type of input source. Specified but not used by Apple as of iOS 14.7 but may be supported in the future. See the <a href=\"https://github.com/jsiegenthaler/homebridge-samsung-tvht/wiki\">Wiki</a> for more details",
+                                    "descriptionxx": "The type of input source. Specified but not used by Apple as of iOS 14.7 but may be supported in the future. See the <a href=\"https://github.com/jsiegenthaler/homebridge-samsung-tvht/wiki\">Wiki</a> for more details",
                                     "default": "3",
                                     "oneOf": [
                                         { "title": "Other", "enum": [0] },
@@ -217,7 +226,7 @@
                                 "inputDeviceType": {
                                     "title": "Input Device Type",
                                     "type": "string",
-                                    "description": "The type of input device. Specified but not used by Apple as of iOS 14.7 but may be supported in the future. See the <a href=\"https://github.com/jsiegenthaler/homebridge-samsung-tvht/wiki\">Wiki</a> for more  details",
+                                    "descriptionxx": "The type of input device. Specified but not used by Apple as of iOS 14.7 but may be supported in the future. See the <a href=\"https://github.com/jsiegenthaler/homebridge-samsung-tvht/wiki\">Wiki</a> for more  details",
                                     "default": "1",
                                     "oneOf": [
                                         { "title": "Other", "enum": [0] },
@@ -414,7 +423,7 @@
                         "placeholder": "KEY_VOLDOWN",
                         "default": "KEY_VOLDOWN"
                     },
-                    "voldownTriplePressButton": {
+                    "voldownButtonTriplePress": {
                         "title": "Volume Down Triple Press",
                         "type": "string",
                         "descriptionxx": "The key code to send when the volume down button is triple-pressed on the iOS remote.<br>See the <a href=\"https://github.com/jsiegenthaler/homebridge-samsung-tvht/wiki\">Wiki</a> for all key codes. Default: KEY_MUTE",
@@ -424,7 +433,7 @@
                     "muteButton": {
                         "title": "Mute",
                         "type": "string",
-                        "descriptionxx": "The key code to send when the volume down button is triple-pressed on the iOS remote.<br>See the <a href=\"https://github.com/jsiegenthaler/homebridge-samsung-tvht/wiki\">Wiki</a> for all key codes. Default: KEY_MUTE",
+                        "descriptionxx": "The key code to send when the mute button is pressed. Currently not supported by the Apple iOS remote, use Volume Down Triple Press instead. <br>See the <a href=\"https://github.com/jsiegenthaler/homebridge-samsung-tvht/wiki\">Wiki</a> for all key codes. Default: KEY_MUTE",
                         "placeholder": "KEY_MUTE",
                         "default": "KEY_MUTE"
                     }
@@ -529,10 +538,17 @@
                                 "orderable": true,
                                 "buttonText": "Add input",
                                 "items": [
-                                    "devices[].inputs[].inputName",
-                                    "devices[].inputs[].inputKeyCode",
-                                    "devices[].inputs[].inputSourceType",
-                                    "devices[].inputs[].inputDeviceType"
+                                    {
+                                        "type": "flex",
+                                        "flex-flow": "row wrap",
+                                        "title": "Configure this input as needed. Input Source and Device Types currently have litte effect.<br>See the <a href=\"https://github.com/jsiegenthaler/homebridge-samsung-tvht/wiki\">Wiki</a> for all key codes.",
+                                        "items": [
+                                            "devices[].inputs[].inputName",
+                                            "devices[].inputs[].inputKeyCode",
+                                            "devices[].inputs[].inputSourceType",
+                                            "devices[].inputs[].inputDeviceType"
+                                        ]
+                                    }                                     
                                 ]
                             }
                         ]
@@ -545,7 +561,7 @@
                     {
                         "key": "devices[]",
                         "type": "section",
-                        "title": "Remote Control Button Mapping",
+                        "title": "Remote Control, Volume Control and Menu Commands",
                         "expandable": true,
                         "items": [
                             {
@@ -712,7 +728,23 @@
                                         ]
                                     } 
                                 ]
-                            }
+                            },
+                            {
+                                "key": "devices[]",
+                                "type": "section",
+                                "title": "...Menu Commands",
+                                "expandable": true,
+                                "items": [
+                                    {
+                                        "type": "flex",
+                                        "flex-flow": "row wrap",
+                                        "title": "The key codes to send when the command is selected in the accessory in the Home app. See the <a href=\"https://github.com/jsiegenthaler/homebridge-samsung-tvht/wiki\">Wiki</a> for all key codes",
+                                        "items": [
+                                            "devices[].viewTvSettingsCommand"
+                                        ]
+                                    } 
+                                ]
+                            }                            
                         ]
                     }
                 ]

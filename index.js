@@ -138,6 +138,8 @@ class samsungTvHtPlatform {
 		// ping the devices regularly to check their power state
 		this.log.debug("powerStateMonitor ---START-----------------------------------------")
 
+		// need to add support for powerOnStartupTime
+
 		// for linux: 	pingCmd = 'ping -c 1 -w 10' + ' ' + this.config.devices[0].ipAddress;
 		// for win: 	pingCmd = 'ping -n 1 -w 10' + ' ' + this.config.devices[0].ipAddress;
 
@@ -784,7 +786,7 @@ class samsungTvHtDevice {
 		this.log('Menu command: View TV Settings');
 		// only send the keys if the power is on
 		if (this.currentPowerState == Characteristic.Active.ACTIVE) {
-			this.sendKey('KEY_MENU');
+			this.sendKey(this.deviceConfig.viewTvSettingsCommand || 'KEY_MENU');
 		} else {
 			this.log('Power is Off. View TV Settings command not sent');
 		}

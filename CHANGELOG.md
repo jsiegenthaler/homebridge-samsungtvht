@@ -6,6 +6,11 @@ All notable changes to this project will be documented in this file.
 
 ### Initial Release
 
+## 0.0.4 (2020-09-16)
+* Fixed config.json bugs & typos
+* Added View TV Settings as configurable key code
+
+
 ## 0.0.3 (2020-09-15)
 * Released as 0.0.3
 
