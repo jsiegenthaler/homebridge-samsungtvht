@@ -17,10 +17,10 @@ Supports multiple devices, allowing you to create an accessory for each TV or Ho
 This plugin was written and tested on the author's Samsung D-series TV and D-series Home Theater system in Switzerland.
 
 ## Requirements
-* An Apple iPhone or iPad with iOS 14.0 (or later). Developed on iOS 14.1...14.7.1, earlier versions not tested.
+* An Apple iPhone or iPad with iOS 14.0 (or later). Developed on iOS 14.1...14.8, earlier versions not tested.
 * [Homebridge](https://homebridge.io/) v1.2.5 (or later). Developed on Homebridge 1.1.116....1.3.4, earlier versions not tested.
 * A non-Tizen Samsung TV or Home Theater system. Tizen started in 2015, so TVs and HTs before 2015 generally work with this plugin.
-* The TV or Home Theater system must be connected to your hme network via Ethernet LAN cable, or Wifi.
+* The TV or Home Theater system must be connected to your home network via Ethernet LAN cable, or WiFi.
 
 ## Decode your Samsung TV Model Number
 https://www.samsung.com/uk/support/tv-audio-video/what-do-samsung-tv-model-numbers-actually-mean-why-are-they-so-long/
@@ -28,7 +28,7 @@ https://www.samsung.com/uk/support/tv-audio-video/what-do-samsung-tv-model-numbe
 
 
 ## Installation
-Homebridge UI: the easiest way to install is seach for "samsung tv" or "samsung ht" in the Homebridge UI, and then click INSTALL.
+Homebridge UI: the easiest way to install is to search for "samsung tv" or "samsung ht" in the Homebridge UI, and then click INSTALL.
 
 Manual install:
 ```sh
@@ -37,7 +37,7 @@ sudo npm install -g homebridge-samsungtvht
 After installing, make sure you restart Homebridge.
 
 ## Adding your Samsung TV or HT to the Home app
-Each Samsung device is exposed as a separate external accessory and each device needs to be manually paired as follows:
+Each Samsung TV or HT device is exposed as a separate external accessory and each device needs to be manually paired as follows:
 
 1. Open the **Home** app on your device.
 2. Tap **+** in the top right corner of the screen to start the process of adding a new accessory or scene.
@@ -71,7 +71,7 @@ The following keys are supported by in the **Apple TV Remote** in the Control Ce
 
 ## Accessory Supported Functions
 ### Power
-You can turn the device power on via HDMI-CEC, and off remote control commands. Power state is shown by pinging the device.
+You can turn the device power on via HDMI-CEC, and off via remote control commands. Current power state is detected by pinging the device.
 
 ### Inputs
 You can configure up to 20 inputs in the plugin config. The inputs can send any key code. Note that the plugin cannot currently read the current TV or HT source, it can only send the key codes. 
