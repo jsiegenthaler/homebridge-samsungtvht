@@ -71,7 +71,7 @@ The following keys are supported by in the **Apple TV Remote** in the Control Ce
 
 ## Accessory Supported Functions
 ### Power
-You can turn the device power on via HDMI-CEC, and off remote control commands. Power state is shown by pinging the device.
+You can turn the device power on via HDMI-CEC, and off via remote control commands. Current power state is detected by pinging the device.
 
 ### Inputs
 You can configure up to 20 inputs in the plugin config. The inputs can send any key code. Note that the plugin cannot currently read the current TV or HT source, it can only send the key codes. 
