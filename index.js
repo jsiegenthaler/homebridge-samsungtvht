@@ -44,9 +44,9 @@ Object.freeze(powerStateName);
 
 // global variables (urgh)
 let currentInputId;
-let currentPowerState;
-let currentMediaState;
-let targetMediaState;
+//let currentPowerState;
+//let currentMediaState;
+//let targetMediaState;
 let Accessory, Characteristic, Service, Categories, UUID;
 
 
@@ -197,7 +197,7 @@ class samsungTvHtPlatform {
 
 				// update device status
 				//self.log.warn("powerStateMonitor: %s Calling device.updateDeviceState with device.currentPowerState %s", device.name, device.currentPowerState);
-				device.updateDeviceState(device.currentPowerState);
+				if (device.currentPowerState) { device.updateDeviceState(device.currentPowerState); }
 				self.log.debug("powerStateMonitor ---END-------------------------------------------")
 		
 			});
@@ -287,7 +287,7 @@ class samsungTvHtDevice {
 	//Prepare accessory (runs from session watchdog)
 	prepareAccessory() {
 		if (this.debugLevel > 0) {
-			this.log.warn('prepareAccessory');
+			this.log.warn('%s: prepareAccessory', this.name);
 		}
 
 		// exit immediately if already configured (runs from session watchdog)
@@ -325,7 +325,7 @@ class samsungTvHtDevice {
 	//Prepare AccessoryInformation service
 	prepareAccessoryInformationService() {
 		if (this.debugLevel > 0) {
-			this.log.warn('prepareAccessoryInformationService');
+			this.log.warn('%s: prepareAccessoryInformationService', this.name);
 		}
 
 		this.accessory.removeService(this.accessory.getService(Service.AccessoryInformation));
@@ -343,7 +343,7 @@ class samsungTvHtDevice {
 	//Prepare Television service
 	prepareTelevisionService() {
 		if (this.debugLevel > 0) {
-			this.log.warn('prepareTelevisionService');
+			this.log.warn('%s: prepareTelevisionService', this.name);
 		}
 		this.televisionService = new Service.Television(this.name, 'televisionService');
 		this.televisionService
@@ -383,7 +383,7 @@ class samsungTvHtDevice {
 	//Prepare TelevisionSpeaker service
 	prepareTelevisionSpeakerService() {
 		if (this.debugLevel > 0) {
-			this.log.warn('prepareTelevisionSpeakerService');
+			this.log.warn('%s: prepareTelevisionSpeakerService', this.name);
 		}
 		this.speakerService = new Service.TelevisionSpeaker(this.name + ' Speaker', 'speakerService');
 		this.speakerService
@@ -408,7 +408,7 @@ class samsungTvHtDevice {
 		// on the samsung devices, the
 		// AVR: HDMI1, HDMI2, Analog
 		if (this.debugLevel > 1) {
-			this.log.warn('prepareInputSourceServices');
+			this.log.warn('%s: prepareInputSourceServices', this.name);
 		}
 
 		// add dummy entry at index 0 for the inputList
@@ -420,10 +420,10 @@ class samsungTvHtDevice {
 		// see https://developers.homebridge.io/#/characteristic/InputSourceType
 		// see https://developers.homebridge.io/#/characteristic/InputDeviceType
 		// HomeKit gets upset when the number of inputs changes. So configure 20 always, set conf and vis states if a deviceconfig exists
-		this.log.warn('prepareInputSourceServices inputs',this.deviceConfig.inputs);
+		this.log.warn('%s: prepareInputSourceServices inputs',this.name, this.deviceConfig.inputs);
 		if (this.deviceConfig.inputs){
 			for (let i = 0; i < 20; i++) {
-				this.log.warn('prepareInputSourceServices loading input %s',i+1,this.deviceConfig.inputs[i] || 'no config found');
+				this.log.warn('%s: prepareInputSourceServices loading input %s',this.name,i+1,this.deviceConfig.inputs[i] || 'no config found');
 				// show only if the deviceConfig setting exists
 				var isConf = Characteristic.IsConfigured.NOT_CONFIGURED;
 				var curVisState = Characteristic.CurrentVisibilityState.HIDDEN;
@@ -507,26 +507,24 @@ class samsungTvHtDevice {
   	//+++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 	// update the device state (async)
-	async updateDeviceState(powerState, mediaState, inputId, sourceType, callback) {
+	async updateDeviceState(powerState, mediaState, inputId, callback) {
 		// doesn't get the data direct from the device box, but rather: gets it from the variables
 
 		// grab the input variables
 		if (powerState != null) { this.currentPowerState = powerState }
 		if (mediaState != null) { this.currentMediaState = mediaState }
 		if (inputId != null) 	{ this.currentInputId = inputId }
-		if (sourceType != null) { this.currentSourceType = sourceType }
 
 		// debugging, helps a lot to see InputName
 		if (this.debugLevel > 2) {
 			let currentInputName; // let is scopt to the current {} block
 			let curInput = this.inputList.find(Input => Input.inputId === this.currentInputId); 
 			if (curInput) { currentInputName = curInput.InputName; }
-			this.log.warn('%s: updateDeviceState: currentPowerState %s, currentMediaState %s [%s], currentInputId %s [%s], currentSourceType %s', 
+			this.log.warn('%s: updateDeviceState: currentPowerState %s, currentMediaState %s [%s], currentInputId %s [%s]', 
 				this.name, 
 				this.currentPowerState, 
 				this.currentMediaState, mediaStateName[this.currentMediaState], 
-				this.currentInputId, currentInputName,
-				this.currentSourceType
+				this.currentInputId, currentInputName
 			);
 		}
 
@@ -537,7 +535,7 @@ class samsungTvHtDevice {
 
 			// set power state if changed
 			var oldPowerState = this.televisionService.getCharacteristic(Characteristic.Active).value;
-			if (oldPowerState !== this.currentPowerState) {
+			if ((this.currentPowerState) && (oldPowerState !== this.currentPowerState)) {
 				this.log('%s: Power changed from %s %s to %s %s', 
 					this.name,
 					oldPowerState, powerStateName[oldPowerState],

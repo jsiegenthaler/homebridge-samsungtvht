@@ -6,6 +6,10 @@ All notable changes to this project will be documented in this file.
 
 ### Initial Release
 
+## 0.0.6 (2020-09-18)
+* Fixed a powerstate undefined issue and made more robust
+
+
 ## 0.0.5 (2020-09-18)
 * Fixed input sources not sending the configured key codes
 
