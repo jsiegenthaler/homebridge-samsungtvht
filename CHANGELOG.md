@@ -6,6 +6,10 @@ All notable changes to this project will be documented in this file.
 
 ### Initial Release
 
+## 0.0.5 (2020-09-18)
+* Fixed input sources not sending the configured key codes
+
+
 ## 0.0.4 (2020-09-16)
 * Fixed config.json bugs & typos
 * Added View TV Settings as configurable key code

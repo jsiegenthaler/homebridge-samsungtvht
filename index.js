@@ -433,7 +433,7 @@ class samsungTvHtDevice {
 					curVisState = Characteristic.CurrentVisibilityState.SHOWN;
 					tarVisState = Characteristic.TargetVisibilityState.HIDDEN;
 				}
-				let inputService = new Service.InputSource(1, "input_" + (i+1).toString());
+				let inputService = new Service.InputSource(1, "input_" + (i+1).toString() + ((this.deviceConfig.inputs[i] || {}).inputKeyCode || '') );
 				inputService
 					.setCharacteristic(Characteristic.Identifier, i+1)
 					.setCharacteristic(Characteristic.ConfiguredName, (this.deviceConfig.inputs[i] || {}).inputName || 'input_' + (i+1).toString())
@@ -738,7 +738,7 @@ class samsungTvHtDevice {
 	// set input
 	async setInput(input, callback) {
 		if (this.debugLevel > 0) {
-			this.log.warn('setInput input:',input.inputId.value, input.inputName.value);
+			this.log.warn('setInput input:',input.inputId.value, input.inputName.value, this.deviceConfig.inputs[input.inputId.value-1].inputKeyCode);
 		}
 		
 		//one day I'll implement the HDMI CEC input control, then I'll need these functions:
@@ -749,22 +749,13 @@ class samsungTvHtDevice {
 		this.log('Change input from %s %s to %s %s', currentInputId, currentInputName, input.inputId, input.InputName);
 		this.switchInput(input.inputId);
 		*/
-
-		//but currently, we're sending SOURCE and HDMI keys
-		if (input.inputName.value.toUpperCase().includes('HDMI')) {
-			this.sendKey('KEY_HDMI');
-		} else if (input.inputName.value.toUpperCase().includes('PC')) {
-			this.sendKey('KEY_PCMODE');
-		} else if (input.inputName.value.toUpperCase().includes('EXT')) {
-			this.sendKey('KEY_AV1');
-		} else if (input.inputName.value.toUpperCase().includes('SOURCE')) {
-			this.sendKey('KEY_SOURCE');
-		} else if (input.inputName.value.toUpperCase().includes('TV')) {
-			this.sendKey('KEY_TV');
-		} else {
-			this.sendKey('KEY_SOURCE');
+		
+		const keyCode = this.deviceConfig.inputs[input.inputId.value-1].inputKeyCode;
+		// send only if a keycode exists
+		if ((keyCode || {}).length > 0) {
+			this.sendKey(keyCode);
 		}
-		callback(null); // for rapid response
+		callback(null);
 	}
 
 	// set input name
