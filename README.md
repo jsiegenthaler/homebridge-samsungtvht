@@ -6,7 +6,7 @@ Suported TVs and HTs are:
 * D-series from 2011 (confirmed working, as used by the author on his UE40D5000 TV and HT-D5500 HT)
 * E-series from 2012 (confirmed working)
 * F-series from 2013 (probably working, needs confirmation)
-* H-series from 2014 (probably working, needs confirmation)
+* H-series from 2014 (probably not working, as this TV needs PIN-code authentication)
 
 This plugin displays your Samsung device as a TV or Audio Receiver Accessory with Power, Input & Remote Control capabilities in your iOS device (iPhone, iPad, iMac, etc.).
 
