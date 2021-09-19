@@ -55,6 +55,14 @@ let Accessory, Characteristic, Service, Categories, UUID;
 // wait function
 const wait=ms=>new Promise(resolve => setTimeout(resolve, ms)); 
 
+// wait function with promise
+function waitprom(ms) {
+	return new Promise((resolve, reject) => {
+	  setTimeout(() => {
+		resolve(ms)
+	  }, ms )
+	})
+  }  
 
 // ++++++++++++++++++++++++++++++++++++++++++++
 // config
@@ -428,23 +436,21 @@ class samsungTvHtDevice {
 			for (let i = 0; i < 20; i++) {
 				this.log.debug('%s: prepareInputSourceServices loading input %s',this.name,i+1,this.deviceConfig.inputs[i] || 'no config found');
 				// show only if the deviceConfig setting exists
-				var isConf = Characteristic.IsConfigured.NOT_CONFIGURED;
-				var curVisState = Characteristic.CurrentVisibilityState.HIDDEN;
-				var tarVisState = Characteristic.TargetVisibilityState.HIDDEN;
+				var configState = Characteristic.IsConfigured.NOT_CONFIGURED;
+				var visState = Characteristic.CurrentVisibilityState.HIDDEN;
 				if (this.deviceConfig.inputs[i]) {
-					isConf = Characteristic.IsConfigured.CONFIGURED;
-					curVisState = Characteristic.CurrentVisibilityState.SHOWN;
-					tarVisState = Characteristic.TargetVisibilityState.HIDDEN;
+					configState = Characteristic.IsConfigured.CONFIGURED;
+					visState = Characteristic.CurrentVisibilityState.SHOWN;
 				}
-				let inputService = new Service.InputSource(1, "input_" + (i+1).toString() + ((this.deviceConfig.inputs[i] || {}).inputKeyCode || '') );
+				let inputService = new Service.InputSource(1, "input_" + (i+1).toString() );
 				inputService
 					.setCharacteristic(Characteristic.Identifier, i+1)
 					.setCharacteristic(Characteristic.ConfiguredName, (this.deviceConfig.inputs[i] || {}).inputName || 'input_' + (i+1).toString())
 					.setCharacteristic(Characteristic.InputSourceType, (this.deviceConfig.inputs[i] || {}).inputSourceType || Characteristic.InputSourceType.HDMI)
 					.setCharacteristic(Characteristic.InputDeviceType, (this.deviceConfig.inputs[i] || {}).inputDeviceType || Characteristic.InputDeviceType.TV)
-					.setCharacteristic(Characteristic.IsConfigured, isConf)
-					.setCharacteristic(Characteristic.CurrentVisibilityState, curVisState)
-					.setCharacteristic(Characteristic.TargetVisibilityState, tarVisState);
+					.setCharacteristic(Characteristic.IsConfigured, configState)
+					.setCharacteristic(Characteristic.CurrentVisibilityState, visState)
+					.setCharacteristic(Characteristic.TargetVisibilityState, visState);
 		
 				this.inputServices.push(inputService);
 				this.accessory.addService(inputService);
@@ -466,26 +472,44 @@ class samsungTvHtDevice {
   	//+++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 	// send a remote control keypress to the settopbox
-	sendKey(keyName) {
+	async sendKey(keyNameSequence) {
 		if (this.debugLevel >= 0) {
-			this.log.warn('%s: sendKey %s', this.name, keyName);
+			this.log.warn('%s: sendKey %s', this.name, keyNameSequence);
 		}
 
 		// make a new remote
 		const remote = new SamsungRemote({
 			ip: this.deviceConfig.ipAddress
 		});
-		
-		// remote reports timeouts as errors
-		remote.send(keyName, (err) => {
-			if (err) {
-				if (err == "Timeout") {
-					// ignore, this is normal with SamsungRemote, some keys just do get a responce from the TV / AVR
+
+		this.log('processing keyNameSequence ', keyNameSequence);
+		let keyArray = keyNameSequence.trim().split(' ');
+		for (let i = 0; i < keyArray.length; i++) {
+			const keyName = keyArray[i].trim();
+			this.log('%s: sendKey: processing step %s of %s: %s', this.name, i+1, keyArray.length, keyName);
+			if (keyName.startsWith('wait(')) {
+				// do a wait
+					const delay = keyName.replace('wait(', '').replace(')','');
+					this.log('%s: sendKey: waiting %s ms', this.name, delay);
+					await waitprom(delay);
+					this.log('%s: sendKey: wait done', this.name);
 				} else {
-					this.log.warn("%s: sendKey: error %s", this.name, err);
+					// send the key
+					this.log('%s: sendKey: sending key %s', this.name, keyName);
+					// remote reports timeouts as errors
+					remote.send(keyName, (err) => {
+						if (err) {
+							if (err == "Timeout") {
+								// ignore, this is normal with SamsungRemote, some keys just do get a responce from the TV / AVR
+							} else {
+								this.log.warn("%s: sendKey: error %s", this.name, err);
+							}
+						}
+					});
+					this.log('%s: sendKey: send done', this.name);
 				}
-			}
-		});
+			}		
+
 	}
 
 

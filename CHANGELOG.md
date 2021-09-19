@@ -6,6 +6,12 @@ All notable changes to this project will be documented in this file.
 
 ### Initial Release
 
+## 0.0.8 (2020-09-19)
+* Added support of multiple keys sent in sequence, with a wait(ms) command. Lots of log entries for testing.
+* Cleaned up some log info
+* Tidied up some code
+
+
 ## 0.0.7 (2020-09-19)
 * Improved UUID generation. Please remove and re-add the accessory. UUID should be stable now
 * Cleaned up some log info
