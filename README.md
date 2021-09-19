@@ -69,12 +69,14 @@ The following keys are supported by in the **Apple TV Remote** in the Control Ce
 * Volume Up
 * Volume Down (triple-press for Mute)
 
+All remote control buttons are fully configurable and can send any [key code](https://github.com/jsiegenthaler/homebridge-samsungtvht/wiki/Key-Codes).
+
 ## Accessory Supported Functions
 ### Power
-You can turn the device power on via HDMI-CEC, and off via remote control commands. Current power state is detected by pinging the device.
+You can turn the device power on via HDMI-CEC, and off via remote control commands. Current power state is detected by pinging the device. See the [Power Control](https://github.com/jsiegenthaler/homebridge-samsungtvht/wiki/Power-Control) wiki page for full details.
 
 ### Inputs
-You can configure up to 20 inputs in the plugin config. The inputs can send any key code. Note that the plugin cannot currently read the current TV or HT source, it can only send the key codes. 
+You can configure up to 20 inputs in the plugin config. The inputs can send any key code (see the [Key Codes](https://github.com/jsiegenthaler/homebridge-samsungtvht/wiki/Key-Codes) wiki page). Note that the plugin cannot currently read the current TV or HT source, it can only send the key codes.
 
 ### View TV Settings
 The Accessory settings icon command **View TV Settings** will open the TV or Home Theater's menu.
