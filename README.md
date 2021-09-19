@@ -1,6 +1,6 @@
 # homebridge-samsungtvht
 
-`homebridge-samsungtvht` is a Homebridge plugin allowing you to control your non-Tizen Samsung TV and Home Theater with Apple HomeKit using the Home app and the Apple TV Remote in the Control Center.
+`homebridge-samsungtvht` is a Homebridge plugin allowing you to control your Samsung TV and Home Theater (with Orsay OS) with Apple HomeKit using the Home app and the Apple TV Remote in the Control Center.
 Suported TVs and HTs are:
 * A-series to C-series from 2008 to 2010 (probably working, needs confirmation)
 * D-series from 2011 (confirmed working, as used by the author on his UE40D5000 TV and HT-D5500 HT)
@@ -11,7 +11,10 @@ Suported TVs and HTs are:
 This plugin displays your Samsung device as a TV or Audio Receiver Accessory with Power, Input & Remote Control capabilities in your iOS device (iPhone, iPad, iMac, etc.).
 
 Supports multiple devices, allowing you to create an accessory for each TV or Home Theater system (should you have more than one).
-supports HT from HT-D5500, HT-D5530, HT-D5550, HT-D6500
+Supports HT devices such as HT-D5500, HT-D5530, HT-D5550, HT-D6500
+
+Does not work with Samsung TVs using the Tizen OS , which means TVs made from 2015!
+
 
 [![donate](https://badgen.net/badge/donate/paypal/91BE09)](https://www.paypal.com/donate?hosted_button_id=CNEDGHRUER468)
 
