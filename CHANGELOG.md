@@ -6,6 +6,11 @@ All notable changes to this project will be documented in this file.
 
 ### Initial Release
 
+## 0.0.7 (2020-09-19)
+* Improved UUID generation. Please remove and re-add the accessory. UUID should be stable now
+* Cleaned up some log info
+
+
 ## 0.0.6 (2020-09-18)
 * Fixed a powerstate undefined issue and made more robust
 

@@ -96,7 +96,6 @@ class samsungTvHtPlatform {
 				this.log.warn('API event: didFinishLaunching');
 			}
 
-			this.log.warn('config',this.config);
 			// detect if running on development environment
 			//	customStoragePath: 'C:\\Users\\jochen\\.homebridge'
 			if ( this.api.user.customStoragePath.includes( 'jochen' ) ) { PLUGIN_ENV = ' DEV' }
@@ -297,8 +296,12 @@ class samsungTvHtDevice {
 		//this.log("prepareAccessory this.ipAddress", this.ipAddress);
 
 		const accessoryName = this.name;
-		const uuidSeed = this.ipAddress + PLUGIN_NAME + PLUGIN_ENV; // must be generated from a stable unchanging seed
-		const accessoryUUID = UUID.generate(uuidSeed); 
+
+		// generate a constant uuid that will never change over the life of the accessory
+		const uuid = UUID.generate(this.ipAddress + PLUGIN_ENV); 
+		if (this.debugLevel > 1) {
+			this.log.warn('%s: prepareAccessory: UUID %s', this.name, uuid);
+		}
 
 		// default category is TV, allow also RECEIVER (avr)
 		let accessoryCategory = Categories.TELEVISION;
@@ -310,7 +313,7 @@ class samsungTvHtDevice {
 				accessoryCategory = Categories.TELEVISION;
 			}
 
-		this.accessory = new Accessory(accessoryName, accessoryUUID, accessoryCategory);
+		this.accessory = new Accessory(accessoryName, uuid, accessoryCategory);
 
 		this.prepareAccessoryInformationService();	// service 1 of 100
 		this.prepareTelevisionService();			// service 2 of 100
@@ -420,10 +423,10 @@ class samsungTvHtDevice {
 		// see https://developers.homebridge.io/#/characteristic/InputSourceType
 		// see https://developers.homebridge.io/#/characteristic/InputDeviceType
 		// HomeKit gets upset when the number of inputs changes. So configure 20 always, set conf and vis states if a deviceconfig exists
-		this.log.warn('%s: prepareInputSourceServices inputs',this.name, this.deviceConfig.inputs);
+		//this.log.warn('%s: prepareInputSourceServices inputs',this.name, this.deviceConfig.inputs);
 		if (this.deviceConfig.inputs){
 			for (let i = 0; i < 20; i++) {
-				this.log.warn('%s: prepareInputSourceServices loading input %s',this.name,i+1,this.deviceConfig.inputs[i] || 'no config found');
+				this.log.debug('%s: prepareInputSourceServices loading input %s',this.name,i+1,this.deviceConfig.inputs[i] || 'no config found');
 				// show only if the deviceConfig setting exists
 				var isConf = Characteristic.IsConfigured.NOT_CONFIGURED;
 				var curVisState = Characteristic.CurrentVisibilityState.HIDDEN;
