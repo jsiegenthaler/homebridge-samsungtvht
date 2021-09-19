@@ -13,7 +13,7 @@ This plugin displays your Samsung device as a TV or Audio Receiver Accessory wit
 Supports multiple devices, allowing you to create an accessory for each TV or Home Theater system (should you have more than one).
 Supports HT devices such as HT-D5500, HT-D5530, HT-D5550, HT-D6500
 
-Does not work with Samsung TVs using the Tizen OS , which means TVs made from 2015!
+Probably does not work with Samsung TVs using the Tizen OS. Tizen = TVs made from 2015!
 
 
 [![donate](https://badgen.net/badge/donate/paypal/91BE09)](https://www.paypal.com/donate?hosted_button_id=CNEDGHRUER468)
