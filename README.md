@@ -83,6 +83,10 @@ You can configure up to 20 inputs in the plugin config. The inputs can send any 
 ### View TV Settings
 The Accessory settings icon command **View TV Settings** will open the TV or Home Theater's menu.
 
+### Multi Key Sequences (Macros) Supported
+The plugin can send multiple key codes, seperate the key codes with spaces. A wait(ms) is supported. The following example selects TV channel 12 by sending TV, waiting 200ms, then sending keys 1, 2 and Enter with 100ms between each key code:
+"KEY_TV wait(200) KEY_1 wait(100) KEY_2 wait(100) KEY_ENTER"
+
 ## Configuration
 ### Config via Settings
 It is easiest to configure the plugin via Homebridge: Plugins > Homebridge Samsung TV HT > SETTINGS.
