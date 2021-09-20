@@ -472,7 +472,65 @@ class samsungTvHtDevice {
   	//+++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 	// send a remote control keypress to the settopbox
-	async sendKey(keyNameSequence) {
+	async sendKey(keySequence) {
+		if (this.debugLevel >= 0) {
+			this.log.warn('%s: sendKey %s', this.name, keySequence);
+		}
+
+		// make a new remote
+		const remote = new SamsungRemote({
+			ip: this.deviceConfig.ipAddress
+		});
+
+		this.log('%s: sendKey: processing keySequence ', this.name, keySequence);
+		let keyArray = keySequence.trim().split(' ');
+		// supported key1 key2 key3 wait() wait(100)
+		for (let i = 0; i < keyArray.length; i++) {
+			const keyName = keyArray[i].trim();
+			this.log('%s: sendKey ------------------------------------', this.name);
+			this.log('%s: sendKey: processing key %s of %s: %s', this.name, i+1, keyArray.length, keyName);
+			
+			// if a wait appears, use it
+			let waitDelay; // default
+			if (keyName.toLowerCase().startsWith('wait(')) {
+				this.log.debug('%s: sendKey: reading delay from %s', this.name, keyName);
+				waitDelay = keyName.toLowerCase().replace('wait(', '').replace(')','');
+				if (waitDelay == ''){ waitDelay = 100; } // default 100ms
+				this.log.debug('%s: sendKey: delay read as %s', this.name, waitDelay);
+			}
+			// else if not first key and last key was not wait, and next key is not wait, then set a default delay of 100 ms
+			 else if (i>0 && i<keyArray.length-1 && !(keyArray[i-1] || '').toLowerCase().startsWith('wait(') && !(keyArray[i+1] || '').toLowerCase().startsWith('wait(')) {
+				this.log('%s: sendKey: not first key and neiher previous key %s nor next key %s is wait(). Setting default wait of 100 ms', this.name, keyArray[i-1], keyArray[i+1]);
+				waitDelay = 100;
+			} 
+
+			// add a wait if waitDelay is defined
+			if (waitDelay) {
+				this.log('%s: sendKey: waiting %s ms', this.name, waitDelay);
+				await waitprom(waitDelay);
+				this.log('%s: sendKey: wait %s done', this.name, waitDelay);
+			}
+
+			// send the key if not a wait()
+			if (!keyName.toLowerCase().startsWith('wait(')) {
+				this.log('%s: sendKey: send key %s', this.name, keyName);
+				remote.send(keyName, (err) => {
+					if (err && (err || '' != "Timeout")) {
+						//  Timeout ignore, this is normal with SamsungRemote, some keys just do get a responce from the TV / AVR
+						this.log.warn("%s: sendKey: %s error %s", this.name, keyName, err);
+					} else {
+						this.log('%s: sendKey: send %s done', this.name, keyName);
+					}
+				});
+			}
+
+		} // end for loop
+
+	}
+
+
+	// send a remote control keypress to the settopbox
+	async sendKeyOld(keyNameSequence) {
 		if (this.debugLevel >= 0) {
 			this.log.warn('%s: sendKey %s', this.name, keyNameSequence);
 		}
@@ -486,10 +544,13 @@ class samsungTvHtDevice {
 		let keyArray = keyNameSequence.trim().split(' ');
 		for (let i = 0; i < keyArray.length; i++) {
 			const keyName = keyArray[i].trim();
+			const nextKeyName = keyArray[i+1].trim();
 			this.log('%s: sendKey: processing step %s of %s: %s', this.name, i+1, keyArray.length, keyName);
+
+			// if a wait appears, use it
 			if (keyName.startsWith('wait(')) {
 				// do a wait
-					const delay = keyName.replace('wait(', '').replace(')','');
+					const delay = keyName.toLowerCase().replace('wait(', '').replace(')','');
 					this.log('%s: sendKey: waiting %s ms', this.name, delay);
 					await waitprom(delay);
 					this.log('%s: sendKey: wait done', this.name);
@@ -511,7 +572,6 @@ class samsungTvHtDevice {
 			}		
 
 	}
-
 
 	// get the device UI status
 	// incomplete, to be completed if I can ever figure out how

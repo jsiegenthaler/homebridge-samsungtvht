@@ -6,6 +6,10 @@ All notable changes to this project will be documented in this file.
 
 ### Initial Release
 
+## 0.0.9 (2020-09-20)
+* Added support of default wait(). If no wait time is speficied, it defaults to 100ms
+* Added support of multi-key without wait(). If no wait is specified, a default wait of 100ms is used
+
 ## 0.0.8 (2020-09-19)
 * Added support of multiple keys sent in sequence, with a wait(ms) command. Lots of log entries for testing.
 * Cleaned up some log info
