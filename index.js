@@ -281,7 +281,7 @@ class samsungTvHtDevice {
 		// update device state regularly
 		// Check & Update Accessory Status every POWER_STATE_POLLING_INTERVAL_MS (Default: 5000 ms)
 		// this is the last step in the setup. From now on polling will occur every 5 seconds
-		//this.checkStateInterval = setInterval(this.updateDeviceState.bind(this),POWER_STATE_POLLING_INTERVAL_MS);
+		this.checkStateInterval = setInterval(this.updateDeviceState.bind(this),POWER_STATE_POLLING_INTERVAL_MS);
 
 	}
 
@@ -632,7 +632,8 @@ class samsungTvHtDevice {
 			
 			// set active input if changed
 			var oldActiveIdentifier = this.televisionService.getCharacteristic(Characteristic.ActiveIdentifier).value;
-			var currentActiveIdentifier = this.inputList.findIndex(input => input.inputId === currentInputId);
+			//var currentActiveIdentifier = this.inputList.findIndex(input => input.inputId === currentInputId);
+			var currentActiveIdentifier = NO_INPUT_ID; // fixed at NO_INPUT_ID to clear the Tile
 			if (currentActiveIdentifier == -1) { currentActiveIdentifier = NO_INPUT_ID } // if nothing found, set to NO_INPUT to clear the name from the Home app tile
 			if (oldActiveIdentifier !== currentActiveIdentifier) {
 				// get names from loaded input list. Using SOURCE button on the remote rolls around the input list
@@ -643,14 +644,12 @@ class samsungTvHtDevice {
 				if (currentActiveIdentifier == NO_INPUT_ID) {
 					newName = 'UNKNOWN';
 				}
-				/*
 				// cannot show current input as it is unknown
 				this.log('%s: Input changed from %s %s to %s %s', 
 					this.name,
 					oldActiveIdentifier + 1, oldName,
 					currentActiveIdentifier + 1, newName);
 				this.televisionService.getCharacteristic(Characteristic.ActiveIdentifier).updateValue(currentActiveIdentifier);
-				*/
 			}
 
 			// set current media state if changed
@@ -803,15 +802,18 @@ class samsungTvHtDevice {
 		// find the currentInputId in the inputs and return the currentActiveInput once found
 		// this allows HomeKit to show the selected current input
 		
+		/*
 		var currentInputName = NO_INPUT_NAME;
 		var currentActiveInput = this.inputServices.findIndex(input => input.inputId === currentInputId);
 		if (currentActiveInput == -1) { currentActiveInput = NO_INPUT_ID } // if nothing found, set to NO_INPUT_ID to clear the name from the Home app tile
 		if ((currentActiveInput > -1) && (currentActiveInput != NO_INPUT_ID)) { 
 			currentInputName = this.inputServices[currentActiveInput].getCharacteristic(Characteristic.ConfiguredName).value; 
 		}
+		*/
 		
-		currentActiveInput = NO_INPUT_ID; // just for now
-		currentInputName = NO_INPUT_NAME;
+		// return the fixed no input always. This prevents the input name from being displayed on the home tile
+		const currentActiveInput = NO_INPUT_ID;
+		const currentInputName = NO_INPUT_NAME;
 
 		if (this.debugLevel > 0) { 
 			this.log.warn('%s: getInput returning input %s [%s]', this.name, currentActiveInput, currentInputName);
@@ -840,6 +842,19 @@ class samsungTvHtDevice {
 		if ((keyCode || {}).length > 0) {
 			this.sendKey(keyCode);
 		}
+
+		// immediately reset the input back to nothing to clear any scenes and clear the tile display
+		if (this.televisionService.getCharacteristic(Characteristic.ActiveIdentifier).value != NO_INPUT_ID) {
+			this.log.warn('setInput setting ActiveIdentifier to NO_INPUT_ID %s :', NO_INPUT_ID);
+			this.televisionService.getCharacteristic(Characteristic.ActiveIdentifier).updateValue(NO_INPUT_ID);
+		} else {
+			this.log.warn('setInput ActiveIdentifier OK, no need to change');
+		}
+		// start an async service to reset after 500ms
+		//this.log('processing wait of %s ms', delay);
+		//await waitprom(500);
+		//this.log('wait done');
+
 		callback(null);
 	}
 
