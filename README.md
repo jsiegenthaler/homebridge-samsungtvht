@@ -2,18 +2,18 @@
 
 `homebridge-samsungtvht` is a Homebridge plugin allowing you to control your Samsung TV and Home Theater (with Orsay OS) with Apple HomeKit using the Home app and the Apple TV Remote in the Control Center.
 Suported TVs and HTs are:
-* A-series to C-series from 2008 to 2010 (probably working, needs confirmation)
-* D-series from 2011 (confirmed working, as used by the author on his UE40D5000 TV and HT-D5500 HT)
-* E-series from 2012 (confirmed working)
-* F-series from 2013 (probably working, needs confirmation)
-* H-series from 2014 (probably working, needs confirmation)
+* C-series from 2010
+* D-series from 2011 (as used by the author on his UE40D5000 TV and HT-D5500 HT)
+* ES-series and EH-series from 2012
+* F-series from 2013
+* H-series from 2014 (probably not working, as this TV needs PIN-code authentication)
 
 This plugin displays your Samsung device as a TV or Audio Receiver Accessory with Power, Input & Remote Control capabilities in your iOS device (iPhone, iPad, iMac, etc.).
 
 Supports multiple devices, allowing you to create an accessory for each TV or Home Theater system (should you have more than one).
 Supports HT devices such as HT-D5500, HT-D5530, HT-D5550, HT-D6500
 
-Does not work with Samsung TVs using the Tizen OS , which means TVs made from 2015!
+Probably does not work with Samsung TVs using the Tizen OS. Tizen = TVs made from 2015!
 
 
 [![donate](https://badgen.net/badge/donate/paypal/91BE09)](https://www.paypal.com/donate?hosted_button_id=CNEDGHRUER468)
@@ -88,8 +88,8 @@ You can configure up to 20 inputs in the plugin config. The inputs can send any 
 The Accessory settings icon command **View TV Settings** will open the TV or Home Theater's menu.
 
 ### Multi Key Sequences (Macros) Supported
-The plugin can send multiple key codes, seperate the key codes with spaces. A wait(ms) is supported. The following example selects TV channel 12 by sending TV, waiting 200ms, then sending keys 1, 2 and Enter with 100ms between each key code:
-"KEY_TV wait(200) KEY_1 wait(100) KEY_2 wait(100) KEY_ENTER"
+The plugin can send multiple key codes, seperate the key codes with spaces. Keys are sent at intervals of 100ms, but can be changed by inserting a wait(ms) in the key code sequence. The following example selects TV channel 12 by sending TV, waiting 200ms, then sending keys 1, 2 and Enter with 100ms between each key code:
+"KEY_TV wait(200) KEY_1 KEY_2 KEY_ENTER"
 
 ## Configuration
 ### Config via Settings
