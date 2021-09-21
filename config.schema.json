@@ -19,9 +19,9 @@
         "pingCommand": {
             "title": "Ping Command",
             "type": "string",
-            "description": "Ping command to detect device power state. Linux: \"ping -c 1 -w 10\"  Windows: \"ping -n 1 -w 10\"",
-            "default": "ping -c 1 -w 10",
-            "placeholder": "ping -c 1 -w 10",
+            "description": "Ping command to detect device power state. Linux: \"ping -c 1 -w 20\"  Windows: \"ping -n 1 -w 50\"",
+            "default": "ping -c 1 -w 20",
+            "placeholder": "ping -c 1 -w 20",
             "minLength": 1,
             "required": true
           },
@@ -156,15 +156,6 @@
                         "description": "A command to issue to the OS to turn the device on. See the <a href=\"https://github.com/jsiegenthaler/homebridge-samsung-tvht/wiki\">Wiki</a> for full details",
                         "placeholder": "echo 'on 0' | cec-client -s -d 1",
                         "default": "echo 'on 0' | cec-client -s -d 1"
-                    },
-                    "powerOnStartupTime": {
-                        "title": "Startup Time",
-                        "type": "integer",
-                        "description": "Time in s for the device to start up. Pings are suppressed during this time to avoid incorrect tile state in the Home app. Default: 4",
-                        "minimum": 1,
-                        "maximum": 20,
-                        "placeholder": 4,
-                        "default": 4
                     },
                     "powerOffButton": {
                         "title": "Power Off Button",
@@ -519,7 +510,6 @@
                         "expandable": true,
                         "items": [
                             "devices[].powerOnCommand",
-                            "devices[].powerOnStartupTime",
                             "devices[].powerOffButton"
                         ]
                     },

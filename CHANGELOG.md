@@ -6,6 +6,18 @@ All notable changes to this project will be documented in this file.
 
 ### Initial Release
 
+## 0.0.11 (2020-09-21)
+* Improved power state detection when TV & HT devices are controlled by physical remotes
+* Improved power state detection after Homebridge restart
+* Tuned ping command defaults for Windows environments
+
+
+## 0.0.10 (2020-09-21)
+* Improved power state detection during power state transition time
+* Removed powerOnStartupTime from config, was superfluous
+* Disabled polling of device state, was superfluous
+
+
 ## 0.0.10 (2020-09-20)
 * Re-enabled power status polling (was turned off some time back)
 * Adapted current input to keep reverting back to 999 no input, so as to clear the Tile display
@@ -14,6 +26,7 @@ All notable changes to this project will be documented in this file.
 ## 0.0.9 (2020-09-20)
 * Added support of default wait(). If no wait time is specified, it defaults to 100ms
 * Added support of multi-key without wait(). If no wait is specified, a default wait of 100ms is used
+
 
 ## 0.0.8 (2020-09-19)
 * Added support of multiple keys sent in sequence, with a wait(ms) command. Lots of log entries for testing.

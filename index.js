@@ -1,4 +1,4 @@
-'use strict';
+//'use strict';
 
 // ****************** start of settings
 
@@ -33,10 +33,11 @@ var PLUGIN_ENV = ''; // controls the development environment, appended to UUID t
 // general constants
 const NO_INPUT_ID = 999; // default to input 999, no input
 const NO_INPUT_NAME = 'UNKNOWN'; // an input name that does not exist
-const POWER_STATE_POLLING_INTERVAL_MS = 2000; // pollling interval in millisec. Default = 2000
+const POWER_STATE_POLLING_INTERVAL_MS = 10000; // polling interval in millisec. Default = 5000, don't do this too quickly
+const POWER_STATE_MAX_TRANSITION_TIME_S = 30; // the maximum transition time we allow for a device to come online after a power ON command
 const mediaStateName = ["PLAY", "PAUSE", "STOP", "UNKNOWN3", "LOADING", "INTERRUPTED"];
 const powerStateName = ["OFF", "ON"];
-const powerStateTransition = { NOT_TRANSITIONING: 0, TRANSITIONING_ON_TO_OFF: 1, TRANSITIONING_OFF_TO_ON: 2 };
+//const powerStateTransition = { NOT_TRANSITIONING: 0, TRANSITIONING_ON_TO_OFF: 1, TRANSITIONING_OFF_TO_ON: 2 }; // used by HDMI-CEC
 Object.freeze(mediaStateName);
 Object.freeze(powerStateName);
 
@@ -143,9 +144,9 @@ class samsungTvHtPlatform {
 
 	powerStateMonitor() {
 		// ping the devices regularly to check their power state
-		this.log.debug("powerStateMonitor ---START-----------------------------------------")
 
 		// need to add support for powerOnStartupTime
+		//this.suppressPowerStateMonitoringUntil // datetime
 
 		// for linux: 	pingCmd = 'ping -c 1 -w 10' + ' ' + this.config.devices[0].ipAddress;
 		// for win: 	pingCmd = 'ping -n 1 -w 10' + ' ' + this.config.devices[0].ipAddress;
@@ -153,11 +154,10 @@ class samsungTvHtPlatform {
 		// ping all devices in the config
 		for (let i = 0; i < this.config.devices.length; i++) {
 			let device = this.devices[i];
-			let secondsSinceLastPowerKeyPress = (Date.now() - device.powerLastKeyPress) / 1000;
-			const powerStateMaxTransitionTimeSeconds = 30;
-			//this.log("secondsSinceLastPowerKeyPress: ", secondsSinceLastPowerKeyPress)
+			this.log.debug("powerStateMonitor: %s ---START-----------------------------------------", device.name);
 
-			var pingCmd = this.config.pingCommand || 'ping -c 1 -w 10'; // default linux
+			// set a ping command
+			var pingCmd = this.config.pingCommand || 'ping -c 1 -w 20'; // default linux, 1 ping, 20ms wait
 			pingCmd = pingCmd.trim() + ' ' + this.config.devices[i].ipAddress;
 			this.log.debug('powerStateMonitor: %s pinging device with %s', device.name, pingCmd);
 	
@@ -165,6 +165,15 @@ class samsungTvHtPlatform {
 			var deviceRealPowerState;
 			exec(pingCmd, function (error, stdout, stderr) {
 				self.log.debug("powerStateMonitor: %s ping response: %s", device.name, stdout);
+
+				self.log.debug('powerStateMonitor: %s powerLastKeyPress %s', device.name, device.powerLastKeyPress.toLocaleString());
+				var dateNow = new Date;
+				const secondsSinceLastPowerKeyPress = (dateNow - device.powerLastKeyPress) / 1000;
+				const yearsSinceLastPowerKeyPress = (dateNow.getFullYear() - device.powerLastKeyPress.getFullYear());
+				
+				self.log.debug('powerStateMonitor: %s secondsSinceLastPowerKeyPress %s', device.name, secondsSinceLastPowerKeyPress);
+				self.log.debug('powerStateMonitor: %s yearsSinceLastPowerKeyPress %s', device.name, yearsSinceLastPowerKeyPress);
+
 				// get the current device power state from the ping results
 				// win10:	Packets: Sent = 1, Received = 0, Lost = 1 (100% loss),
 				// linux: 	1 packets transmitted, 0 received, 100% packet loss, time 0ms
@@ -182,16 +191,22 @@ class samsungTvHtPlatform {
 
 				// evaluate the real vs target power states
 				self.log.debug("powerStateMonitor: %s evaluating power state. deviceRealPowerState %s, currentPowerState %s, targetPowerState %s", device.name, deviceRealPowerState, device.currentPowerState, device.targetPowerState);
-				if (deviceRealPowerState != device.targetPowerState) {
+				if (!(deviceRealPowerState === device.currentPowerState) && (yearsSinceLastPowerKeyPress > 100)) {
+					// (yearsSinceLastPowerKeyPress > 100) means no HomeKit key presses were made, but a deviceRealPowerState has detected which is differen to the currentPowerState. Probably changed through a non-HomeKit method, eg physical remote control
+					self.log.debug("powerStateMonitor: %s power state change detected from device, setting currentPowerState to deviceRealPowerState %s", device.name, deviceRealPowerState);
+					device.targetPowerState = deviceRealPowerState;
+					device.currentPowerState = deviceRealPowerState;
+
+				} else if ((deviceRealPowerState != device.targetPowerState) && (yearsSinceLastPowerKeyPress < 100)) {
 					self.log.debug("powerStateMonitor: %s is currently transitioning from %s to %s. Transition time so far: %s seconds", device.name, deviceRealPowerState, device.targetPowerState, secondsSinceLastPowerKeyPress);
-					// change in power state was requested
-					if (secondsSinceLastPowerKeyPress < powerStateMaxTransitionTimeSeconds) {
+					// change in power state was requested. yearsSinceLastPowerKeyPress helps us detect a Homebridge reboot 
+					if ((secondsSinceLastPowerKeyPress < POWER_STATE_MAX_TRANSITION_TIME_S) && (yearsSinceLastPowerKeyPress < 100)) {
 						// device is currently undergoing a power state transition to the targetPowerState, set currentPowerState to targetPowerState
-						self.log.debug("powerStateMonitor: %s is still within the allowed transition time of %s seconds, setting currentPowerState to targetPowerState %s", device.name, powerStateMaxTransitionTimeSeconds, device.targetPowerState);
+						self.log.debug("powerStateMonitor: %s is still within the allowed transition time of %s seconds, setting currentPowerState to targetPowerState %s", device.name, POWER_STATE_MAX_TRANSITION_TIME_S, device.targetPowerState);
 						device.currentPowerState = device.targetPowerState;
 					} else {
 						// transition time has timed out, cancel the targetPowerState, reset current and target to deviceRealPowerState
-						self.log.debug("powerStateMonitor: %s transition time longer than %s seconds, transition has timed out, no power state change occured, resetting currentPowerState to %s", device.name, powerStateMaxTransitionTimeSeconds, deviceRealPowerState);
+						self.log.debug("powerStateMonitor: %s transition time longer than %s seconds, transition has timed out, no power state change occured, resetting currentPowerState to %s", device.name, POWER_STATE_MAX_TRANSITION_TIME_S, deviceRealPowerState);
 						device.targetPowerState = deviceRealPowerState;
 						device.currentPowerState = deviceRealPowerState;
 					}
@@ -203,14 +218,17 @@ class samsungTvHtPlatform {
 
 
 				// update device status
-				//self.log.warn("powerStateMonitor: %s Calling device.updateDeviceState with device.currentPowerState %s", device.name, device.currentPowerState);
-				if (device.currentPowerState) { device.updateDeviceState(device.currentPowerState); }
-				self.log.debug("powerStateMonitor ---END-------------------------------------------")
+				self.log.debug("powerStateMonitor: %s calling device.updateDeviceState with device.currentPowerState %s", device.name, device.currentPowerState);
+				device.updateDeviceState(device.currentPowerState); 
+
+				// end log event must occur inside the ping function, as it is async
+				self.log.debug("powerStateMonitor: %s ---END-------------------------------------------", device.name);
 		
 			});
 
 
 		}
+
 
 	}
 	
@@ -244,29 +262,20 @@ class samsungTvHtDevice {
 		this.lastRemoteKeyPress1 = [];	// holds the time value of the last-1 remote button press for key index i
 		this.lastRemoteKeyPress2 = [];	// holds the time value of the last-2 remote button press for key index i
 		this.lastVolDownKeyPress = [];  // holds the time value of the last button press for the volume down button
-
-
-		this.inputList = [];
-		/*
-			{inputId: "1", inputName: "SOURCE"},
-			{inputId: "2", inputName: "SOURCE2"},
-			{inputId: "2", inputName: "HDMI"},
-			{inputId: "3", inputName: "HDMI2"}
-		];
-		*/
+		this.inputList = [];			// hols the input list, do we really need it?
 
 		//setup variables
 		this.accessoryConfigured = false;	// true when the accessory is configured
-		this.currentPowerTransitionState = powerStateTransition.NOT_TRANSITIONING;
+		this//.currentPowerTransitionState = powerStateTransition.NOT_TRANSITIONING;
 
 
 		// initial states. Will be updated by code
-		this.currentPowerState = Characteristic.Active.INACTIVE;
+		this.currentPowerState; // deliberately leave at undefined to detect a reboot and inital start = Characteristic.Active.INACTIVE;
 		this.targetPowerState = this.currentPowerState;
 		this.currentInputId = NO_INPUT_ID;
 		this.currentMediaState = Characteristic.CurrentMediaState.STOP;
 		this.targetMediaState = this.currentMediaState;
-		this.powerLastKeyPress = 0;
+		this.powerLastKeyPress = new Date("1900-01-01T00:00:00Z"); // set a valid date but many years in the past
 
 		// use defaults of plugin/platform name & version
 		// until device is discovered
@@ -281,7 +290,8 @@ class samsungTvHtDevice {
 		// update device state regularly
 		// Check & Update Accessory Status every POWER_STATE_POLLING_INTERVAL_MS (Default: 5000 ms)
 		// this is the last step in the setup. From now on polling will occur every 5 seconds
-		this.checkStateInterval = setInterval(this.updateDeviceState.bind(this),POWER_STATE_POLLING_INTERVAL_MS);
+		// disabled 21.09.2021, we don't need to do any polling here. It is handled by the powerStateMonitor
+		//this.checkStateInterval = setInterval(this.updateDeviceState.bind(this),POWER_STATE_POLLING_INTERVAL_MS);
 
 	}
 
@@ -291,7 +301,7 @@ class samsungTvHtDevice {
 	// START of preparing accessory and services
   	//+++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-	//Prepare accessory (runs from session watchdog)
+	//Prepare accessory (runs from samsungTvHtDevice)
 	prepareAccessory() {
 		if (this.debugLevel > 0) {
 			this.log.warn('%s: prepareAccessory', this.name);
@@ -582,7 +592,7 @@ class samsungTvHtDevice {
 	}
 
   	//+++++++++++++++++++++++++++++++++++++++++++++++++++++
-	// END session handler
+	// END state handler
   	//+++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 
@@ -595,7 +605,10 @@ class samsungTvHtDevice {
 
 	// update the device state (async)
 	async updateDeviceState(powerState, mediaState, inputId, callback) {
-		// doesn't get the data direct from the device box, but rather: gets it from the variables
+		// doesn't get the data direct from the device, but rather: gets it from the variables
+		if (this.debugLevel > 1) { 
+			this.log.warn('%s: updateDeviceState: powerState %s, mediaState %s, inputId %s', this.name, powerState, mediaState, inputId); 
+		}
 
 		// grab the input variables
 		if (powerState != null) { this.currentPowerState = powerState }
@@ -604,14 +617,14 @@ class samsungTvHtDevice {
 
 		// debugging, helps a lot to see InputName
 		if (this.debugLevel > 2) {
-			let currentInputName; // let is scopt to the current {} block
+			//let currentInputName; // let is scopt to the current {} block
 			let curInput = this.inputList.find(Input => Input.inputId === this.currentInputId); 
-			if (curInput) { currentInputName = curInput.InputName; }
+			//if (curInput) { currentInputName = curInput.InputName; }
 			this.log.warn('%s: updateDeviceState: currentPowerState %s, currentMediaState %s [%s], currentInputId %s [%s]', 
 				this.name, 
 				this.currentPowerState, 
 				this.currentMediaState, mediaStateName[this.currentMediaState], 
-				this.currentInputId, currentInputName
+				this.currentInputId, (curInput || {}).InputName
 			);
 		}
 
@@ -621,13 +634,16 @@ class samsungTvHtDevice {
 		if (this.televisionService) {
 
 			// set power state if changed
-			var oldPowerState = this.televisionService.getCharacteristic(Characteristic.Active).value;
-			if ((this.currentPowerState) && (oldPowerState !== this.currentPowerState)) {
+			var previousPowerState = this.televisionService.getCharacteristic(Characteristic.Active).value;
+			this.log.debug('%s: updateDeviceState: previousPowerState %s, currentPowerState %s',this.name, previousPowerState, this.currentPowerState);
+			if (previousPowerState !== this.currentPowerState) {
 				this.log('%s: Power changed from %s %s to %s %s', 
 					this.name,
-					oldPowerState, powerStateName[oldPowerState],
+					previousPowerState, powerStateName[previousPowerState],
 					this.currentPowerState, powerStateName[this.currentPowerState]);
 				this.televisionService.getCharacteristic(Characteristic.Active).updateValue(this.currentPowerState);
+			} else {
+				this.log.debug('%s: updateDeviceState: no change to current power, Characteristic.Active not updated',this.name);
 			}
 			
 			// set active input if changed
@@ -650,6 +666,8 @@ class samsungTvHtDevice {
 					oldActiveIdentifier + 1, oldName,
 					currentActiveIdentifier + 1, newName);
 				this.televisionService.getCharacteristic(Characteristic.ActiveIdentifier).updateValue(currentActiveIdentifier);
+			} else {
+				this.log.debug('%s: updateDeviceState: no change to current input, Characteristic.ActiveIdentifier not updated',this.name);
 			}
 
 			// set current media state if changed
@@ -665,8 +683,6 @@ class samsungTvHtDevice {
 		}
 		return null;
 	}
-
-
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++
 	// END regular device update polling functions
@@ -689,7 +705,7 @@ class samsungTvHtDevice {
 		if (this.debugLevel > 1) { 
 			this.log.warn('%s: getPower returning %s [%s]', this.name, this.currentPowerState, powerStateName[this.currentPowerState]); 
 		}
-		callback(null, this.currentPowerState); // return current state: 0=off, 1=on
+		callback(null, this.currentPowerState || Characteristic.Active.INACTIVE); // return current state: 0=off, 1=on. Default to OFF if null.
 	}
 
 	// set power state
@@ -704,7 +720,8 @@ class samsungTvHtDevice {
 		// only take action if the target state is different to the current state
 		if (this.currentPowerState != this.targetPowerState) {
 			// check what we want to do
-			this.powerLastKeyPress = Date.now();
+			this.powerLastKeyPress = new Date();
+			this.log.warn("%s: setPower reset powerLastKeyPress to %s", this.name, this.powerLastKeyPress.toLocaleString());
 			this.currentPowerState = this.targetPowerState; // to ensure HomeKit gets the correct state at next poll, regardless
 
 			if (this.targetPowerState == Characteristic.Active.INACTIVE){
