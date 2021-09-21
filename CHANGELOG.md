@@ -6,6 +6,9 @@ All notable changes to this project will be documented in this file.
 
 ### Initial Release
 
+## 0.0.13 (2020-09-21)
+* Fixed wrong default keycode for Volume Up
+
 ## 0.0.12 (2020-09-21)
 * Reset POWER_STATE_POLLING_INTERVAL_MS to a sensible value
 

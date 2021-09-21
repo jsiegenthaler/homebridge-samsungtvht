@@ -404,8 +404,8 @@
                         "title": "Volume Up",
                         "type": "string",
                         "descriptionxx": "The key code to send when the volume up button is pressed on the iOS remote.<br>See the <a href=\"https://github.com/jsiegenthaler/homebridge-samsung-tvht/wiki\">Wiki</a> for all key codes. Default: KEY_VOLUP",
-                        "placeholder": "KEY_VOL_UP",
-                        "default": "KEY_VOL_UP"
+                        "placeholder": "KEY_VOLUP",
+                        "default": "KEY_VOLUP"
                     },
                     "voldownButton": {
                         "title": "Volume Down",
