@@ -58,21 +58,24 @@
             "type": "integer",
             "description": "The amount of time in ms to detect double-press or double-tap of an iOS remote control button. Default 250ms",
             "default": 250,
-            "placeholder": 250
+            "placeholder": 250,
+            "required": true
         },
         "triplePressTime": {
             "title": "Triple-Press Time",
             "type": "integer",
             "description": "The amount of time in ms to detect triple-press or triple-tap of an iOS remote control button. Default: 450ms",
             "default": 450,
-            "placeholder": 450
+            "placeholder": 450,
+            "required": false
         },
         "doublePressDelayTime": {
             "title": "Double-Press Delay Time",
             "type": "integer",
             "description": "The amount of time in ms to wait for the next iOS remote control button before giving up and sending the current button. Default 300ms",
             "default": 300,
-            "placeholder": 300
+            "placeholder": 300,
+            "required": true
         },
         "debugLevel": {
             "title": "Debug Level",
@@ -82,7 +85,8 @@
                 { "title": "Minimum", "enum": [1] },
                 { "title": "Enhanced", "enum": [2] },
                 { "title": "Verbose", "enum": [3] }
-            ]
+            ],
+            "required": false
         },
         
           
