@@ -6,6 +6,10 @@ All notable changes to this project will be documented in this file.
 
 ### Initial Release
 
+## 0.0.14 (2020-09-21)
+* Made Ping Interval configurable with default 3s
+
+
 ## 0.0.13 (2020-09-21)
 * Fixed wrong default keycode for Volume Up
 

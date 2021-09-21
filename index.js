@@ -33,7 +33,7 @@ var PLUGIN_ENV = ''; // controls the development environment, appended to UUID t
 // general constants
 const NO_INPUT_ID = 999; // default to input 999, no input
 const NO_INPUT_NAME = 'UNKNOWN'; // an input name that does not exist
-const POWER_STATE_POLLING_INTERVAL_MS = 3000; // polling interval in millisec. Default = 3000
+const POWER_STATE_DEFAULT_POLLING_INTERVAL_MS = 3000; // default polling interval in millisec
 const POWER_STATE_MAX_TRANSITION_TIME_S = 30; // the maximum transition time we allow for a device to come online after a power ON command, default 30 s
 const mediaStateName = ["PLAY", "PAUSE", "STOP", "UNKNOWN3", "LOADING", "INTERRUPTED"];
 const powerStateName = ["OFF", "ON"];
@@ -126,7 +126,10 @@ class samsungTvHtPlatform {
 				}
 				}
 				// start the regular powerStateMonitor
-				this.checkPowerInterval = setInterval(this.powerStateMonitor.bind(this), POWER_STATE_POLLING_INTERVAL_MS);
+				//pingInterval
+				this.log("Pinging at intervals of %s ms", this.config.pingInterval * 1000 || POWER_STATE_DEFAULT_POLLING_INTERVAL_MS);
+				
+				this.checkPowerInterval = setInterval(this.powerStateMonitor.bind(this), this.config.pingInterval * 1000 || POWER_STATE_DEFAULT_POLLING_INTERVAL_MS);
 		
 		});
 	}
