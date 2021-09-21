@@ -33,8 +33,8 @@ var PLUGIN_ENV = ''; // controls the development environment, appended to UUID t
 // general constants
 const NO_INPUT_ID = 999; // default to input 999, no input
 const NO_INPUT_NAME = 'UNKNOWN'; // an input name that does not exist
-const POWER_STATE_POLLING_INTERVAL_MS = 10000; // polling interval in millisec. Default = 5000, don't do this too quickly
-const POWER_STATE_MAX_TRANSITION_TIME_S = 30; // the maximum transition time we allow for a device to come online after a power ON command
+const POWER_STATE_POLLING_INTERVAL_MS = 3000; // polling interval in millisec. Default = 3000
+const POWER_STATE_MAX_TRANSITION_TIME_S = 30; // the maximum transition time we allow for a device to come online after a power ON command, default 30 s
 const mediaStateName = ["PLAY", "PAUSE", "STOP", "UNKNOWN3", "LOADING", "INTERRUPTED"];
 const powerStateName = ["OFF", "ON"];
 //const powerStateTransition = { NOT_TRANSITIONING: 0, TRANSITIONING_ON_TO_OFF: 1, TRANSITIONING_OFF_TO_ON: 2 }; // used by HDMI-CEC
