@@ -105,13 +105,14 @@ Example configuration as used on the author's Samsung TV (where 192.168.0.x is t
     "platforms": [
         {
             "name": "Samsung TV HT",
-            "pingCommand": "ping -n 1 -w 10",
-            "pingResponseOn": "(0% loss)",
-            "pingResponseOff": "(100% loss)",
+            "pingCommand": "ping -c 1 -w 20",
+            "pingInterval": 3,
+            "pingResponseOn": ", 0% packet loss",
+            "pingResponseOff": ", 100% packet loss",
             "doublePressTime": 250,
-            "triplePressTime": 500,
-            "doublePressDelayTime": 300,
-            "debugLevel": 2,
+            "triplePressTime": 450,
+            "doublePressDelayTime": 300,            
+            "debugLevel": 0,
             "devices": [
                 {
                     "name": "Samsung TV DEV",
@@ -122,33 +123,195 @@ Example configuration as used on the author's Samsung TV (where 192.168.0.x is t
                     "serialNumber": "T-MSV4DEUC-1005.0",
                     "firmwareRevision": "1005.0",
                     "powerOnCommand": "echo 'on 0' | cec-client -s -d 1",
-                    "powerOnStartupTime": 4,
                     "powerOffButton": "KEY_POWEROFF",
                     "viewTvSettingsCommand": "KEY_MENU",
                     "inputs": [
+                    "inputs": [
+                        {
+                            "inputName": "HDMI1 (Cable STB)",
+                            "inputKeyCode": "KEY_EXT20",
+                            "inputSourceType": "3",
+                            "inputDeviceType": "1"
+                        },
+                        {
+                            "inputName": "HDMI2 (Blu-ray)",
+                            "inputKeyCode": "KEY_AUTO_ARC_PIP_WIDE",
+                            "inputSourceType": "3",
+                            "inputDeviceType": "1"
+                        },
+                        {
+                            "inputName": "HDMI3 PC",
+                            "inputKeyCode": "KEY_AUTO_ARC_PIP_RIGHT_BOTTOM",
+                            "inputSourceType": "3",
+                            "inputDeviceType": "1"
+                        },
+                        {
+                            "inputName": "Mute",
+                            "inputKeyCode": "KEY_MUTE",
+                            "inputSourceType": "0",
+                            "inputDeviceType": "0"
+                        },
+                        {
+                            "inputName": "Volume Up",
+                            "inputKeyCode": "KEY_VOLUP wait(200) KEY_VOLUP wait(200) KEY_VOLUP",
+                            "inputSourceType": "0",
+                            "inputDeviceType": "0"
+                        },
+                        {
+                            "inputName": "Volume Down",
+                            "inputKeyCode": "KEY_VOLDOWN wait(200) KEY_VOLDOWN wait(200) KEY_VOLDOWN",
+                            "inputSourceType": "0",
+                            "inputDeviceType": "0"
+                        },
                         {
                             "inputName": "Source",
                             "inputKeyCode": "KEY_SOURCE",
                             "inputSourceType": "3",
-                            "inputDeviceType": "0"
+                            "inputDeviceType": "1"
                         },
                         {
-                            "inputName": "HDMI",
-                            "inputKeyCode": "KEY_HDMI",
+                            "inputName": "Up",
+                            "inputKeyCode": "KEY_UP",
                             "inputSourceType": "3",
-                            "inputDeviceType": "0"
+                            "inputDeviceType": "1"
                         },
                         {
-                            "inputName": "Ext AV1",
-                            "inputKeyCode": "KEY_AV1",
+                            "inputName": "Down",
+                            "inputKeyCode": "KEY_DOWN",
                             "inputSourceType": "3",
-                            "inputDeviceType": "0"
+                            "inputDeviceType": "1"
                         },
                         {
-                            "inputName": "PC",
-                            "inputKeyCode": "KEY_PCMODE",
+                            "inputName": "Enter",
+                            "inputKeyCode": "KEY_ENTER",
                             "inputSourceType": "3",
+                            "inputDeviceType": "1"
+                        },
+                        {
+                            "inputName": "Energy Saving High",
+                            "inputKeyCode": "KEY_TOOLS KEY_DOWN KEY_DOWN KEY_RIGHT KEY_RIGHT KEY_ENTER",
+                            "inputSourceType": "0",
                             "inputDeviceType": "0"
+                        }
+                    ],
+                    "arrowUpButton": "KEY_UP",
+                    "arrowUpButtonDoubleTap": "KEY_CHUP",
+                    "arrowUpButtonTripleTap": "KEY_UP",
+                    "arrowDownButton": "KEY_DOWN",
+                    "arrowDownButtonDoubleTap": "KEY_CHDOWN",
+                    "arrowDownButtonTripleTap": "KEY_DOWN",
+                    "arrowLeftButton": "KEY_LEFT",
+                    "arrowLeftButtonDoubleTap": "KEY_REWIND",
+                    "arrowLeftButtonTripleTap": "KEY_LEFT",
+                    "arrowRightButton": "KEY_RIGHT",
+                    "arrowRightButtonDoubleTap": "KEY_FF",
+                    "arrowRightButtonTripleTap": "KEY_RIGHT",
+                    "selectButton": "KEY_ENTER",
+                    "selectButtonDoubleTap": "KEY_SOURCE",
+                    "selectButtonTripleTap": "KEY_HDMI",
+                    "playPauseButton": "KEY_PLAY",
+                    "playPauseButtonDoubleTap": "KEY_PAUSE",
+                    "playPauseButtonTripleTap": "KEY_STOP",
+                    "backButton": "KEY_RETURN",
+                    "backButtonDoubleTap": "KEY_EXIT",
+                    "backButtonTripleTap": "KEY_RETURN",
+                    "infoButton": "KEY_MENU",
+                    "infoButtonDoubleTap": "KEY_INFO",
+                    "infoButtonTripleTap": "KEY_TOOLS",
+                    "volupButton": "KEY_VOLUP",
+                    "voldownButton": "KEY_VOLDOWN",
+                    "voldownButtonTriplePress": "KEY_MUTE",
+                    "muteButton": "KEY_MUTE"
+                },
+                {
+                    "name": "Home Theater DEV",
+                    "ipAddress": "192.168.0.x",
+                    "type": "receiver",
+                    "manufacturer": "Samsung",
+                    "modelName": "HT-D5500",
+                    "serialNumber": "HTB-D6500EUB-1023.1",
+                    "firmwareRevision": "1023.1",
+                    "powerOnCommand": "echo 'on 5' | cec-client -s -d 1 RPI",
+                    "powerOffButton": "BD_KEY_POWER",
+                    "viewTvSettingsCommand": "KEY_MENU",
+                    "inputs": [
+                        {
+                            "inputName": "Volume Up",
+                            "inputKeyCode": "KEY_VOLUP",
+                            "inputSourceType": "3",
+                            "inputDeviceType": "1"
+                        },
+                        {
+                            "inputName": "Volume Down",
+                            "inputKeyCode": "KEY_VOLDOWN",
+                            "inputSourceType": "3",
+                            "inputDeviceType": "1"
+                        },
+                        {
+                            "inputName": "Mute",
+                            "inputKeyCode": "KEY_MUTE",
+                            "inputSourceType": "3",
+                            "inputDeviceType": "1"
+                        },
+                        {
+                            "inputName": "Left",
+                            "inputKeyCode": "KEY_LEFT",
+                            "inputSourceType": "3",
+                            "inputDeviceType": "1"
+                        },
+                        {
+                            "inputName": "Right",
+                            "inputKeyCode": "KEY_RIGHT",
+                            "inputSourceType": "3",
+                            "inputDeviceType": "1"
+                        },
+                        {
+                            "inputName": "Up",
+                            "inputKeyCode": "KEY_UP",
+                            "inputSourceType": "3",
+                            "inputDeviceType": "1"
+                        },
+                        {
+                            "inputName": "Down",
+                            "inputKeyCode": "KEY_DOWN",
+                            "inputSourceType": "3",
+                            "inputDeviceType": "1"
+                        },
+                        {
+                            "inputName": "Enter",
+                            "inputKeyCode": "KEY_ENTER",
+                            "inputSourceType": "3",
+                            "inputDeviceType": "1"
+                        },
+                        {
+                            "inputName": "Sub Level",
+                            "inputKeyCode": "KEY_VCHIP",
+                            "inputSourceType": "3",
+                            "inputDeviceType": "1"
+                        },
+                        {
+                            "inputName": "Dolby PLII",
+                            "inputKeyCode": "KEY_LIVE",
+                            "inputSourceType": "3",
+                            "inputDeviceType": "1"
+                        },
+                        {
+                            "inputName": "KEY_CH_LIST",
+                            "inputKeyCode": "KEY_CH_LIST",
+                            "inputSourceType": "3",
+                            "inputDeviceType": "1"
+                        },
+                        {
+                            "inputName": "KEY_SUB_TITLE",
+                            "inputKeyCode": "KEY_SUB_TITLE",
+                            "inputSourceType": "3",
+                            "inputDeviceType": "1"
+                        },
+                        {
+                            "inputName": "Interactive",
+                            "inputKeyCode": "KEY_INTERACTIVE",
+                            "inputSourceType": "3",
+                            "inputDeviceType": "1"
                         }
                     ],
                     "arrowUpButton": "KEY_UP",
@@ -196,19 +359,21 @@ Example configuration as used on the author's Samsung TV (where 192.168.0.x is t
 
 * **pingCommand**: the ping command to be used to ping the device to determine it's power state. For Linux, use "ping -c 1 -w 1" (the default>). For Windows, use "ping -n 1 -w 10". The ping options used are: Linux: -c 1 = ping once only; -w 1 = wait 1 millisecond before timing out.  Windows: -w 10 = wait 10 milliseconds before timing out.
 
+* **pingInterval**: the interval in seconds between each ping. Shorter intervals generate more network traffic but show a more responsive tile in the Home app. 3 seconds is a good balance between traffic and responsiveness. Default 3. Mandatory.
+
 * **pingResponseOn**: the ping response that corresponds to a successfuly ping response, indicating that the device is turned on. For Linux, use ", 0% packet loss". For Windows use "(0% loss)"
 
 * **pingResponseOff**: the ping response that corresponds to no ping response, indicating that the device is turned off. For Linux, use "100% packet loss". For Windows use "(100% loss)"
 
 * **doublePressTime**: the time in ms to detect a double key press (or tap). Default 250 ms. Mandatory.
 
-* **triplePressTime**: the time in ms to detect a triple key press (or tap). Default 450 ms. Mandatory.
+* **triplePressTime**: the time in ms to detect a triple key press (or tap). Default 450 ms. Optional, for future use.
 
 * **doublePressDelayTime**: the time in ms to wait for another key press to detect a double key press. Must be greater than doublePressTime. Default 300 ms. Mandatory.
 
-* **debugLevel**: the level of debug info displayed by this plugin, from 0 (none) to 3 (Verbose). Default 0. Mandatory.
+* **debugLevel**: the level of debug info displayed by this plugin, from 0 (none) to 3 (Verbose). Default 0. Optional.
 
-* **devices**: an array for each device's config, See below.
+* **devices**: an array for each device's config, see below.
 
 #### Device Config (array)
 
@@ -228,10 +393,12 @@ Example configuration as used on the author's Samsung TV (where 192.168.0.x is t
 
 * **powerOnCommand**: the command to execute on your Homebridge system to turn the power on. HDMI-CEC commands work well here. Optional.
 
-* **powerOnStartupTime**: the amount of time in ms to wait for the device to power up. Pings are asuppressed during this wait time. Default 4000 ms. Optional.
-
 * **powerOffButton**: the key code to send to turn the device off. Optional.
 
+* **viewTvSettingsCommand**: the key code to send when the View TV Sessings option is selected in the Accessory setup. Optional.
+
+* **inputs**: an array for each device's inputs, see below.
+* 
 * **xxxButton**: The key code to send when button xxx is tapped in the iOS remote control. See the example for supported button names.
 
 * **xxxButtonDoubleTap**: The key code to send when button xxx is tapped in the iOS remote control. See the example for supported button names.
@@ -242,7 +409,7 @@ Example configuration as used on the author's Samsung TV (where 192.168.0.x is t
 
 * **inputName**: the input name to display in the Home app. Optional.
 
-* **inputKeyCode**: the key code to send for this input. Optional.
+* **inputKeyCode**: the key code to send for this input. Can be a sequence of key codes separated by spaces. Optional.
 
 * **inputSourceType**: the input device type, as defined in the [Homebridge API Input Source Type](https://developers.homebridge.io/#/characteristic/InputSourceType). Default 3 (HDMI). Optional.
 
