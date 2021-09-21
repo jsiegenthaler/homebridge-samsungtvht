@@ -88,8 +88,7 @@ You can configure up to 20 inputs in the plugin config. The inputs can send any 
 The Accessory settings icon command **View TV Settings** will open the TV or Home Theater's menu.
 
 ### Multi Key Sequences (Macros) Supported
-The plugin can send multiple key codes, seperate the key codes with spaces. Keys are sent at intervals of 100ms, but can be changed by inserting a wait(ms) in the key code sequence. The following example selects TV channel 12 by sending TV, waiting 200ms, then sending keys 1, 2 and Enter with 100ms between each key code:
-"KEY_TV wait(200) KEY_1 KEY_2 KEY_ENTER"
+The plugin can send multiple key codes, seperate the key codes with spaces. Keys are sent at intervals of 100ms, but can be changed by inserting a wait(ms) in the key code sequence. To select TV channel 12 by sending TV, waiting 200ms, then sending keys 1, 2 and Enter, use: `KEY_TV wait(200) KEY_1 KEY_2 KEY_ENTER`
 
 ## Configuration
 ### Config via Settings
@@ -99,7 +98,7 @@ It is easiest to configure the plugin via Homebridge: Plugins > Homebridge Samsu
 You can also configure manually. 
 Add a new platform to the platforms section of your homebridge `config.json`.
 
-Example configuration as used on the author's Samsung TV (where 192.168.0.x is the IP address of the TV):
+Example configuration as used on the author's Samsung TV and Samsung HT:
 
 ```js
     "platforms": [
