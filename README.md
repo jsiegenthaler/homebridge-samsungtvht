@@ -370,7 +370,7 @@ Example configuration as used on the author's Samsung TV and Samsung HT:
 
 * **doublePressDelayTime**: the time in ms to wait for another key press to detect a double key press. Must be greater than doublePressTime. Default 300 ms. Mandatory.
 
-* **debugLevel**: the level of debug info displayed by this plugin, from 0 (none) to 3 (Verbose). Default 0. Optional.
+* **debugLevel**: the level of debug info displayed by this plugin, integer, one of 0 (none), 1 (Minimum), 2 (Enhanced), 3 (Verbose). Default 0. Optional.
 
 * **devices**: an array for each device's config, see below.
 
