@@ -184,8 +184,8 @@ class samsungTvHtPlatform {
 					self.log.debug("powerStateMonitor: %s is responding to ping, power is currently ON", device.name);
 					deviceRealPowerState = Characteristic.Active.ACTIVE;
 				} else {
-					self.log.debug("powerStateMonitor: WARNING %s ping result cannot be parsed! stdout:", device.name, stdout);
-					deviceRealPowerState = null;
+					self.log.warn("powerStateMonitor: WARNING %s cannot determine power state from ping result! stdout:", device.name, stdout);
+					deviceRealPowerState = device.currentPowerState; // maintain current state
 				}
 
 
@@ -278,11 +278,10 @@ class samsungTvHtDevice {
 		this.powerLastKeyPress = new Date("1900-01-01T00:00:00Z"); // set a valid date but many years in the past
 
 		// use defaults of plugin/platform name & version
-		// until device is discovered
-		this.manufacturer = this.config.manufacturer || "Samsung";
-		this.modelName = this.config.modelName || PLATFORM_NAME;
-		this.serialNumber = this.config.serialNumber || 'unknown';
-		this.firmwareRevision = this.config.firmwareRevision || PLUGIN_VERSION; // must be numeric. Non-numeric values are not displayed
+		this.manufacturer = this.deviceConfig.manufacturer || "Samsung";
+		this.modelName = this.deviceConfig.modelName || PLATFORM_NAME;
+		this.serialNumber = this.deviceConfig.serialNumber || 'unknown';
+		this.firmwareRevision = this.deviceConfig.firmwareRevision || PLUGIN_VERSION; // must be numeric. Non-numeric values are not displayed
 
 		// prepare the accessory
 		this.prepareAccessory();
