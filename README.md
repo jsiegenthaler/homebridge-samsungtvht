@@ -8,6 +8,8 @@ Suported TVs and HTs are:
 * F-series from 2013
 * H-series from 2014 (probably not working, as this TV needs PIN-code authentication)
 
+<img src="https://github.com/jsiegenthaler/homebridge-samsungtvht/blob/master/pics/AccessoryTilesTVHT.png" alt="AccessoryTilesTVHT" height="80" align="left">
+
 This plugin displays your Samsung device as a TV or Audio Receiver Accessory with Power, Input & Remote Control capabilities in your iOS device (iPhone, iPad, iMac, etc.).
 
 Supports multiple devices, allowing you to create an accessory for each TV or Home Theater system (should you have more than one).
@@ -18,7 +20,9 @@ Probably does not work with Samsung TVs using the Tizen OS. Tizen = TVs made fro
 **Submitted for Homebridge Verification on 23 September 2021**
 
 
-[![donate](https://badgen.net/badge/donate/paypal/91BE09)](https://www.paypal.com/donate?hosted_button_id=CNEDGHRUER468)
+[![npm](https://img.shields.io/npm/v/homebridge-samsungtvht)](https://www.npmjs.com/package/homebridge-samsungtvht)
+[![GitHub issues](https://img.shields.io/github/issues/jsiegenthaler/homebridge-samsungtvht)](https://github.com/jsiegenthaler/homebridge-samsungtvht/issues)
+www.paypal.com/donate?hosted_button_id=CNEDGHRUER468)
 
 ## Made in Switzerland
 This plugin was written and tested on the author's Samsung D-series TV and D-series Home Theater system in Switzerland.
