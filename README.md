@@ -72,6 +72,7 @@ Your new accessory will appear shortly in the room that you selected. It may sho
 To access the **Apple TV Remote**, open your **Control Center** by swiping down from the top (newer iPhones) or up from the bottom of the screen (older iPhones). If you do not see the remote control icon, you will need to activate it in **Settings > Control Centre** and ensure that the **Apple TV Remote** is in the list of **INCLUDED CONTROLS**.
 
 The following keys are supported by in the **Apple TV Remote** in the Control Center:
+<img src="https://github.com/jsiegenthaler/homebridge-samsungtvht/blob/master/pics/RemoteControl.png" alt="RemoteControl" height="300" align="right">
 
 * Navigation (Up/Down/Left/Right)	
 * OK
@@ -88,6 +89,8 @@ All remote control buttons are fully configurable and can send any [key code](ht
 You can turn the device power on via HDMI-CEC, and off via remote control commands. Current power state is detected by pinging the device. See the [Power Control](https://github.com/jsiegenthaler/homebridge-samsungtvht/wiki/Power-Control) wiki page for full details.
 
 ### Inputs
+<img src="https://github.com/jsiegenthaler/homebridge-samsungtvht/blob/master/pics/TvInputSelector.png" alt="TvInputSelector" height="300" align="right">
+
 You can configure up to 20 inputs in the plugin config. The inputs can send any key code (see the [Key Codes](https://github.com/jsiegenthaler/homebridge-samsungtvht/wiki/Key-Codes) wiki page). Note that the plugin cannot currently read the current TV or HT source, it can only send the key codes.
 
 ### View TV Settings
