@@ -22,7 +22,7 @@ Probably does not work with Samsung TVs using the Tizen OS. Tizen = TVs made fro
 
 [![npm](https://img.shields.io/npm/v/homebridge-samsungtvht)](https://www.npmjs.com/package/homebridge-samsungtvht)
 [![GitHub issues](https://img.shields.io/github/issues/jsiegenthaler/homebridge-samsungtvht)](https://github.com/jsiegenthaler/homebridge-samsungtvht/issues)
-www.paypal.com/donate?hosted_button_id=CNEDGHRUER468)
+[![donate](https://badgen.net/badge/donate/paypal/91BE09)](www.paypal.com/donate?hosted_button_id=CNEDGHRUER468)
 
 ## Made in Switzerland
 This plugin was written and tested on the author's Samsung D-series TV and D-series Home Theater system in Switzerland.
