@@ -15,6 +15,8 @@ Supports HT devices such as HT-D5500, HT-D5530, HT-D5550, HT-D6500
 
 Probably does not work with Samsung TVs using the Tizen OS. Tizen = TVs made from 2015!
 
+**Submitted for Homebridge Verification on 23 September 2021**
+
 
 [![donate](https://badgen.net/badge/donate/paypal/91BE09)](https://www.paypal.com/donate?hosted_button_id=CNEDGHRUER468)
 
@@ -356,7 +358,7 @@ Example configuration as used on the author's Samsung TV and Samsung HT:
 
 * **name**: The displayed name of your device. Default is the plugin name. Mandatory.
 
-* **pingCommand**: the ping command to be used to ping the device to determine it's power state. For Linux, use "ping -c 1 -w 1" (the default>). For Windows, use "ping -n 1 -w 10". The ping options used are: Linux: -c 1 = ping once only; -w 1 = wait 1 millisecond before timing out.  Windows: -w 10 = wait 10 milliseconds before timing out.
+* **pingCommand**: the ping command to be used to ping the device to determine it's power state. For Linux, use "ping -c 2 -w 10" (the default>). For Windows, use "ping -n 2 -w 20". The ping options used are: Linux: -c 2 = ping twice only; -w 10 = wait 10 milliseconds before timing out.  Windows: -w 20 = wait 20 milliseconds before timing out.
 
 * **pingInterval**: the interval in seconds between each ping. Shorter intervals generate more network traffic but show a more responsive tile in the Home app. 3 seconds is a good balance between traffic and responsiveness. Default 3. Mandatory.
 
