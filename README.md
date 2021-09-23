@@ -17,8 +17,7 @@ Supports HT devices such as HT-D5500, HT-D5530, HT-D5550, HT-D6500
 
 Probably does not work with Samsung TVs using the Tizen OS. Tizen = TVs made from 2015!
 
-**Submitted for Homebridge Verification on 23 September 2021**
-
+**[Submitted for Homebridge Verification on 23 September 2021](https://github.com/homebridge/verified/issues/337)**
 
 [![npm](https://img.shields.io/npm/v/homebridge-samsungtvht)](https://www.npmjs.com/package/homebridge-samsungtvht)
 [![GitHub issues](https://img.shields.io/github/issues/jsiegenthaler/homebridge-samsungtvht)](https://github.com/jsiegenthaler/homebridge-samsungtvht/issues)
