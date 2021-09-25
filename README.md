@@ -1,3 +1,10 @@
+<p align="center">
+    <img src="https://github.com/jsiegenthaler/homebridge-samsungtvht/blob/master/pics/Samsung-D5000.jpg" alt="TV D-5000" height="200" align="center">
+    <img src="https://github.com/jsiegenthaler/homebridge-samsungtvht/blob/master/pics/Samsung-HT-D5500.jpg" alt="HT HT-D5500" height="200" align="center">
+
+  </a>
+</p>
+
 # homebridge-samsungtvht
 
 `homebridge-samsungtvht` is a Homebridge plugin allowing you to control your Samsung TV and Home Theater (with Orsay OS) with Apple HomeKit using the Home app and the Apple TV Remote in the Control Center.
