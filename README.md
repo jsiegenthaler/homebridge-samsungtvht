@@ -3,7 +3,7 @@
 `homebridge-samsungtvht` is a Homebridge plugin allowing you to control your Samsung TV and Home Theater (with Orsay OS) with Apple HomeKit using the Home app and the Apple TV Remote in the Control Center.
 Suported TVs and HTs are:
 * C-series from 2010
-* D-series from 2011 (as used by the author on his UE40D5000 TV and HT-D5500 HT)
+* D-series from 2011 (as used by the author on his UE40D5000 TV and HT-D5500 Home Theater)
 * ES-series and EH-series from 2012
 * F-series from 2013
 * H-series from 2014 (probably not working, as this TV needs PIN-code authentication)
@@ -364,13 +364,13 @@ Example configuration as used on the author's Samsung TV and Samsung HT:
 
 * **name**: The displayed name of your device. Default is the plugin name. Mandatory.
 
-* **pingCommand**: the ping command to be used to ping the device to determine it's power state. For Linux, use "ping -c 2 -w 10" (the default>). For Windows, use "ping -n 2 -w 20". The ping options used are: Linux: -c 2 = ping twice only; -w 10 = wait 10 milliseconds before timing out.  Windows: -w 20 = wait 20 milliseconds before timing out.
+* **pingCommand**: the ping command to be used to ping the device to determine it's power state. For Linux, use "ping -c 2 -w 10" (the default>). For Windows, use "ping -n 2 -w 20". The ping options used are: Linux: -c 2 = ping twice only; -w 10 = wait 10 milliseconds before timing out.  Windows: -w 20 = wait 20 milliseconds before timing out. . See the [Power-Control](https://github.com/jsiegenthaler/homebridge-samsungtvht/wiki/Power-Control) wiki page for more incormation.
 
 * **pingInterval**: the interval in seconds between each ping. Shorter intervals generate more network traffic but show a more responsive tile in the Home app. 3 seconds is a good balance between traffic and responsiveness. Default 3. Mandatory.
 
-* **pingResponseOn**: the ping response that corresponds to a successfuly ping response, indicating that the device is turned on. For Linux, use ", 0% packet loss". For Windows use "(0% loss)"
+* **pingResponseOn**: the ping response that corresponds to a successfuly ping response, indicating that the device is turned on. For Linux, use ", 0% packet loss". For Windows use "(0% loss)". See the [Power-Control](https://github.com/jsiegenthaler/homebridge-samsungtvht/wiki/Power-Control) wiki page for more incormation.
 
-* **pingResponseOff**: the ping response that corresponds to no ping response, indicating that the device is turned off. For Linux, use "100% packet loss". For Windows use "(100% loss)"
+* **pingResponseOff**: the ping response that corresponds to no ping response, indicating that the device is turned off. For Linux, use "100% packet loss". For Windows use "(100% loss)". See the [Power-Control](https://github.com/jsiegenthaler/homebridge-samsungtvht/wiki/Power-Control) wiki page for more incormation.
 
 * **doublePressTime**: the time in ms to detect a double key press (or tap). Default 250 ms. Mandatory.
 
