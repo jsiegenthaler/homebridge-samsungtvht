@@ -1,7 +1,14 @@
+<p align="center">
+    <img src="https://github.com/jsiegenthaler/homebridge-samsungtvht/blob/master/pics/Samsung-D5000.jpg" alt="TV D-5000" height="200" align="center">
+    <img src="https://github.com/jsiegenthaler/homebridge-samsungtvht/blob/master/pics/Samsung-HT-D5500.jpg" alt="HT HT-D5500" height="200" align="center">
+
+  </a>
+</p>
+
 # homebridge-samsungtvht
 
 `homebridge-samsungtvht` is a Homebridge plugin allowing you to control your Samsung TV and Home Theater (with Orsay OS) with Apple HomeKit using the Home app and the Apple TV Remote in the Control Center.
-Suported TVs and HTs are:
+Supported TVs and HTs are:
 * C-series from 2010
 * D-series from 2011 (as used by the author on his UE40D5000 TV and HT-D5500 Home Theater)
 * ES-series and EH-series from 2012
@@ -55,7 +62,7 @@ Each Samsung TV or HT device is exposed as a separate external accessory and eac
 3. Tap **Add Accessory** to start the process of adding a new accessory.
 4. **Add Accessory**: tap **I Don't Have a Code or Cannot Scan**.
 5. **Select an Accessory to Add to (Home Name)**: Select the accessory you want to add. You should see your Samsung device here. If not, check your Homebridge config.
-6. Accept the **Uncertified Accesory** warning by tapping **Add Anyway**.
+6. Accept the **Uncertified Accessory** warning by tapping **Add Anyway**.
 7. **Enter HomeKit Setup Code**: Enter the **HomeKit Setup Code** (displayed in Homebridge under the QR code, format XXX-XX-XXX), or use the device's camera to scan the QR code in Homebridge and tap **Continue**.
 8. **TV Location**: Select a room for your Samsung accessory and tap **Continue**.
 9. **TV Name**: Give your Samsung device a different name if you wish (you can change this in the Home app later) and tap **Continue**.
@@ -96,7 +103,7 @@ You can configure up to 20 inputs in the plugin config. The inputs can send any 
 The Accessory settings icon command **View TV Settings** will open the TV or Home Theater's menu.
 
 ### Multi Key Sequences (Macros) Supported
-The plugin can send multiple key codes, seperate the key codes with spaces. Keys are sent at intervals of 100ms, but can be changed by inserting a wait(ms) in the key code sequence. To select TV channel 12 by sending TV, waiting 200ms, then sending keys 1, 2 and Enter, use: `KEY_TV wait(200) KEY_1 KEY_2 KEY_ENTER`
+The plugin can send multiple key codes, separate the key codes with spaces. Keys are sent at intervals of 100ms, but can be changed by inserting a wait(ms) in the key code sequence. To select TV channel 12 by sending TV, waiting 200ms, then sending keys 1, 2 and Enter, use: `KEY_TV wait(200) KEY_1 KEY_2 KEY_ENTER`
 
 ## Configuration
 ### Config via Settings
@@ -364,13 +371,13 @@ Example configuration as used on the author's Samsung TV and Samsung HT:
 
 * **name**: The displayed name of your device. Default is the plugin name. Mandatory.
 
-* **pingCommand**: the ping command to be used to ping the device to determine it's power state. For Linux, use "ping -c 2 -w 10" (the default>). For Windows, use "ping -n 2 -w 20". The ping options used are: Linux: -c 2 = ping twice only; -w 10 = wait 10 milliseconds before timing out.  Windows: -w 20 = wait 20 milliseconds before timing out. . See the [Power-Control](https://github.com/jsiegenthaler/homebridge-samsungtvht/wiki/Power-Control) wiki page for more incormation.
+* **pingCommand**: the ping command to be used to ping the device to determine it's power state. For Linux, use "ping -c 2 -w 10" (the default>). For Windows, use "ping -n 2 -w 20". The ping options used are: Linux: -c 2 = ping twice only; -w 10 = wait 10 milliseconds before timing out.  Windows: -w 20 = wait 20 milliseconds before timing out. . See the [Power-Control](https://github.com/jsiegenthaler/homebridge-samsungtvht/wiki/Power-Control) wiki page for more information.
 
 * **pingInterval**: the interval in seconds between each ping. Shorter intervals generate more network traffic but show a more responsive tile in the Home app. 3 seconds is a good balance between traffic and responsiveness. Default 3. Mandatory.
 
-* **pingResponseOn**: the ping response that corresponds to a successfuly ping response, indicating that the device is turned on. For Linux, use ", 0% packet loss". For Windows use "(0% loss)". See the [Power-Control](https://github.com/jsiegenthaler/homebridge-samsungtvht/wiki/Power-Control) wiki page for more incormation.
+* **pingResponseOn**: the ping response that corresponds to a successfully ping response, indicating that the device is turned on. For Linux, use ", 0% packet loss". For Windows use "(0% loss)". See the [Power-Control](https://github.com/jsiegenthaler/homebridge-samsungtvht/wiki/Power-Control) wiki page for more information.
 
-* **pingResponseOff**: the ping response that corresponds to no ping response, indicating that the device is turned off. For Linux, use "100% packet loss". For Windows use "(100% loss)". See the [Power-Control](https://github.com/jsiegenthaler/homebridge-samsungtvht/wiki/Power-Control) wiki page for more incormation.
+* **pingResponseOff**: the ping response that corresponds to no ping response, indicating that the device is turned off. For Linux, use "100% packet loss". For Windows use "(100% loss)". See the [Power-Control](https://github.com/jsiegenthaler/homebridge-samsungtvht/wiki/Power-Control) wiki page for more information.
 
 * **doublePressTime**: the time in ms to detect a double key press (or tap). Default 250 ms. Mandatory.
 
@@ -402,7 +409,7 @@ Example configuration as used on the author's Samsung TV and Samsung HT:
 
 * **powerOffButton**: the key code to send to turn the device off. Optional.
 
-* **viewTvSettingsCommand**: the key code to send when the View TV Sessings option is selected in the Accessory setup. Optional.
+* **viewTvSettingsCommand**: the key code to send when the View TV Settings option is selected in the Accessory setup. Optional.
 
 * **inputs**: an array for each device's inputs, see below.
 * 
