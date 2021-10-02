@@ -6,6 +6,9 @@ All notable changes to this project will be documented in this file.
 
 ### Initial Release
 
+## 0.1.2 (2020-10-02)
+* Bumped dependencies
+
 ## 0.1.1 (2020-09-23)
 * Fixed display of Manufacturer, Serial Number, Model and Firmware in the accessory settings
 * Cleaned up more logging
