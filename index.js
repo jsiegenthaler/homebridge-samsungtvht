@@ -44,7 +44,7 @@ Object.freeze(powerStateName);
 
 
 // global variables (urgh)
-let currentInputId;
+// let currentInputId;
 //let currentPowerState;
 //let currentMediaState;
 //let targetMediaState;
@@ -262,7 +262,7 @@ class samsungTvHtDevice {
 		this.lastRemoteKeyPress1 = [];	// holds the time value of the last-1 remote button press for key index i
 		this.lastRemoteKeyPress2 = [];	// holds the time value of the last-2 remote button press for key index i
 		this.lastVolDownKeyPress = [];  // holds the time value of the last button press for the volume down button
-		this.inputList = [];			// hols the input list, do we really need it?
+		this.inputList = [];			// holds the input list, do we really need it?
 
 		//setup variables
 		this.accessoryConfigured = false;	// true when the accessory is configured
@@ -337,6 +337,10 @@ class samsungTvHtDevice {
 		this.prepareTelevisionSpeakerService();		// service 3 of 100
 		this.prepareInputSourceServices();			// service 4...10
 
+		// set displayOrder
+		this.televisionService.getCharacteristic(Characteristic.DisplayOrder)
+			.value = Buffer.from(this.displayOrder).toString('base64');
+
 		this.api.publishExternalAccessories(PLUGIN_NAME, [this.accessory]);
 		this.accessoryConfigured = true;
 	}
@@ -359,6 +363,8 @@ class samsungTvHtDevice {
 
 		this.accessory.addService(informationService);
 	}
+
+
 
 	//Prepare Television service
 	prepareTelevisionService() {
@@ -421,6 +427,7 @@ class samsungTvHtDevice {
 	}
 	
 
+
 	//Prepare InputSource services
 	prepareInputSourceServices() {
 		// This is the input list, each input is a service, max 100 services less the services created so far
@@ -433,6 +440,7 @@ class samsungTvHtDevice {
 
 		// add dummy entry at index 0 for the inputList
 		this.inputList.push({inputId: '0', inputName: 'Dummy'});
+		this.displayOrder = [];
 
 		// For Release 1.0, I'll only support the source by sending the SOURCE key, which just goes to next source
 		// so disable HDMI 2 and Analog AUX. these need HDMI CEC support.
@@ -460,12 +468,32 @@ class samsungTvHtDevice {
 					.setCharacteristic(Characteristic.IsConfigured, configState)
 					.setCharacteristic(Characteristic.CurrentVisibilityState, visState)
 					.setCharacteristic(Characteristic.TargetVisibilityState, visState);
-		
+
 				this.inputServices.push(inputService);
 				this.accessory.addService(inputService);
 				this.televisionService.addLinkedService(inputService);
 				this.inputList.push({inputId: inputService.getCharacteristic(Characteristic.Identifier), inputName: inputService.getCharacteristic(Characteristic.ConfiguredName)});
+
+				// add DisplayOrder, see :
+				// https://github.com/homebridge/HAP-NodeJS/issues/644
+				// https://github.com/ebaauw/homebridge-zp/blob/master/lib/ZpService.js  line 916: this.displayOrder.push(0x01, 0x04, identifier & 0xff, 0x00, 0x00, 0x00)
+				//this.displayOrder.push(0x01, 0x04, i & 0xff, 0x00, 0x00, 0x00);
+				//                       type  len   inputId  empty empty empty
+				//this.displayOrder.push(0x01, 0x04,       i, 0x00, 0x00, 0x00);
+				// inputId is the inputIdentifier (not the index), starting index 0 = identifier 1
+				// types:
+				// 	0x00 end of TLV item
+				// 	0x01 identifier...new TLV item for displayOrder
+				// length:	Number of following bytes, excluding type and len fields
+				// value:	A number of <len> bytes. Can be mepty if length=0
+				// 0x01 0x01 xx is a valid TLV8 as it contains only 1 data byte.
+				// the data must be a single 8-bit byte, hence the logical AND with 0xff
+				this.displayOrder.push(0x01, 0x01, i & 0xff); // 0x01 0x01 0xXX
+
 			}
+			// close off the TLV8 by sending 0x00 0x00
+			this.displayOrder.push(0x00, 0x00); // close off the displayorder array with 0x00 0x00
+
 		}	
 
 	}
@@ -480,7 +508,7 @@ class samsungTvHtDevice {
 	// START state handler
   	//+++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-	// send a remote control keypress to the settopbox
+	// send a remote control keypress to the device
 	async sendKey(keySequence) {
 		if (this.debugLevel > 0) {
 			this.log.warn('%s: sendKey: keySequence %s', this.name, keySequence);
@@ -898,6 +926,24 @@ class samsungTvHtDevice {
 			}
 	}
 
+	// get display order
+	async getDisplayOrder(callback) {
+		// fired when the user clicks away from the iOS Device TV Remote Control, regardless of which TV was selected
+		// fired when the icon is clicked in HomeKit and HomeKit requests a refresh
+		// log the display order
+		let dispOrder = this.televisionService.getCharacteristic(Characteristic.DisplayOrder).value;
+		if (this.config.debugLevel > 1) { this.log.warn("%s: getDisplayOrder returning '%s'", this.name, dispOrder); }
+		callback(null, dispOrder);
+	}
+
+	// set display order
+	async setDisplayOrder(displayOrder, callback) {
+		// fired when the user clicks away from the iOS Device TV Remote Control, regardless of which TV was selected
+		// fired when the icon is clicked in HomeKit and HomeKit requests a refresh
+		if (this.config.debugLevel > 1) { this.log.warn('%s: setDisplayOrder displayOrder',this.name, displayOrder); }
+		callback(null);
+	}
+
 	// set remote key
 	async setRemoteKey(remoteKey, callback) {
 		if (this.config.debugLevel > 1) { this.log.warn('%s: setRemoteKey: remoteKey:', this.name, remoteKey); }
@@ -907,7 +953,7 @@ class samsungTvHtDevice {
 		// keys 0...15 exist, but keys 12, 13 & 14 are not defined by Apple
 
 
-		// ------------- triple press function ---------------
+		// ------------- double and triple press function ---------------
 		// triple key presses triggers a second layer function
 		var tripleVolDownPress = 100000; // default high value to prevent a tripleVolDown detection when no triple key pressed
 

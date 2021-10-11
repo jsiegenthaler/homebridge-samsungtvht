@@ -6,6 +6,10 @@ All notable changes to this project will be documented in this file.
 
 ### Initial Release
 
+## 0.1.4 (2020-10-11)
+* Added DisplayOrder to ensure correct display on Mac and iOS devices
+
+
 ## 0.1.3 (2020-10-09)
 * Bumped dependencies: "homebridge": ">=1.3.5"
 
