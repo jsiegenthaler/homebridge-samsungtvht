@@ -38,7 +38,7 @@ If you like this plugin, consider making a donation or buying me a coffee!<br>
 This plugin was written and tested on the author's Samsung D-series TV and D-series Home Theater system in Switzerland.
 
 ## Requirements
-* An Apple iPhone or iPad with iOS 14.0 (or later). Developed on iOS 14.1...15.0.1, earlier versions not tested.
+* An Apple iPhone or iPad with iOS 14.0 (or later). Developed on iOS 14.1...15.1, earlier versions not tested.
 * [Homebridge](https://homebridge.io/) v1.3.5 (or later). Developed on Homebridge 1.1.116....1.3.5, earlier versions not tested.
 * A non-Tizen Samsung TV or Home Theater system. Tizen started in 2015, so TVs and HTs before 2015 generally work with this plugin.
 * The TV or Home Theater system must be connected to your home network via Ethernet LAN cable, or WiFi.
@@ -62,17 +62,16 @@ After installing, make sure you restart Homebridge.
 Each Samsung TV or HT device is exposed as a separate external accessory and each device needs to be manually paired as follows:
 
 1. Open the **Home** app on your device.
-2. Tap **+** in the top right corner of the screen to start the process of adding a new accessory or scene.
-3. Tap **Add Accessory** to start the process of adding a new accessory.
-4. **Add Accessory**: tap **I Don't Have a Code or Cannot Scan**.
-5. **Select an Accessory to Add to (Home Name)**: Select the accessory you want to add. You should see your Samsung device here. If not, check your Homebridge config.
+2. Tap **+** in the top right corner of the screen and then **Add Accessory** to start the process of adding a new accessory.
+4. **Add Accessory**: tap **More options...** to add the accessory manually.
+5. **Select an Accessory to Add to \<HomeName\>**: Select the accessory you want to add. You should see your Samsung device here. If not, check your Homebridge config.
 6. Accept the **Uncertified Accessory** warning by tapping **Add Anyway**.
 7. **Enter HomeKit Setup Code**: Enter the **HomeKit Setup Code** (displayed in Homebridge under the QR code, format XXX-XX-XXX), or use the device's camera to scan the QR code in Homebridge and tap **Continue**.
 8. **TV Location**: Select a room for your Samsung accessory and tap **Continue**.
 9. **TV Name**: Give your Samsung device a different name if you wish (you can change this in the Home app later) and tap **Continue**.
 10. **Name TV Input Sources**: Name your TV input sources if you wish (you can change these in the Home app later) and tap **Continue**.
 11. **TV Automations**: Switch on any suggested automations if you wish (you can change these in the Home app later) and tap **Continue**.
-12. **TV Added to (Home Name)**: Tap **Done** to finish the setup.
+12. **TV Added to \<HomeName\>**: Tap **Done** to finish the setup.
 
 If adding a Home Theater, the icon displayed will be an Audio Receiver and some text in the setup screens will show Audio Receiver instead of TV.
 
