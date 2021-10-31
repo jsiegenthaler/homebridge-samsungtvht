@@ -6,6 +6,10 @@ All notable changes to this project will be documented in this file.
 
 ### Initial Release
 
+## 0.1.5 (2020-10-31)
+* Bumped dependencies: "node": ">=16.13.0"
+
+
 ## 0.1.4 (2020-10-11)
 * Added DisplayOrder to ensure correct display on Mac and iOS devices
 
