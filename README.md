@@ -414,7 +414,7 @@ Example configuration as used on the author's Samsung TV and Samsung HT:
 * **viewTvSettingsCommand**: the key code to send when the View TV Settings option is selected in the Accessory setup. Optional.
 
 * **inputs**: an array for each device's inputs, see below.
-* 
+
 * **xxxButton**: The key code to send when button xxx is tapped in the iOS remote control. See the example for supported button names.
 
 * **xxxButtonDoubleTap**: The key code to send when button xxx is tapped in the iOS remote control. See the example for supported button names.
