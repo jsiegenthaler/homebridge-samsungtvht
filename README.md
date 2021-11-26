@@ -9,6 +9,7 @@
 
 [![npm](https://badgen.net/npm/dt/homebridge-samsungtvht)](https://www.npmjs.com/package/homebridge-samsungtvht)
 [![npm](https://img.shields.io/npm/v/homebridge-samsungtvht)](https://www.npmjs.com/package/homebridge-samsungtvht)
+[![verified-by-homebridge](https://badgen.net/badge/homebridge/verified/purple)](https://github.com/homebridge/homebridge/wiki/Verified-Plugins)
 [![GitHub issues](https://img.shields.io/github/issues/jsiegenthaler/homebridge-samsungtvht)](https://github.com/jsiegenthaler/homebridge-samsungtvht/issues)
 [![donate](https://badgen.net/badge/donate/paypal/91BE09)](www.paypal.com/donate?hosted_button_id=CNEDGHRUER468)
 
@@ -28,8 +29,6 @@ Supports multiple devices, allowing you to create an accessory for each TV or Ho
 Supports HT devices such as HT-D5500, HT-D5530, HT-D5550, HT-D6500
 
 Probably does not work with Samsung TVs using the Tizen OS. Tizen = TVs made from 2015!
-
-**[Submitted for Homebridge Verification on 23 September 2021](https://github.com/homebridge/verified/issues/337)**
 
 If you like this plugin, consider making a donation or buying me a coffee!<br>
 <a target="blank" href="https://www.paypal.com/donate?hosted_button_id=CNEDGHRUER468"><img src="https://img.shields.io/badge/PayPal-Donate-blue.svg?logo=paypal"/></a>  <a target="blank" href="https://ko-fi.com/jsiegenthaler"><img src="https://img.shields.io/badge/Ko--Fi-Buy%20me%20a%20coffee-29abe0.svg?logo=ko-fi"/></a>
