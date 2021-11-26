@@ -6,6 +6,20 @@ All notable changes to this project will be documented in this file.
 
 ### Initial Release
 
+## TO-DO
+Clean up power state logging so it doesn't flood the logs too much
+Debug log level 2 = some power state logging, but only 1 line per ping.
+Debug log level 4 = full power state logging, with entire log results
+
+
+## 0.1.7 (2020-11-26)
+* Bumped dependencies: "homebridge": ">=1.3.8",
+
+
+## 0.1.6 (2020-10-31)
+* Added Homebridge verification
+
+
 ## 0.1.5 (2020-10-31)
 * Bumped dependencies: "node": ">=16.13.0"
 
