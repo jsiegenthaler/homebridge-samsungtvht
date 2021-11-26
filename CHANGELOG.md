@@ -14,9 +14,6 @@ Debug log level 4 = full power state logging, with entire log results
 
 ## 0.1.7 (2020-11-26)
 * Bumped dependencies: "homebridge": ">=1.3.8",
-
-
-## 0.1.6 (2020-10-31)
 * Added Homebridge verification
 
 
