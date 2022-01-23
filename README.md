@@ -8,6 +8,7 @@
 # homebridge-samsungtvht
 
 [![npm](https://badgen.net/npm/dt/homebridge-samsungtvht)](https://www.npmjs.com/package/homebridge-samsungtvht)
+[![npm](https://badgen.net/npm/dm/homebridge-samsungtvht)](https://www.npmjs.com/package/homebridge-samsungtvht)
 [![npm](https://img.shields.io/npm/v/homebridge-samsungtvht)](https://www.npmjs.com/package/homebridge-samsungtvht)
 [![verified-by-homebridge](https://badgen.net/badge/homebridge/verified/purple)](https://github.com/homebridge/homebridge/wiki/Verified-Plugins)
 [![GitHub issues](https://img.shields.io/github/issues/jsiegenthaler/homebridge-samsungtvht)](https://github.com/jsiegenthaler/homebridge-samsungtvht/issues)
