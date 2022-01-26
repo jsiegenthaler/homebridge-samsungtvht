@@ -38,7 +38,7 @@ If you like this plugin, consider making a donation or buying me a coffee!<br>
 This plugin was written and tested on the author's Samsung D-series TV and D-series Home Theater system in Switzerland.
 
 ## Requirements
-* An Apple iPhone or iPad with iOS 14.0 (or later). Developed on iOS 14.1...15.2, earlier versions not tested.
+* An Apple iPhone or iPad with iOS 14.0 (or later). Developed on iOS 14.1...15.3, earlier versions not tested.
 * [Homebridge](https://homebridge.io/) v1.4.0 (or later). Developed on Homebridge 1.1.116....1.4.0, earlier versions not tested.
 * A non-Tizen Samsung TV or Home Theater system. Tizen started in 2015, so TVs and HTs before 2015 generally work with this plugin.
 * The TV or Home Theater system must be connected to your home network via Ethernet LAN cable, or WiFi.
