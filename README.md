@@ -20,7 +20,6 @@ Supported TVs and HTs are:
 * D-series from 2011 (as used by the author on his UE40D5000 TV and HT-D5500 Home Theater)
 * ES-series and EH-series from 2012
 * F-series from 2013
-* H-series from 2014 (probably not working, as this TV needs PIN-code authentication)
 
 <img src="https://github.com/jsiegenthaler/homebridge-samsungtvht/blob/master/pics/AccessoryTilesTVHT.png" alt="AccessoryTilesTVHT" height="80" align="left">
 
@@ -38,7 +37,7 @@ If you like this plugin, consider making a donation or buying me a coffee!<br>
 This plugin was written and tested on the author's Samsung D-series TV and D-series Home Theater system in Switzerland.
 
 ## Requirements
-* An Apple iPhone or iPad with iOS 14.0 (or later). Developed on iOS 14.1...15.3, earlier versions not tested.
+* An Apple iPhone or iPad with iOS 14.0 (or later). Developed on iOS 14.1...15.4, earlier versions not tested.
 * [Homebridge](https://homebridge.io/) v1.4.0 (or later). Developed on Homebridge 1.1.116....1.4.0, earlier versions not tested.
 * A non-Tizen Samsung TV or Home Theater system. Tizen started in 2015, so TVs and HTs before 2015 generally work with this plugin.
 * The TV or Home Theater system must be connected to your home network via Ethernet LAN cable, or WiFi.
