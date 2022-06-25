@@ -13,6 +13,10 @@ Debug log level 4 = full power state logging, with entire log results
 
 
 ## 0.1.12 (2022-03-22)
+* Bumped dependencies: "homebridge": ">=1.5.0", "node": ">=16.15.1"
+
+
+## 0.1.12 (2022-03-22)
 * Bumped dependencies: "node": ">=16.14.2"
 
 
