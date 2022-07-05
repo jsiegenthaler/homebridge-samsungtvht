@@ -12,6 +12,10 @@ Debug log level 2 = some power state logging, but only 1 line per ping.
 Debug log level 4 = full power state logging, with entire log results
 
 
+## 0.1.14 (2022-07-05)
+* Fixed typo bug in mute function (thanks albinmedoc)
+
+
 ## 0.1.13 (2022-06-25)
 * Bumped dependencies: "homebridge": ">=1.5.0", "node": ">=16.15.1"
 
