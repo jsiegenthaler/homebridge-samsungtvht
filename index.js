@@ -738,7 +738,7 @@ class samsungTvHtDevice {
 			this.log.warn('%s: setMute: muteState:', this.name, muteState);
 		}
 
-		if (callbackMute && typoeof(callbackMute) === 'function') { 
+		if (callbackMute && typeof(callbackMute) === 'function') { 
 			callbackMute();
 		}
  
