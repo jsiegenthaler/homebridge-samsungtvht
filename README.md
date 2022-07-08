@@ -26,7 +26,7 @@ Supported TVs and HTs are:
 This plugin displays your Samsung device as a TV or Audio Receiver Accessory with Power, Input & Remote Control capabilities in your iOS device (iPhone, iPad, iMac, etc.).
 
 Supports multiple devices, allowing you to create an accessory for each TV or Home Theater system (should you have more than one).
-Supports HT devices such as HT-D5500, HT-D5530, HT-D5550, HT-D6500
+Supports HT devices such as HT-D5500, HT-D5530, HT-D5550, HT-D6500.
 
 Probably does not work with Samsung TVs using the Tizen OS. Tizen = TVs made from 2015!
 
