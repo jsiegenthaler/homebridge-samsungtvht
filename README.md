@@ -12,7 +12,7 @@
 [![npm](https://img.shields.io/npm/v/homebridge-samsungtvht)](https://www.npmjs.com/package/homebridge-samsungtvht)
 [![verified-by-homebridge](https://badgen.net/badge/homebridge/verified/purple)](https://github.com/homebridge/homebridge/wiki/Verified-Plugins)
 [![GitHub issues](https://img.shields.io/github/issues/jsiegenthaler/homebridge-samsungtvht)](https://github.com/jsiegenthaler/homebridge-samsungtvht/issues)
-[![donate](https://badgen.net/badge/donate/paypal/91BE09)](www.paypal.com/donate?hosted_button_id=CNEDGHRUER468)
+[![donate](https://badgen.net/badge/donate/paypal/91BE09)](https://www.paypal.com/donate?hosted_button_id=CNEDGHRUER468)
 
 `homebridge-samsungtvht` is a Homebridge plugin allowing you to control your Samsung TV and Home Theater (with Orsay OS) with Apple HomeKit using the Home app and the Apple TV Remote in the Control Center.
 Supported TVs and HTs are:
