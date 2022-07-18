@@ -12,7 +12,7 @@ Debug log level 2 = some power state logging, but only 1 line per ping.
 Debug log level 4 = full power state logging, with entire log results
 
 
-## 0.1.17 (2022-07-18)
+## 0.1.16 (2022-07-18)
 * Fixed broken link in README.md (thanks jamesanderson9182)
 * Bumped dependencies: "node": ">=16.16.0"
 
