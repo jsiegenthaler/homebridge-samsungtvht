@@ -44,7 +44,7 @@ This plugin was written and tested on the author's Samsung D-series TV and D-ser
 * The TV or Home Theater system must have Network Remote Control turned on.
 
 ## Decode your Samsung TV Model Number
-https://www.samsung.com/uk/support/tv-audio-video/what-do-samsung-tv-model-numbers-actually-mean-why-are-they-so-long/
+https://www.samsung.com/levant/support/tv-audio-video/what-do-samsung-tv-model-number-means-and-why-they-are-long/
 
 
 
