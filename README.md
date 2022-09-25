@@ -23,7 +23,7 @@ Supported TVs and HTs are:
 
 | iOS 16 Accessory Tiles | Older iOS/iPadOS Accessory Tiles |
 | :---         |     :---:      |
-| <img src="https://github.com/jsiegenthaler/homebridge-samsungtvht/blob/master/pics/AccessoryTilesTVHT.png" alt="AccessoryTilesTVHT" height="80" align="center"> | <img src="https://github.com/jsiegenthaler/homebridge-samsungtvht/blob/master/pics/AccessoryTilesTVHTiOS15.png" alt="AccessoryTilesTVHTiOS15" height="80" align="center"> |
+| <img src="https://github.com/jsiegenthaler/homebridge-samsungtvht/blob/master/pics/AccessoryTilesTVHT.png" alt="AccessoryTilesTVHT" height="60" align="center"> | <img src="https://github.com/jsiegenthaler/homebridge-samsungtvht/blob/master/pics/AccessoryTilesTVHTiOS15.png" alt="AccessoryTilesTVHTiOS15" height="80" align="center"> |
 
 
 
