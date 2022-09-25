@@ -12,6 +12,12 @@ Debug log level 2 = some power state logging, but only 1 line per ping.
 Debug log level 4 = full power state logging, with entire log results
 
 
+## 0.1.19 (2022-09-25)
+* Updated iOS version references in README.md
+* Fixed log flooding when ping results are not 0% or 100% (causing many "cannot determine power state from ping result" messages)
+* Bumped dependencies: "node": ">=16.17.1"
+
+
 ## 0.1.18 (2022-07-24)
 * Updated iOS version references in README.md
 
