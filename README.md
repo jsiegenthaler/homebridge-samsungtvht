@@ -21,7 +21,11 @@ Supported TVs and HTs are:
 * ES-series and EH-series from 2012
 * F-series from 2013
 
-<img src="https://github.com/jsiegenthaler/homebridge-samsungtvht/blob/master/pics/AccessoryTilesTVHT.png" alt="AccessoryTilesTVHT" height="80" align="left">
+| iOS 16 accessory tiles | Older iOS/iPadOS accessory tiles |
+| :---:         |     :---:      |
+| <img src="https://github.com/jsiegenthaler/homebridge-samsungtvht/blob/master/pics/AccessoryTilesTVHT.png" alt="AccessoryTilesTVHT" height="80" align="center"> | <img src="https://github.com/jsiegenthaler/homebridge-samsungtvht/blob/master/pics/AccessoryTilesTVHTiOS15.png" alt="AccessoryTilesTVHTiOS15" height="80" align="center"> |
+
+
 
 This plugin displays your Samsung device as a TV or Audio Receiver Accessory with Power, Input & Remote Control capabilities in your iOS device (iPhone, iPad, iMac, etc.).
 
@@ -131,7 +135,7 @@ Example configuration as used on the author's Samsung TV and Samsung HT:
             "debugLevel": 0,
             "devices": [
                 {
-                    "name": "Samsung TV DEV",
+                    "name": "Samsung TV",
                     "ipAddress": "192.168.0.x",
                     "type": "television",
                     "manufacturer": "Samsung",
@@ -240,7 +244,7 @@ Example configuration as used on the author's Samsung TV and Samsung HT:
                     "muteButton": "KEY_MUTE"
                 },
                 {
-                    "name": "Home Theater DEV",
+                    "name": "Home Theater",
                     "ipAddress": "192.168.0.x",
                     "type": "receiver",
                     "manufacturer": "Samsung",
