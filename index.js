@@ -184,7 +184,7 @@ class samsungTvHtPlatform {
 					self.log.debug("powerStateMonitor: %s is responding to ping, power is currently ON", device.name);
 					deviceRealPowerState = Characteristic.Active.ACTIVE;
 				} else {
-					self.log.warn("powerStateMonitor: WARNING %s cannot determine power state from ping result! stdout:", device.name, stdout);
+					self.log.debug("powerStateMonitor: WARNING %s cannot determine power state from ping result! stdout:", device.name, stdout);
 					deviceRealPowerState = device.currentPowerState; // maintain current state
 				}
 
