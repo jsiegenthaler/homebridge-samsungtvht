@@ -2,15 +2,8 @@
 
 All notable changes to this project will be documented in this file.
 
+
 ### Bug Fixes and Improvements
-
-### Initial Release
-
-## TO-DO
-Clean up power state logging so it doesn't flood the logs too much
-Debug log level 2 = some power state logging, but only 1 line per ping.
-Debug log level 4 = full power state logging, with entire log results
-
 
 ## 0.1.21 (2022-10-11)
 * Adapted log levels of remote key presses to avoid flooding logs
@@ -150,6 +143,8 @@ Debug log level 4 = full power state logging, with entire log results
 * Fixed config.json bugs & typos
 * Added View TV Settings as configurable key code
 
+
+### Initial Release
 
 ## 0.0.3 (2021-09-15)
 * Released as 0.0.3
