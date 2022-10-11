@@ -542,17 +542,17 @@ class samsungTvHtDevice {
 
 			// add a wait if waitDelay is defined
 			if (waitDelay) {
-				this.log('%s: sendKey: wait %s ms', this.name, waitDelay);
+				if (this.debugLevel > 0) {this.log('%s: sendKey: wait %s ms', this.name, waitDelay)};
 				await waitprom(waitDelay);
 				this.log.debug('%s: sendKey: wait %s done', this.name, waitDelay);
 			}
 
 			// send the key if not a wait()
 			if (!keyName.toLowerCase().startsWith('wait(')) {
-				this.log('%s: sendKey: send %s', this.name, keyName);
+				if (this.debugLevel > 0) {this.log('%s: sendKey: send %s', this.name, keyName)};
 				remote.send(keyName, (err) => {
 					if (err && (err || '' != "Timeout")) {
-						//  Timeout ignore, this is normal with SamsungRemote, some keys just do get a responce from the TV / AVR
+						//  Timeout ignore, this is normal with SamsungRemote, some keys just do get a response from the TV / AVR
 						this.log.warn("%s: sendKey: %s error %s", this.name, keyName, err);
 					} else {
 						this.log.debug('%s: sendKey: send %s done', this.name, keyName);
