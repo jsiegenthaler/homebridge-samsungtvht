@@ -5,6 +5,10 @@ All notable changes to this project will be documented in this file.
 
 ### Bug Fixes and Improvements
 
+## 0.1.22 (2022-10-26)
+* Uppdated iOS and iPadOS version references in Readme
+
+
 ## 0.1.21 (2022-10-11)
 * Adapted log levels of remote key presses to avoid flooding logs
 
