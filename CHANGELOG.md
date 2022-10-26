@@ -7,6 +7,7 @@ All notable changes to this project will be documented in this file.
 
 ## 0.1.22 (2022-10-26)
 * Uppdated iOS and iPadOS version references in Readme
+* Bumped dependencies: "homebridge": ">=1.5.1"
 
 
 ## 0.1.21 (2022-10-11)
