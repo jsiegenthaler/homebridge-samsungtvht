@@ -32,7 +32,7 @@ This plugin displays your Samsung device as a TV or Audio Receiver Accessory wit
 Supports multiple devices, allowing you to create an accessory for each TV or Home Theater system (should you have more than one).
 Supports HT devices such as HT-D5500, HT-D5530, HT-D5550, HT-D6500.
 
-Does not work with Samsung TVs using the Tizen OS. Tizen = TVs made from 2015.
+Works with Samesung D, E, F, H and some J, and K series TVs using Orsay OS. Does not work with Samsung TVs using the Tizen OS. Tizen = TVs made from 2015.
 
 If you like this plugin, consider making a donation or buying me a coffee!<br>
 <a target="blank" href="https://www.paypal.com/donate?hosted_button_id=CNEDGHRUER468"><img src="https://img.shields.io/badge/PayPal-Donate-blue.svg?logo=paypal"/></a>  <a target="blank" href="https://ko-fi.com/jsiegenthaler"><img src="https://img.shields.io/badge/Ko--Fi-Buy%20me%20a%20coffee-29abe0.svg?logo=ko-fi"/></a>
@@ -43,7 +43,7 @@ This plugin was written and tested on the author's Samsung D-series TV and D-ser
 ## Requirements
 * An Apple iPhone or iPad with iOS/iPadOS 14.0 (or later). Developed on iOS/iPadOS 14.1...16.1, earlier versions not tested.
 * [Homebridge](https://homebridge.io/) v1.5.1 (or later). Developed on Homebridge 1.1.116....1.5.1, earlier versions not tested.
-* A non-Tizen Samsung TV or Home Theater system. Tizen started in 2015, so TVs and HTs before 2015 generally work with this plugin.
+* An Orsay (non-Tizen) Samsung TV or Home Theater system from D-series (2011), E-series (2012), F-series (2013), H-series (2014) and some entry level J and K series models. Orsay started in 2011, Tizen started in 2015, so TVs and HTs from 2011 to 2015 generally work with this plugin.
 * The TV or Home Theater system must be connected to your home network via Ethernet LAN cable, or WiFi.
 * The TV or Home Theater system must have Network Remote Control turned on.
 
