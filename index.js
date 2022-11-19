@@ -153,77 +153,82 @@ class samsungTvHtPlatform {
 
 		// ping all devices in the config
 		for (let i = 0; i < this.config.devices.length; i++) {
+			this.devices[i].powerStateMonitorCounter++; // increment global counter by 1
 			let device = this.devices[i];
-			this.log.debug("powerStateMonitor: %s ---START-----------------------------------------", device.name);
+			let logPrefix = 'powerStateMonitor(' + device.powerStateMonitorCounter + '): '; // set a log prefix for this instance of the powerStateMonitor to allow differentiation in the logs
 
 			// set a ping command
 			var pingCmd = this.config.pingCommand || 'ping -c 1 -w 20'; // default linux, 1 ping, 20ms wait
 			pingCmd = pingCmd.trim() + ' ' + this.config.devices[i].ipAddress;
-			this.log.debug('powerStateMonitor: %s pinging device with %s', device.name, pingCmd);
+			this.log.debug(logPrefix + '%s pinging device with %s', device.name, pingCmd);
 	
 			var self = this;
 			var deviceRealPowerState;
 			exec(pingCmd, function (error, stdout, stderr) {
-				self.log.debug("powerStateMonitor: %s ping response: %s", device.name, stdout);
+				self.log.debug(logPrefix + "%s ping response: %s", device.name, stdout);
 
-				self.log.debug('powerStateMonitor: %s powerLastKeyPress %s', device.name, device.powerLastKeyPress.toLocaleString());
+				self.log.debug(logPrefix + '%s powerLastKeyPress %s', device.name, device.powerLastKeyPress.toLocaleString());
 				var dateNow = new Date;
 				const secondsSinceLastPowerKeyPress = (dateNow - device.powerLastKeyPress) / 1000;
 				const yearsSinceLastPowerKeyPress = (dateNow.getFullYear() - device.powerLastKeyPress.getFullYear());
 				
-				self.log.debug('powerStateMonitor: %s secondsSinceLastPowerKeyPress %s', device.name, secondsSinceLastPowerKeyPress);
-				self.log.debug('powerStateMonitor: %s yearsSinceLastPowerKeyPress %s', device.name, yearsSinceLastPowerKeyPress);
+				self.log.debug(logPrefix + '%s secondsSinceLastPowerKeyPress %s', device.name, secondsSinceLastPowerKeyPress);
+				self.log.debug(logPrefix + '%s yearsSinceLastPowerKeyPress %s', device.name, yearsSinceLastPowerKeyPress);
 
 				// get the current device power state from the ping results
 				// win10:	Packets: Sent = 1, Received = 0, Lost = 1 (100% loss),
 				// linux: 	1 packets transmitted, 0 received, 100% packet loss, time 0ms
-				if (stdout.includes(self.config.pingResponseOff || '100%')) { // 100% packet loss or 100% loss
-					self.log.debug("powerStateMonitor: %s is not responding to ping, power is currently OFF", device.name);
+				// reworked to show 100% loss is OFF, anything else is ON
+				if (stdout.includes(self.config.pingResponseOff) && ((self.config.pingResponseOff  || '') !=  '')) { // user-configred OFF response found which is not empty
+					self.log.debug(logPrefix + "%s is not responding to ping, power is currently OFF (using config detection)", device.name);
 					deviceRealPowerState = Characteristic.Active.INACTIVE;
-				} else if (stdout.includes(self.config.pingResponseOn || '0%')) { // 0% packet loss or 0% loss
-					self.log.debug("powerStateMonitor: %s is responding to ping, power is currently ON", device.name);
-					deviceRealPowerState = Characteristic.Active.ACTIVE;
+				} else if (stdout.includes('100% packet loss')) { // Linux: "1 packets transmitted, 0 received, 100% packet loss, time 0ms" detect "100% packet loss"
+					self.log.debug(logPrefix + "%s is not responding to ping, power is currently OFF (using Linux detection)", device.name);
+					deviceRealPowerState = Characteristic.Active.INACTIVE;
+				} else if (stdout.includes('(100% loss)')) { // Windows: "Packets: Sent = 1, Received = 0, Lost = 1 (100% loss)", detect "(100% loss)"
+					self.log.debug(logPrefix + "%s is not responding to ping, power is currently OFF (using Windows detection)", device.name);
+					deviceRealPowerState = Characteristic.Active.INACTIVE;
 				} else {
-					self.log.debug("powerStateMonitor: WARNING %s cannot determine power state from ping result! stdout:", device.name, stdout);
-					deviceRealPowerState = device.currentPowerState; // maintain current state
+					// any ping where we did not have 100% loss, is considered being ON, as some packets were returned
+					self.log.debug(logPrefix + "%s is responding to ping, power is currently ON", device.name);
+					deviceRealPowerState = Characteristic.Active.ACTIVE;
+					//self.log.debug("powerStateMonitor: WARNING %s cannot determine power state from ping result! stdout:", device.name, stdout);
+					//deviceRealPowerState = device.currentPowerState; // maintain current state
 				}
 
 
 				// evaluate the real vs target power states
-				self.log.debug("powerStateMonitor: %s evaluating power state. deviceRealPowerState %s, currentPowerState %s, targetPowerState %s", device.name, deviceRealPowerState, device.currentPowerState, device.targetPowerState);
+				self.log.debug(logPrefix + "%s evaluating power state. deviceRealPowerState %s, currentPowerState %s, targetPowerState %s", device.name, deviceRealPowerState, device.currentPowerState, device.targetPowerState);
 				if (!(deviceRealPowerState === device.currentPowerState) && (yearsSinceLastPowerKeyPress > 100)) {
 					// (yearsSinceLastPowerKeyPress > 100) means no HomeKit key presses were made, but a deviceRealPowerState has detected which is differen to the currentPowerState. Probably changed through a non-HomeKit method, eg physical remote control
-					self.log.debug("powerStateMonitor: %s power state change detected from device, setting currentPowerState to deviceRealPowerState %s", device.name, deviceRealPowerState);
+					self.log.debug(logPrefix + "%s power state change detected from device, setting currentPowerState to deviceRealPowerState %s", device.name, deviceRealPowerState);
 					device.targetPowerState = deviceRealPowerState;
 					device.currentPowerState = deviceRealPowerState;
 
 				} else if ((deviceRealPowerState != device.targetPowerState) && (yearsSinceLastPowerKeyPress < 100)) {
-					self.log.debug("powerStateMonitor: %s is currently transitioning from %s to %s. Transition time so far: %s seconds", device.name, deviceRealPowerState, device.targetPowerState, secondsSinceLastPowerKeyPress);
+					self.log.debug(logPrefix + "%s is currently transitioning from %s to %s. Transition time so far: %s seconds", device.name, deviceRealPowerState, device.targetPowerState, secondsSinceLastPowerKeyPress);
 					// change in power state was requested. yearsSinceLastPowerKeyPress helps us detect a Homebridge reboot 
 					if ((secondsSinceLastPowerKeyPress < POWER_STATE_MAX_TRANSITION_TIME_S) && (yearsSinceLastPowerKeyPress < 100)) {
 						// device is currently undergoing a power state transition to the targetPowerState, set currentPowerState to targetPowerState
-						self.log.debug("powerStateMonitor: %s is still within the allowed transition time of %s seconds, setting currentPowerState to targetPowerState %s", device.name, POWER_STATE_MAX_TRANSITION_TIME_S, device.targetPowerState);
+						self.log.debug(logPrefix + "%s is still within the allowed transition time of %s seconds, setting currentPowerState to targetPowerState %s", device.name, POWER_STATE_MAX_TRANSITION_TIME_S, device.targetPowerState);
 						device.currentPowerState = device.targetPowerState;
 					} else {
 						// transition time has timed out, cancel the targetPowerState, reset current and target to deviceRealPowerState
-						self.log.debug("powerStateMonitor: %s transition time longer than %s seconds, transition has timed out, no power state change occured, resetting currentPowerState to %s", device.name, POWER_STATE_MAX_TRANSITION_TIME_S, deviceRealPowerState);
+						self.log.debug(logPrefix + "%s transition time longer than %s seconds, transition has timed out, no power state change occured, resetting currentPowerState to %s", device.name, POWER_STATE_MAX_TRANSITION_TIME_S, deviceRealPowerState);
 						device.targetPowerState = deviceRealPowerState;
 						device.currentPowerState = deviceRealPowerState;
 					}
 
 				} else {
 					device.currentPowerState = deviceRealPowerState || device.currentPowerState; // handle null if a parse error occured
-					self.log.debug("powerStateMonitor: %s currentPowerState stays unchanged at %s", device.name, device.currentPowerState);
+					self.log.debug(logPrefix + "%s currentPowerState stays unchanged at %s", device.name, device.currentPowerState);
 				}
 
 
 				// update device status
-				self.log.debug("powerStateMonitor: %s calling device.updateDeviceState with device.currentPowerState %s", device.name, device.currentPowerState);
+				self.log.debug(logPrefix + "%s calling device.updateDeviceState with device.currentPowerState %s", device.name, device.currentPowerState);
 				device.updateDeviceState(device.currentPowerState); 
 
-				// end log event must occur inside the ping function, as it is async
-				self.log.debug("powerStateMonitor: %s ---END-------------------------------------------", device.name);
-		
 			});
 
 
@@ -249,6 +254,7 @@ class samsungTvHtDevice {
 		this.deviceIndex = deviceIndex; // the current device's index
 		this.debugLevel = platform.debugLevel || 0; // debugLevel defaults to 0 (minimum)
 		this.deviceConfig = this.config.devices[deviceIndex]; // the config for the current device
+		this.powerStateMonitorCounter=0; // the power state monitor counter for this device
 
 		this.name = this.deviceConfig.name 	// device name from config
 		this.ipAddress = this.deviceConfig.ipAddress // device ip address from config
@@ -396,12 +402,34 @@ class samsungTvHtDevice {
 		this.televisionService.getCharacteristic(Characteristic.PowerModeSelection)
 			.on('set', this.setPowerModeSelection.bind(this));
 
-		this.televisionService.getCharacteristic(Characteristic.CurrentMediaState)
-			.on('get', this.getCurrentMediaState.bind(this));
 
-		this.televisionService.getCharacteristic(Characteristic.TargetMediaState)
-			.on('get', this.getTargetMediaState.bind(this))
-			.on('set', (newMediaState, callback) => { this.setTargetMediaState(newMediaState, callback); });
+		// Experimenting with removing some unwanted optional characteristics
+		// removeCharacteristic(accessory.service.getCharacteristic(Characteristic.ABC))
+		//		this.televisionService
+		//			.removeCharacteristic(this.televisionService.getCharacteristic(Characteristic.CurrentMediaState))
+		//			.removeCharacteristic(this.televisionService.getCharacteristic(Characteristic.TargetMediaState))
+		//;
+		//this.televisionService.setCharacteristic(Characteristic.IsConfigured, configState)
+
+		/*
+		this.log('this.televisionService')
+		this.log(this.televisionService)
+		
+		this.log('this.televisionService.Brightness.Props')
+		//this.log(this.televisionService.Brightness.Props)
+
+		this.log('this.televisionService Brightness')
+		this.log(this.televisionService.getCharacteristic(Characteristic.Brightness))
+		
+		// Hidden ”hd” This characteristic is hidden from the user
+		this.televisionService.getCharacteristic(Characteristic.CurrentMediaState)
+			.setProps({ 
+				perms: [Characteristic.Perms.HIDDEN]
+			});
+
+		this.log('this.televisionService CurrentMediaState')
+		this.log(this.televisionService.getCharacteristic(Characteristic.CurrentMediaState))
+		*/
 
 		this.accessory.addService(this.televisionService);
 	}
