@@ -12,11 +12,6 @@ const PLUGIN_VERSION = packagejson.version;
 const fs = require('fs');
 const fsPromises = require('fs').promises;
 const path = require('path');
-
-//const qs = require('qs')
-//const _ = require('underscore');
-
-
 const SamsungRemote = require('samsung-remote');
 
 // https://github.com/Samfox2/homebridge-cec-tv-platform/blob/main/index.js
@@ -377,7 +372,8 @@ class samsungTvHtDevice {
 		if (this.debugLevel > 0) {
 			this.log.warn('%s: prepareTelevisionService', this.name);
 		}
-		this.televisionService = new Service.Television(this.name, 'televisionService');
+		//this.televisionService = new Service.Television(this.name, 'televisionService');
+		this.televisionService = new Service.Television(null, 'televisionService');
 		this.televisionService
 			.setCharacteristic(Characteristic.ConfiguredName, this.name)
 			.setCharacteristic(Characteristic.SleepDiscoveryMode, Characteristic.SleepDiscoveryMode.ALWAYS_DISCOVERABLE);
@@ -755,7 +751,7 @@ class samsungTvHtDevice {
 			// if current is already same as target
 			this.log.debug("%s: Current power state is already %s [%s], doing nothing", this.name, this.currentPowerState, powerStateName[this.currentPowerState]);
 		}
-		callback(null); 
+		callback(); 
 	}
 
 	// set mute state
@@ -883,7 +879,7 @@ class samsungTvHtDevice {
 		//await waitprom(500);
 		//this.log('wait done');
 
-		callback(null);
+		callback();
 	}
 
 	// set input name
@@ -892,7 +888,7 @@ class samsungTvHtDevice {
 		if (this.debugLevel > 0) {
 			this.log.warn('%s: setInputName inputName:', this.name, inputName);
 		}
-		callback(null);
+		callback();
 	};
 
 	// set power mode selection (View TV Settings menu option)
@@ -908,7 +904,7 @@ class samsungTvHtDevice {
 		} else {
 			this.log('%s: Power is Off. View TV Settings command not sent', this.name);
 		}
-		callback(null);
+		callback();
 	}
 
 	// get current media state
@@ -969,13 +965,13 @@ class samsungTvHtDevice {
 		// fired when the user clicks away from the iOS Device TV Remote Control, regardless of which TV was selected
 		// fired when the icon is clicked in HomeKit and HomeKit requests a refresh
 		if (this.config.debugLevel > 1) { this.log.warn('%s: setDisplayOrder displayOrder',this.name, displayOrder); }
-		callback(null);
+		callback();
 	}
 
 	// set remote key
 	async setRemoteKey(remoteKey, callback) {
 		if (this.config.debugLevel > 1) { this.log.warn('%s: setRemoteKey: remoteKey:', this.name, remoteKey); }
-		callback(null); // for rapid response
+		callback(); // for rapid response
 
 		// remoteKey is the key pressed on the Apple TV Remote in the Control Center
 		// keys 0...15 exist, but keys 12, 13 & 14 are not defined by Apple
