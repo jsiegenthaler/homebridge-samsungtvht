@@ -6,9 +6,10 @@ All notable changes to this project will be documented in this file.
 ### Bug Fixes and Improvements
 
 
-## 0.1.24 (2022-11-19)
+## 0.1.24-beta.2 (2022-11-19)
 * Improved power state monitoring for better power state detection 
 * Bumped dependencies: "node": ">=18.12.1"
+* Code optimisation and clean-ups
 
 
 ## 0.1.23 (2022-10-26)
