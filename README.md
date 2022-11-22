@@ -127,7 +127,6 @@ Example configuration as used on the author's Samsung TV and Samsung HT:
             "name": "Samsung TV HT",
             "pingCommand": "ping -c 1 -w 20",
             "pingInterval": 3,
-            "pingResponseOn": ", 0% packet loss",
             "pingResponseOff": ", 100% packet loss",
             "doublePressTime": 250,
             "triplePressTime": 450,
@@ -381,9 +380,7 @@ Example configuration as used on the author's Samsung TV and Samsung HT:
 
 * **pingInterval**: the interval in seconds between each ping. Shorter intervals generate more network traffic but show a more responsive tile in the Home app. 3 seconds is a good balance between traffic and responsiveness. Default 3. Mandatory.
 
-* **pingResponseOn**: the ping response that corresponds to a successfully ping response, indicating that the device is turned on. For Linux, use ", 0% packet loss". For Windows use "(0% loss)". See the [Power-Control](https://github.com/jsiegenthaler/homebridge-samsungtvht/wiki/Power-Control) wiki page for more information.
-
-* **pingResponseOff**: the ping response that corresponds to no ping response, indicating that the device is turned off. For Linux, use "100% packet loss". For Windows use "(100% loss)". See the [Power-Control](https://github.com/jsiegenthaler/homebridge-samsungtvht/wiki/Power-Control) wiki page for more information.
+* **pingResponseOff**: the ping response that corresponds to no ping response, indicating that the device is turned off. For Linux, use "100% packet loss". For Windows use "(100% loss)". Note that if any ping is successful, the device is considered on. See the [Power-Control](https://github.com/jsiegenthaler/homebridge-samsungtvht/wiki/Power-Control) wiki page for more information.
 
 * **doublePressTime**: the time in ms to detect a double key press (or tap). Default 250 ms. Mandatory.
 
