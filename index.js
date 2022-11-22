@@ -226,14 +226,9 @@ class samsungTvHtPlatform {
 
 			});
 
-
 		}
 
-
 	}
-	
-
-
 
 }
 
@@ -267,32 +262,18 @@ class samsungTvHtDevice {
 
 		//setup variables
 		this.accessoryConfigured = false;	// true when the accessory is configured
-		this//.currentPowerTransitionState = powerStateTransition.NOT_TRANSITIONING;
-
 
 		// initial states. Will be updated by code
 		this.currentPowerState; // deliberately leave at undefined to detect a reboot and inital start = Characteristic.Active.INACTIVE;
 		this.targetPowerState = this.currentPowerState;
 		this.currentInputId = NO_INPUT_ID;
-		this.currentMediaState = Characteristic.CurrentMediaState.STOP;
+		this.currentMediaState = Characteristic.CurrentMediaState.STOP; // default stop
 		this.targetMediaState = this.currentMediaState;
 		this.powerLastKeyPress = new Date("1900-01-01T00:00:00Z"); // set a valid date but many years in the past
-
-		// use defaults of plugin/platform name & version
-		this.manufacturer = this.deviceConfig.manufacturer || "Samsung";
-		this.modelName = this.deviceConfig.modelName || PLATFORM_NAME;
-		this.serialNumber = this.deviceConfig.serialNumber || 'unknown';
-		this.firmwareRevision = this.deviceConfig.firmwareRevision || PLUGIN_VERSION; // must be numeric. Non-numeric values are not displayed
 
 		// prepare the accessory
 		this.prepareAccessory();
 		
-		// update device state regularly
-		// Check & Update Accessory Status every POWER_STATE_POLLING_INTERVAL_MS (Default: 5000 ms)
-		// this is the last step in the setup. From now on polling will occur every 5 seconds
-		// disabled 21.09.2021, we don't need to do any polling here. It is handled by the powerStateMonitor
-		//this.checkStateInterval = setInterval(this.updateDeviceState.bind(this),POWER_STATE_POLLING_INTERVAL_MS);
-
 	}
 
 
@@ -336,7 +317,7 @@ class samsungTvHtDevice {
 		this.prepareAccessoryInformationService();	// service 1 of 100
 		this.prepareTelevisionService();			// service 2 of 100
 		this.prepareTelevisionSpeakerService();		// service 3 of 100
-		this.prepareInputSourceServices();			// service 4...10
+		this.prepareInputSourceServices();			// service 4....100
 
 		// set displayOrder
 		this.televisionService.getCharacteristic(Characteristic.DisplayOrder)
@@ -357,10 +338,10 @@ class samsungTvHtDevice {
 		const informationService = new Service.AccessoryInformation();
 		informationService
 			.setCharacteristic(Characteristic.Name, this.name)
-			.setCharacteristic(Characteristic.Manufacturer, this.manufacturer)
-			.setCharacteristic(Characteristic.Model, this.modelName)
-			.setCharacteristic(Characteristic.SerialNumber, this.serialNumber)
-			.setCharacteristic(Characteristic.FirmwareRevision, this.firmwareRevision)
+			.setCharacteristic(Characteristic.Manufacturer, this.deviceConfig.manufacturer || 'Samsung')
+			.setCharacteristic(Characteristic.Model, this.deviceConfig.modelName || PLATFORM_NAME)
+			.setCharacteristic(Characteristic.SerialNumber, this.deviceConfig.serialNumber || 'unknown')
+			.setCharacteristic(Characteristic.FirmwareRevision, this.deviceConfig.firmwareRevision || PLUGIN_VERSION) // must be numeric. Non-numeric values are not displayed
 
 		this.accessory.addService(informationService);
 	}
