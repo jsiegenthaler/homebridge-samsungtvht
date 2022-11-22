@@ -8,6 +8,7 @@ All notable changes to this project will be documented in this file.
 
 ## 0.1.24-beta.2 (2022-11-19)
 * Improved power state monitoring for better power state detection 
+* Removed pingResponseOff config item, as no longer needed
 * Bumped dependencies: "node": ">=18.12.1"
 * Code optimisation and clean-ups
 
