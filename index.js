@@ -2,6 +2,7 @@
 
 // ****************** start of settings
 
+
 // name and version
 const packagejson = require('./package.json');
 const PLUGIN_NAME = packagejson.name;
@@ -12,7 +13,8 @@ const PLUGIN_VERSION = packagejson.version;
 const fs = require('fs');
 const fsPromises = require('fs').promises;
 const path = require('path');
-const SamsungRemote = require('samsung-remote');
+const SamsungRemote = require('samsung-remote'); // https://github.com/natalan/samsung-remote
+
 
 // https://github.com/Samfox2/homebridge-cec-tv-platform/blob/main/index.js
 //const  CecController = require('cec-controller');
