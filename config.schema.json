@@ -34,15 +34,6 @@
             "maximum": 15,
             "required": true
           },
-        "pingResponseOn": {
-            "title": "Ping Response Power On",
-            "type": "string",
-            "description": "Ping response to detect device ON state. Linux: \"received, 0% packet\"  Windows: \"(0% loss)\"",
-            "default": "received, 0% packet",
-            "placeholder": "received, 0% packet",
-            "minLength": 1,
-            "required": true
-          },
         "pingResponseOff": {
             "title": "Ping Response Power Off",
             "type": "string",
@@ -463,7 +454,6 @@
             "name",
             "pingCommand",
             "pingInterval",
-            "pingResponseOn",
             "pingResponseOff"
         ]
     },

@@ -6,6 +6,21 @@ All notable changes to this project will be documented in this file.
 ### Bug Fixes and Improvements
 
 
+## 1.0.0 (2023-02-20)
+* Improved power state monitoring for better power state detection 
+* Removed pingResponseOff config item, as no longer needed
+* Bumped dependencies: "homebridge": ">=1.6.0", "node": ">=18.14.0"
+* Bumped dependencies: "samsung-remote": "^1.6.2"
+* Code optimisation and clean-ups, finally created v1.0.0
+
+
+## 0.1.24-beta.2 (2022-11-19)
+* Improved power state monitoring for better power state detection 
+* Removed pingResponseOff config item, as no longer needed
+* Bumped dependencies: "node": ">=18.12.1"
+* Code optimisation and clean-ups
+
+
 ## 0.1.23 (2022-10-26)
 * Bumped dependencies: "node": ">=18.12.0"
 
