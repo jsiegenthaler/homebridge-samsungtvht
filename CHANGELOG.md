@@ -6,6 +6,11 @@ All notable changes to this project will be documented in this file.
 ### Bug Fixes and Improvements
 
 
+## 1.0.1 (2023-05-19)
+* Updated iOS and iPadOS and Homebridge version references in README.md
+* Bumped dependencies: "homebridge": "^1.6.1", "node": ">=18.16.0"
+
+
 ## 1.0.0 (2023-02-20)
 * Improved power state monitoring for better power state detection 
 * Removed pingResponseOff config item, as no longer needed
