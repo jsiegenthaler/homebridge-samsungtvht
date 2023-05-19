@@ -97,6 +97,10 @@ class samsungTvHtPlatform {
 		this.devices = [];
 		this.debugLevel = this.config.debugLevel || 0;
 
+		// show some useful version info
+		this.log.info('%s v%s, node %s, homebridge v%s', packagejson.name, packagejson.version, process.version, this.api.serverVersion)
+
+
 		this.api.on('didFinishLaunching', () => {
 			if (this.debugLevel > 0) {
 				this.log.warn('API event: didFinishLaunching');
