@@ -69,7 +69,7 @@ Each Samsung TV or HT device is exposed as a separate external accessory and eac
 4. **Add Accessory**: tap **More options...** to add the accessory manually.
 5. **Select an Accessory to Add to \<HomeName\>**: Select the accessory you want to add. You should see your Samsung device here. If not, check your Homebridge config.
 6. Accept the **Uncertified Accessory** warning by tapping **Add Anyway**.
-7. **Enter HomeKit Setup Code**: Enter the **HomeKit Setup Code** (displayed in Homebridge under the QR code, format XXX-XX-XXX), or use the device's camera to scan the QR code in Homebridge and tap **Continue**.
+7. **Enter HomeKit Setup Code**: Enter the **HomeKit Setup Code** (displayed in Homebridge under the QR code, format XXXX-XXXX), or use the device's camera to scan the QR code in Homebridge and tap **Continue**.
 8. **TV Location**: Select a room for your Samsung accessory and tap **Continue**.
 9. **TV Name**: Give your Samsung device a different name if you wish (you can change this in the Home app later) and tap **Continue**.
 10. **Name TV Input Sources**: Name your TV input sources if you wish (you can change these in the Home app later) and tap **Continue**.
