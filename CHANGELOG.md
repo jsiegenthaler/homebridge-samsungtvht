@@ -6,6 +6,10 @@ All notable changes to this project will be documented in this file.
 ### Bug Fixes and Improvements
 
 
+## 1.0.3 (2023-08-04)
+* Updated iOS and iPadOS version references in README.md
+
+
 ## 1.0.2 (2023-08-04)
 * Bumped dependencies: "node": "^18.17.0"
 
