@@ -6,6 +6,10 @@ All notable changes to this project will be documented in this file.
 ### Bug Fixes and Improvements
 
 
+## 1.0.2 (2023-08-04)
+* Bumped dependencies: "node": "^18.17.0"
+
+
 ## 1.0.1 (2023-05-19)
 * Added logging of version info
 * Updated iOS and iPadOS and Homebridge version references in README.md
