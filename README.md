@@ -41,7 +41,7 @@ If you like this plugin, consider making a donation or buying me a coffee!<br>
 This plugin was written and tested on the author's Samsung D-series TV and D-series Home Theater system in Switzerland.
 
 ## Requirements
-* An Apple iPhone or iPad with iOS/iPadOS 14.0 (or later). Developed on iOS/iPadOS 14.1...16.5, earlier versions not tested.
+* An Apple iPhone or iPad with iOS/iPadOS 14.0 (or later). Developed on iOS/iPadOS 14.1...16.6, earlier versions not tested.
 * [Homebridge](https://homebridge.io/) v1.5.1 (or later). Developed on Homebridge 1.1.116....1.6.1, earlier versions not tested.
 * An Orsay (non-Tizen) Samsung TV or Home Theater system from C-series (2010), D-series (2011), E-series (2012), F-series (2013) models. Orsay started in 2011, Tizen started in 2015, so TVs and HTs from 2011 to 2015 generally work with this plugin. May also work on some later models as well.
 * The TV or Home Theater system must be connected to your home network via Ethernet LAN cable, or WiFi.
