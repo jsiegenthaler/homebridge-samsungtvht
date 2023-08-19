@@ -10,9 +10,9 @@ const PLATFORM_NAME = packagejson.platformname;
 const PLUGIN_VERSION = packagejson.version;
 
 // required node modules
-const fs = require('fs');
-const fsPromises = require('fs').promises;
-const path = require('path');
+//const fs = require('fs'); -- removed in 1.0.4, not needed
+//const fsPromises = require('fs').promises; -- removed in 1.0.4, not needed
+//const path = require('path'); -- removed in 1.0.4, not needed
 //import SamsungRemote from 'samsung-remote'; // https://github.com/natalan/samsung-remote
 const SamsungRemote = require('samsung-remote'); // https://github.com/natalan/samsung-remote
 
@@ -89,8 +89,12 @@ class samsungTvHtPlatform {
 	// build the platform. Runs once on restart
 	constructor(log, config, api) {
 		// only load if configured
-		if (!config || !Array.isArray(config.devices)) {
-			log('No configuration found for %s', PLUGIN_NAME);
+		if (!config) {
+			log.warn('No configuration found for %s', PLUGIN_NAME);
+			return;
+		}
+		if (!Array.isArray(config.devices)) {
+			log.warn('No devices configured for %s, please add at least one device', PLUGIN_NAME);
 			return;
 		}
 		this.log = log;
