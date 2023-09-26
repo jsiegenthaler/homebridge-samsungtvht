@@ -5,6 +5,9 @@ All notable changes to this project will be documented in this file.
 
 ### Bug Fixes and Improvements
 
+## 1.0.5 (2023-09-26)
+* Updated iOS and iPadOS version references in README.md
+
 
 ## 1.0.4 (2023-08-19)
 * Improved warning messages on startup when config is incomplete
