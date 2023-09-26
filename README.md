@@ -96,6 +96,11 @@ The following keys are supported by in the **Apple TV Remote** in the Control Ce
 
 All remote control buttons are fully configurable and can send any [key code](https://github.com/jsiegenthaler/homebridge-samsungtvht/wiki/Key-Codes).
 
+The following keys are available in the **Apple TV Remote** as of iOS 17, but they cannot be used 8they remain disabled):
+
+* Mute
+* Power
+
 ## Accessory Supported Functions
 ### Power
 You can turn the device power on via HDMI-CEC, and off via remote control commands. Current power state is detected by pinging the device. See the [Power Control](https://github.com/jsiegenthaler/homebridge-samsungtvht/wiki/Power-Control) wiki page for full details.
