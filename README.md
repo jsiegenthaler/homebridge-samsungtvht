@@ -96,7 +96,7 @@ The following keys are supported by in the **Apple TV Remote** in the Control Ce
 
 All remote control buttons are fully configurable and can send any [key code](https://github.com/jsiegenthaler/homebridge-samsungtvht/wiki/Key-Codes).
 
-The following keys are available in the **Apple TV Remote** as of iOS 17, but they cannot be used 8they remain disabled):
+The following keys are visible in the **Apple TV Remote** as of iOS 17, but they cannot be used (they remain disabled):
 
 * Mute
 * Power
