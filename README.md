@@ -21,7 +21,7 @@ Supported TVs and HTs are:
 * ES-series and EH-series from 2012
 * F-series from 2013
 
-| iOS/iPadOS 16 Accessory Tiles | Older iOS/iPadOS Accessory Tiles |
+| iOS/iPadOS 16/17 Accessory Tiles | Older iOS/iPadOS Accessory Tiles |
 | :---         |     :---:      |
 | <img src="https://github.com/jsiegenthaler/homebridge-samsungtvht/blob/master/pics/AccessoryTilesTVHT.png" alt="AccessoryTilesTVHT" height="60" align="center"> | <img src="https://github.com/jsiegenthaler/homebridge-samsungtvht/blob/master/pics/AccessoryTilesTVHTiOS15.png" alt="AccessoryTilesTVHTiOS15" height="80" align="center"> |
 
