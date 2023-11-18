@@ -150,7 +150,6 @@ Example configuration as used on the author's Samsung TV and Samsung HT:
                     "powerOffButton": "KEY_POWEROFF",
                     "viewTvSettingsCommand": "KEY_MENU",
                     "inputs": [
-                    "inputs": [
                         {
                             "inputName": "HDMI1 (Cable STB)",
                             "inputKeyCode": "KEY_EXT20",
