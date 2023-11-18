@@ -89,7 +89,6 @@
             "description": "Each TV or HT is a device. This plugin supports multiple devices.",
             "items": {
                 "type": "object",
-                "titlexxx": "Devices",
                 "properties": {
                     "name": {
                         "title": "Name",
@@ -105,7 +104,7 @@
                         "title": "IP Address",
                         "type": "string",
                         "description": "The IP address of the device",
-                        "default": "192.168.0.xxx",
+                        "default": "",
                         "maxLength": 15,
                         "required": true,
                         "format": "ipv4"
@@ -481,20 +480,13 @@
         "items": [
             {
                 "key": "devices",
-                "type": "array",
-                "buttonText": "Add device",
+                "type": "tabarray",
+                "minItems": 1,
+                "title": "{{ value.name || 'new device' }}",
                 "items": [
-                    {
-                        "key": "devices[]",
-                        "type": "section",
-                        "title": "Name, Icon and IP",
-                        "expandable": true,
-                        "items": [
-                            "devices[].name",
-                            "devices[].type",
-                            "devices[].ipAddress"
-                        ]
-                    },
+                    "devices[].name",
+                    "devices[].type",
+                    "devices[].ipAddress",
                     {
                         "key": "devices[]",
                         "type": "section",
@@ -527,10 +519,12 @@
                             {
                                 "key": "devices[].inputs",
                                 "type": "array",
+                                "buttonText": "Add input",
+                                "minItems": 1,
+                                "maxItems": 20,
                                 "expandable": true,
                                 "expanded": true,
                                 "orderable": true,
-                                "buttonText": "Add input",
                                 "items": [
                                     {
                                         "type": "flex",
