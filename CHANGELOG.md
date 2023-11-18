@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 
 ### Bug Fixes and Improvements
 
+## 1.0.6-beta.0 (2023-11-18)
+* Improved config schema layout for devices
+* Fixed small error in sample config in README.md
+* Bumped dependencies: "node": "^20.9.0"
+
+
 ## 1.0.5 (2023-09-26)
 * Updated iOS and iPadOS version references in README.md
 
