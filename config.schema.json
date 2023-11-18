@@ -2,7 +2,7 @@
     "pluginAlias": "samsungtvht",
     "pluginType": "platform",
     "singular": true,
-    "headerDisplay": "Homebridge plugin for Samsung TV (D5000 series) and Home Theater (D5500 series) from ca 2011.",
+    "headerDisplay": "Homebridge plugin for Samsung TV (D5000 series) and Home Theater (D5500 series) from 2011, as well as others. See the [Wiki FAQ](https://github.com/jsiegenthaler/homebridge-samsung-tvht/wiki/FAQ) for a full list of supported devices.",
     "footerDisplay": "For a detailed description, see the [README](https://www.npmjs.com/package/homebridge-samsungtvht) and the [Wiki](https://github.com/jsiegenthaler/homebridge-samsung-tvht/wiki).",
     "schema": {
       "type": "object",
