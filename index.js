@@ -9,6 +9,7 @@ const PLUGIN_NAME = packagejson.name;
 const PLATFORM_NAME = packagejson.platformname;
 const PLUGIN_VERSION = packagejson.version;
 
+
 // required node modules
 //const fs = require('fs'); -- removed in 1.0.4, not needed
 //const fsPromises = require('fs').promises; -- removed in 1.0.4, not needed
@@ -64,6 +65,12 @@ function waitprom(ms) {
 	})
   }  
 
+
+// funtion to return a unique set of keys from an array
+function uniqBy(arr, key) {
+	return Object.values([...arr].reverse().reduce((m, i) => {m[key.split('.').reduce((a, p) => a?.[p], i)] = i; return m;}, {}))
+  }
+
 // ++++++++++++++++++++++++++++++++++++++++++++
 // config
 // ++++++++++++++++++++++++++++++++++++++++++++
@@ -90,13 +97,20 @@ class samsungTvHtPlatform {
 	constructor(log, config, api) {
 		// only load if configured
 		if (!config) {
-			log.warn('No configuration found for %s', PLUGIN_NAME);
+			log.warn('WARNING: No configuration found for %s', PLUGIN_NAME);
 			return;
 		}
 		if (!Array.isArray(config.devices)) {
-			log.warn('No devices configured for %s, please add at least one device', PLUGIN_NAME);
+			log.warn('WARNING: No devices configured for %s, please add at least one device', PLUGIN_NAME);
 			return;
 		}
+
+		// abort load if device IP address are not unique
+		if (uniqBy(config.devices, 'ipAddress').length != config.devices.length) {
+			log.warn('WARNING: IP addresses not unique for %s. Please ensure you use a unique IP address per device', PLUGIN_NAME);
+			return;
+		}
+
 		this.log = log;
 		this.config = config;
 		this.api = api;
@@ -703,7 +717,7 @@ class samsungTvHtDevice {
 		// currentPowerState is updated by the polling mechanisn
 		//this.log('getPowerState current power state:', currentPowerState);
 		if (this.debugLevel > 1) { 
-			this.log.warn('%s: getPower returning %s [%s]', this.name, this.currentPowerState, powerStateName[this.currentPowerState]); 
+			this.log.warn('%s: getPower returning %s [%s]', this.name, this.currentPowerState || Characteristic.Active.INACTIVE, powerStateName[this.currentPowerState || Characteristic.Active.INACTIVE]); 
 		}
 		callback(null, this.currentPowerState || Characteristic.Active.INACTIVE); // return current state: 0=off, 1=on. Default to OFF if null.
 	}
