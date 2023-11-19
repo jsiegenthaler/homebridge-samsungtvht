@@ -6,7 +6,7 @@ All notable changes to this project will be documented in this file.
 ### Bug Fixes and Improvements
 
 
-## 1.0.7-beta.0 (2023-11-19)
+## 1.0.7 (2023-11-19)
 * Added warning message to detect if non-unique device IP addresses exist
 * Improved display of power state logging directly after a homebridge restart
 * Bumped dependencies: "homebridge": "^1.7.0"
