@@ -10,7 +10,7 @@ All notable changes to this project will be documented in this file.
 * Updated description in package.json for better display in Homebridge on small device screens
 * Updated Homebridge version references in README.md
 * Updated iOS version references in README.md
-* Improved display of devices during setup
+* Improved display of devices during config setup
 * Bumped dependencies: "node": "^20.10.0"
 
 
