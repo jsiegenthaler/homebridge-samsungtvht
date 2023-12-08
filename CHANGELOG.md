@@ -6,6 +6,13 @@ All notable changes to this project will be documented in this file.
 ### Bug Fixes and Improvements
 
 
+## 1.0.8 (2023-12-08)
+* Updated description in package.json for better display in Homebridge on small device screens
+* Updated Homebridge version references in README.md
+* Updated iOS version references in README.md
+* Bumped dependencies: "node": "^20.10.0"
+
+
 ## 1.0.7 (2023-11-19)
 * Added warning message to detect if non-unique device IP addresses exist
 * Improved display of power state logging directly after a homebridge restart
