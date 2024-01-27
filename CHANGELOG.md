@@ -6,8 +6,15 @@ All notable changes to this project will be documented in this file.
 ### Bug Fixes and Improvements
 
 
+## 1.0.10 (2024-01-27)
+* Updated iOS version references in README.md
+* Updated Homebridge version references in README.md
+* Bumped engines: "node": "^20.11.0"
+
+
 ## 1.0.9 (2024-01-04)
 * Updated iOS version references in README.md
+
 
 ## 1.0.8 (2023-12-08)
 * Updated description in package.json for better display in Homebridge on small device screens
