@@ -868,7 +868,11 @@ class samsungTvHtDevice {
 		this.switchInput(input.inputId);
 		*/
 		
-		const keyCode = this.deviceConfig.inputs[input.inputId.value-1].inputKeyCode;
+		// get keycode only if we have an input (sometimes not defined)
+		var keyCode = '';
+		if (input.inputId !== undefined) {
+			keyCode = this.deviceConfig.inputs[input.inputId.value-1].inputKeyCode;
+		}
 		// send only if a keycode exists
 		if ((keyCode || {}).length > 0) {
 			this.sendKey(keyCode);
