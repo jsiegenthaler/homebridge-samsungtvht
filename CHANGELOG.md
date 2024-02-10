@@ -6,6 +6,10 @@ All notable changes to this project will be documented in this file.
 ### Bug Fixes and Improvements
 
 
+## 1.0.11 (2024-02-10)
+* Fixed crash when input change occurs before HomeKit has updated list of inputs
+
+
 ## 1.0.10 (2024-01-27)
 * Updated iOS version references in README.md
 * Updated Homebridge version references in README.md
