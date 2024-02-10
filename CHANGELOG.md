@@ -6,8 +6,12 @@ All notable changes to this project will be documented in this file.
 ### Bug Fixes and Improvements
 
 
-## 1.0.11 (2024-02-10)
+## 1.0.12 (2024-02-10)
+* Improved fix for crash when input change occurs before HomeKit has updated list of inputs
 * Removed PayPal donate button in README.md
+
+
+## 1.0.11 (2024-02-10)
 * Fixed crash when input change occurs before HomeKit has updated list of inputs
 
 
