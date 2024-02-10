@@ -855,7 +855,7 @@ class samsungTvHtDevice {
 
 	// set input
 	async setInput(input, callback) {
-		if (this.debugLevel > 0) {
+		if ((this.debugLevel > 0) & (input !== undefined)) {
 			this.log.warn('%s: setInput input:', this.name,input.inputId.value, input.inputName.value, this.deviceConfig.inputs[input.inputId.value-1].inputKeyCode);
 		}
 		
@@ -870,7 +870,7 @@ class samsungTvHtDevice {
 		
 		// get keycode only if we have an input (sometimes not defined)
 		var keyCode = '';
-		if (input.inputId !== undefined) {
+		if (input !== undefined) {
 			keyCode = this.deviceConfig.inputs[input.inputId.value-1].inputKeyCode;
 		}
 		// send only if a keycode exists
