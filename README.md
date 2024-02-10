@@ -12,7 +12,7 @@
 [![npm](https://img.shields.io/npm/v/homebridge-samsungtvht)](https://www.npmjs.com/package/homebridge-samsungtvht)
 [![verified-by-homebridge](https://badgen.net/badge/homebridge/verified/purple)](https://github.com/homebridge/homebridge/wiki/Verified-Plugins)
 [![GitHub issues](https://img.shields.io/github/issues/jsiegenthaler/homebridge-samsungtvht)](https://github.com/jsiegenthaler/homebridge-samsungtvht/issues)
-[![donate](https://badgen.net/badge/donate/paypal/91BE09)](https://www.paypal.com/donate?hosted_button_id=CNEDGHRUER468)
+<a target="blank" href="https://ko-fi.com/jsiegenthaler"><img src="https://img.shields.io/badge/Ko--Fi-Buy%20me%20a%20coffee-29abe0.svg?logo=ko-fi"/></a>
 
 `homebridge-samsungtvht` is a Homebridge plugin allowing you to control your Samsung TV and Home Theater (with Orsay OS) with Apple HomeKit using the Home app and the Apple TV Remote in the Control Center.
 Supported TVs and HTs are:
@@ -34,8 +34,8 @@ Supports HT devices such as HT-D5500, HT-D5530, HT-D5550, HT-D6500.
 
 Works with Samesung C, D, E, F series TVs using Orsay OS. Does not work with Samsung TVs using the Tizen OS. Tizen = TVs made from 2015.
 
-If you like this plugin, consider making a donation or buying me a coffee!<br>
-<a target="blank" href="https://www.paypal.com/donate?hosted_button_id=CNEDGHRUER468"><img src="https://img.shields.io/badge/PayPal-Donate-blue.svg?logo=paypal"/></a>  <a target="blank" href="https://ko-fi.com/jsiegenthaler"><img src="https://img.shields.io/badge/Ko--Fi-Buy%20me%20a%20coffee-29abe0.svg?logo=ko-fi"/></a>
+If you like this plugin, consider buying me a coffee!<br>
+<a target="blank" href="https://ko-fi.com/jsiegenthaler"><img src="https://img.shields.io/badge/Ko--Fi-Buy%20me%20a%20coffee-29abe0.svg?logo=ko-fi"/></a>
 
 ## Made in Switzerland
 This plugin was written and tested on the author's Samsung D-series TV and D-series Home Theater system in Switzerland.
