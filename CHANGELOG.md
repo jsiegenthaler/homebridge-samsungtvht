@@ -6,6 +6,10 @@ All notable changes to this project will be documented in this file.
 ### Bug Fixes and Improvements
 
 
+## 1.0.14 (2024-05-22)
+* Updated iOS version references in README.md
+
+
 ## 1.0.13 (2024-03-05)
 * Updated iOS version references in README.md
 
