@@ -469,8 +469,14 @@ class samsungTvHtDevice {
 			this.log.warn('%s: prepareInputSourceServices', this.name);
 		}
 
-		// add dummy entry at index 0 for the inputList
-		this.inputList.push({inputId: '0', inputName: 'Dummy'});
+		//this.inputList.push({inputId: '0', inputName: 'Dummy'});
+		// add dummy entry at index 999 for the inputList
+		var defaultEntry = {
+			inputId: NO_INPUT_ID,
+			inputName: NO_INPUT_NAME 
+		}
+		this.inputList.push(defaultEntry);
+		//this.log(defaultEntry);
 		this.displayOrder = [];
 
 		// For Release 1.0, I'll only support the source by sending the SOURCE key, which just goes to next source
@@ -490,10 +496,10 @@ class samsungTvHtDevice {
 					configState = Characteristic.IsConfigured.CONFIGURED;
 					visState = Characteristic.CurrentVisibilityState.SHOWN;
 				}
-				let inputService = new Service.InputSource(1, "input_" + (i+1).toString() );
+				let inputService = new Service.InputSource(1, "input" + (i+1).toString() );
 				inputService
 					.setCharacteristic(Characteristic.Identifier, i+1)
-					.setCharacteristic(Characteristic.ConfiguredName, (this.deviceConfig.inputs[i] || {}).inputName || 'input_' + (i+1).toString())
+					.setCharacteristic(Characteristic.ConfiguredName, (this.deviceConfig.inputs[i] || {}).inputName || 'input' + (i+1).toString())
 					.setCharacteristic(Characteristic.InputSourceType, (this.deviceConfig.inputs[i] || {}).inputSourceType || Characteristic.InputSourceType.HDMI)
 					.setCharacteristic(Characteristic.InputDeviceType, (this.deviceConfig.inputs[i] || {}).inputDeviceType || Characteristic.InputDeviceType.TV)
 					.setCharacteristic(Characteristic.IsConfigured, configState)
@@ -516,7 +522,7 @@ class samsungTvHtDevice {
 				// 	0x00 end of TLV item
 				// 	0x01 identifier...new TLV item for displayOrder
 				// length:	Number of following bytes, excluding type and len fields
-				// value:	A number of <len> bytes. Can be mepty if length=0
+				// value:	A number of <len> bytes. Can be empty if length=0
 				// 0x01 0x01 xx is a valid TLV8 as it contains only 1 data byte.
 				// the data must be a single 8-bit byte, hence the logical AND with 0xff
 				this.displayOrder.push(0x01, 0x01, i & 0xff); // 0x01 0x01 0xXX
@@ -630,14 +636,20 @@ class samsungTvHtDevice {
 
 		// debugging, helps a lot to see InputName
 		if (this.debugLevel > 2) {
-			//let currentInputName; // let is scopt to the current {} block
-			let curInput = this.inputList.find(Input => Input.inputId === this.currentInputId); 
-			//if (curInput) { currentInputName = curInput.InputName; }
+			//let currentInputName; // let is scoped to the current {} block
+			//this.log.warn('%s: updateDeviceState: this.inputList', this.name, this.inputList);
+	
+			// get current input, ensure we always have a json value
+			let curInput = (this.inputList.find(Input => Input.inputId.value === this.currentInputId) || {});
+
+			// ensure we have a name value even for input 999
+			let curName = ((curInput.inputName || {}).value || NO_INPUT_NAME);
+
 			this.log.warn('%s: updateDeviceState: currentPowerState %s, currentMediaState %s [%s], currentInputId %s [%s]', 
 				this.name, 
 				this.currentPowerState, 
 				this.currentMediaState, mediaStateName[this.currentMediaState], 
-				this.currentInputId, (curInput || {}).InputName
+				this.currentInputId, curName
 			);
 		}
 
@@ -829,22 +841,29 @@ class samsungTvHtDevice {
 		// fired when the icon is clicked in HomeKit and HomeKit requests a refresh
 		// currentInputId is updated by the polling mechanisn
 		// must return a valid index, and must never return null
+		this.log.warn('%s: getInput: called, this.currentInputId:', this.name, this.currentInputId);
 
 		// find the currentInputId in the inputs and return the currentActiveInput once found
 		// this allows HomeKit to show the selected current input
 		
-		/*
+		// reenabled for v1.1.0
 		var currentInputName = NO_INPUT_NAME;
-		var currentActiveInput = this.inputServices.findIndex(input => input.inputId === currentInputId);
-		if (currentActiveInput == -1) { currentActiveInput = NO_INPUT_ID } // if nothing found, set to NO_INPUT_ID to clear the name from the Home app tile
+		var currentActiveInput = this.inputServices.findIndex(input => input.inputId === this.currentInputId);
+		this.log.warn('%s: getInput: called, this.inputServices:', this.name, this.inputServices);
+		this.log.warn('%s: getInput: called, this.inputServices[1].characteristics', this.name, this.inputServices[1].characteristics);
+
+		this.log.warn('%s: getInput: called, currentActiveInput:', this.name, currentActiveInput);
+		if (currentActiveInput == -1) { currentActiveInput = NO_INPUT_ID } // if nothing found (-1), set to NO_INPUT_ID to clear the name from the Home app tile
 		if ((currentActiveInput > -1) && (currentActiveInput != NO_INPUT_ID)) { 
 			currentInputName = this.inputServices[currentActiveInput].getCharacteristic(Characteristic.ConfiguredName).value; 
 		}
-		*/
 		
 		// return the fixed no input always. This prevents the input name from being displayed on the home tile
+		// disabled in v1.1.0, we now allow the persistance of the selected value
+		/*
 		const currentActiveInput = NO_INPUT_ID;
 		const currentInputName = NO_INPUT_NAME;
+		*/
 
 		if (this.debugLevel > 0) { 
 			this.log.warn('%s: getInput returning input %s [%s]', this.name, currentActiveInput, currentInputName);
@@ -876,8 +895,13 @@ class samsungTvHtDevice {
 		// send only if a keycode exists
 		if ((keyCode || {}).length > 0) {
 			this.sendKey(keyCode);
+			this.log.warn('%s: setInput setting active identifier to:', this.name, input.inputId.value);
+			this.currentInputId = input.inputId.value; // persist to homebridge
+			this.televisionService.getCharacteristic(Characteristic.ActiveIdentifier).updateValue(input.inputId.value);
 		}
 
+		// disabled in v1.1.0, we now allow the persistance of the selected value
+		/*
 		// immediately reset the input back to nothing to clear any scenes and clear the tile display
 		if (this.televisionService.getCharacteristic(Characteristic.ActiveIdentifier).value != NO_INPUT_ID) {
 			this.log.warn('%s: setInput setting ActiveIdentifier to NO_INPUT_ID %s :', this.name, NO_INPUT_ID);
@@ -885,6 +909,7 @@ class samsungTvHtDevice {
 		} else {
 			this.log.debug('%s: setInput: ActiveIdentifier OK, no need to change', this.name);
 		}
+		*/
 		// start an async service to reset after 500ms
 		//this.log('processing wait of %s ms', delay);
 		//await waitprom(500);
