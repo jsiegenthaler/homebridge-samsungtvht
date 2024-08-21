@@ -6,6 +6,14 @@ All notable changes to this project will be documented in this file.
 ### Bug Fixes and Improvements
 
 
+
+## 1.1.0-beta.1 (2024-08-21)
+* Adapted behaviour to allow the selected Accessory input to remain selected (issue #23)
+* Added support for Homebridge v2.0
+* Fixed bug where input name was not properly displayed in logs for updateDeviceState 
+* Updated iOS and Homebridge version references in README.md
+* Still contains some debug info in beta.1
+
 ## 1.0.14 (2024-05-22)
 * Updated iOS version references in README.md
 
