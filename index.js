@@ -380,10 +380,14 @@ class samsungTvHtDevice {
 			this.log.warn('%s: prepareTelevisionService', this.name);
 		}
 		//this.televisionService = new Service.Television(this.name, 'televisionService');
-		this.televisionService = new Service.Television(null, 'televisionService');
+		this//.televisionService = new Service.Television(null, 'televisionService');
+		this.televisionService = new Service.Television(this.name, 'televisionService');
 		this.televisionService
 			.setCharacteristic(Characteristic.ConfiguredName, this.name)
-			.setCharacteristic(Characteristic.SleepDiscoveryMode, Characteristic.SleepDiscoveryMode.ALWAYS_DISCOVERABLE);
+			.setCharacteristic(Characteristic.SleepDiscoveryMode, Characteristic.SleepDiscoveryMode.ALWAYS_DISCOVERABLE)
+			// extra characteristics added here are accessible in Shortcuts and Automations (both personal and home)
+			.setCharacteristic(Characteristic.StatusFault, Characteristic.StatusFault.NO_FAULT) // NO_FAULT or GENERAL_FAULT
+			//.setCharacteristic(Characteristic.InUse, Characteristic.InUse.NOT_IN_USE) // NOT_IN_USE or IN_USE
 		
 		/* // not yet working
 		this.televisionService.getCharacteristic(Characteristic.ConfiguredName)
@@ -391,17 +395,21 @@ class samsungTvHtDevice {
 			.on('set', (newName, callback) => { this.setDeviceName(newName, callback); });
 		*/
 
+		// power
 		this.televisionService.getCharacteristic(Characteristic.Active)
 			.on('get', this.getPower.bind(this))
 			.on('set', this.setPower.bind(this));
 
+		// active input
 		this.televisionService.getCharacteristic(Characteristic.ActiveIdentifier)
 			.on('get', this.getInput.bind(this))
 			.on('set', (newInputIdentifier, callback) => { this.setInput(this.inputList[newInputIdentifier], callback); });
 
+		// remote control keys in the Apple TV Remote app
 		this.televisionService.getCharacteristic(Characteristic.RemoteKey)
 			.on('set', this.setRemoteKey.bind(this));
 
+		// the View TV Settings menu item
 		this.televisionService.getCharacteristic(Characteristic.PowerModeSelection)
 			.on('set', this.setPowerModeSelection.bind(this));
 
