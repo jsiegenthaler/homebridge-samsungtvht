@@ -7,11 +7,13 @@ All notable changes to this project will be documented in this file.
 
 
 
-## 1.1.0-beta.1 (2024-08-21)
+## 1.1.0-beta.2 (2024-09-21)
 * Adapted behaviour to allow the selected Accessory input to remain selected (issue #23)
 * Added support for Homebridge v2.0
+* Added logging of unknown remote buttons
 * Fixed bug where input name was not properly displayed in logs for updateDeviceState 
 * Updated iOS and Homebridge version references in README.md
+* Updated comments for Mute and Power buttons for iOS18 in README.md
 * Still contains some debug info in beta.1
 
 ## 1.0.14 (2024-05-22)
