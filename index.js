@@ -1096,13 +1096,13 @@ class samsungTvHtDevice {
 			case Characteristic.RemoteKey.FAST_FORWARD: // 1
 				keyName = 'KEY_FF'; break;
 
-			case Characteristic.RemoteKey.NEXT_TRACK: // 2
+			//case Characteristic.RemoteKey.NEXT_TRACK: // 2
 				//keyNameDefault = "";  // no corresponding keys can be identified. not supported in Apple Remote GUI
-				break;
+			//	break;
 
-			case Characteristic.RemoteKey.PREVIOUS_TRACK: // 3
+			//case Characteristic.RemoteKey.PREVIOUS_TRACK: // 3
 				//keyNameDefault = "";  // no corresponding keys can be identified. not supported in Apple Remote GUI
-				break;
+			//	break;
 
 			case Characteristic.RemoteKey.ARROW_UP: // 4
 				keyNameDefault = "KEY_UP";
@@ -1180,38 +1180,40 @@ class samsungTvHtDevice {
 				}
 				break;
 
-			}
+			default: // log any other keypresses in case Apple adds any more
+				this.log('%s: setRemoteKey: Unknown remoteKey:', this.name, remoteKey);
+		}
 
 
-			// handle the key code (can be a sequence)
-			// send only if keyName is not null
-			if (keyName) {
-				if (this.readyToSendRemoteKeyPress){ 
-					// send immediately
-					this.log.debug('%s: setRemoteKey: sending key %s immediately', this.name, keyName);
-					this.sendKey(keyName); 
-				} else {
-					// immediate send is not enabled. 
-					// start a delay equal to doublePressTime, then send only if the readyToSendRemoteKeyPress is true
-					var delayTime = this.config.doublePressDelayTime || 300;
-					this.log.debug('%s: setRemoteKey: sending key %s after delay of %s milliseconds', this.name, keyName, delayTime);
-					setTimeout(() => { 
-						// check if can be sent. Only send if sendRemoteKeyPressAfterDelay is still set. It may have been reset by another key press
-						this.log.debug('%s: setRemoteKey: setTimeout delay completed, checking sendRemoteKeyPressAfterDelay for %s', this.name, keyName);
-						if (this.sendRemoteKeyPressAfterDelay){ 
-							this.log.debug('%s: setRemoteKey: setTimeout delay completed, sending %s', this.name, keyName);
-							this.sendKey(keyName); 
-							this.log.debug('%s: setRemoteKey: setTimeout delay completed, key %s sent, resetting readyToSendRemoteKeyPress', this.name, keyName);
-							this.readyToSendRemoteKeyPress = true; // reset the enable flag
-						} else {
-							this.log.debug('%s: setRemoteKey: setTimeout delay completed, checking sendRemoteKeyPressAfterDelay for %s: sendRemoteKeyPressAfterDelay is false, doing nothing', this.name, keyName);
-						}
-					},
-					delayTime); // send after delayTime
-				}
+		// handle the key code (can be a sequence)
+		// send only if keyName is not null
+		if (keyName) {
+			if (this.readyToSendRemoteKeyPress){ 
+				// send immediately
+				this.log.debug('%s: setRemoteKey: sending key %s immediately', this.name, keyName);
+				this.sendKey(keyName); 
+			} else {
+				// immediate send is not enabled. 
+				// start a delay equal to doublePressTime, then send only if the readyToSendRemoteKeyPress is true
+				var delayTime = this.config.doublePressDelayTime || 300;
+				this.log.debug('%s: setRemoteKey: sending key %s after delay of %s milliseconds', this.name, keyName, delayTime);
+				setTimeout(() => { 
+					// check if can be sent. Only send if sendRemoteKeyPressAfterDelay is still set. It may have been reset by another key press
+					this.log.debug('%s: setRemoteKey: setTimeout delay completed, checking sendRemoteKeyPressAfterDelay for %s', this.name, keyName);
+					if (this.sendRemoteKeyPressAfterDelay){ 
+						this.log.debug('%s: setRemoteKey: setTimeout delay completed, sending %s', this.name, keyName);
+						this.sendKey(keyName); 
+						this.log.debug('%s: setRemoteKey: setTimeout delay completed, key %s sent, resetting readyToSendRemoteKeyPress', this.name, keyName);
+						this.readyToSendRemoteKeyPress = true; // reset the enable flag
+					} else {
+						this.log.debug('%s: setRemoteKey: setTimeout delay completed, checking sendRemoteKeyPressAfterDelay for %s: sendRemoteKeyPressAfterDelay is false, doing nothing', this.name, keyName);
+					}
+				},
+				delayTime); // send after delayTime
 			}
-			this.lastRemoteKeyPressed = remoteKey; // store the current key as last key pressed
-		}	
+		}
+		this.lastRemoteKeyPressed = remoteKey; // store the current key as last key pressed
+	}	
 
   	//+++++++++++++++++++++++++++++++++++++++++++++++++++++
 	// END of accessory get/set charteristic handlers
