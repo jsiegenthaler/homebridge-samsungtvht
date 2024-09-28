@@ -510,7 +510,7 @@ class samsungTvHtDevice {
 			// deviceconfig is zero-based, starting at 0
 			for (let i = 0; i < 4; i++) { // was 20
 
-				this.log('%s: prepareInputSourceServices loading config index %s input %s',this.name,i,i+1,this.deviceConfig.inputs[i] || 'no config found');
+				this.log.debug('%s: prepareInputSourceServices loading config index %s input %s',this.name,i,i+1,this.deviceConfig.inputs[i] || 'no config found');
 				// show only if the deviceConfig setting exists
 				var configState = Characteristic.IsConfigured.NOT_CONFIGURED;
 				var visState = Characteristic.CurrentVisibilityState.HIDDEN;
@@ -559,7 +559,7 @@ class samsungTvHtDevice {
 			this.displayOrder.push(0x00, 0x00); // close off the displayorder array with 0x00 0x00
 
 		}	
-		this.log('%s: prepareInputSourceServices loading complete, this.inputServices',this.name,this.inputServices);
+		this.log.debug('%s: prepareInputSourceServices loading complete, this.inputServices',this.name,this.inputServices);
 
 	}
   	//+++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -902,11 +902,11 @@ class samsungTvHtDevice {
 		// this allows HomeKit to show the selected current input
 		// search for input by the displayName, which is configured as "inputN" where N is the index: 1=first, 2=next, and so on
 		// currentActiveIdentifierZeroBased is zero-based: 0=input1, 1=input2, etc
-		this.log.warn('%s: getActiveIdentifier this.inputServices', this.name, this.inputServices);
+		//this.log.warn('%s: getActiveIdentifier this.inputServices', this.name, this.inputServices);
 		var currentActiveIdentifierZeroBased = this.inputServices.findIndex(input => input.displayName === 'input' + this.currentInputId) ; // returns -1 if not found, returns the index (0-based) when found. Index 0 = Input 1
 		if (currentActiveIdentifierZeroBased == -1) { currentActiveIdentifierZeroBased = NO_INPUT_ID -1 } // if nothing found (-1), set to NO_INPUT_ID to clear the name from the Home app tile
-		this.log.warn('%s: getActiveIdentifier currentActiveIdentifierZeroBased', this.name, currentActiveIdentifierZeroBased);
-		this.log.warn('%s: getActiveIdentifier this.inputServices[currentActiveIdentifierZeroBased]', this.name, this.inputServices[currentActiveIdentifierZeroBased]);
+		//this.log.warn('%s: getActiveIdentifier currentActiveIdentifierZeroBased', this.name, currentActiveIdentifierZeroBased);
+		//this.log.warn('%s: getActiveIdentifier this.inputServices[currentActiveIdentifierZeroBased]', this.name, this.inputServices[currentActiveIdentifierZeroBased]);
 
 		// get name if currentActiveInput is within bounds of the inputServices array
 		var currentInputName; // default empty
