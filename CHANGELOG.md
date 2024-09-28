@@ -7,8 +7,8 @@ All notable changes to this project will be documented in this file.
 
 
 
-## 1.1.0-beta.5 (2024-09-28)
-* fixed issues with Input Identifier
+## 1.1.0-beta.6 (2024-09-28)
+* Fixed issues with Input Identifier
 * Set default input to identifier 1 (first in list) on startup to ensure HomeKit has a valid value
 * Adapted behaviour of input selection to allow the selected Accessory input to remain selected (issue #23)
 * Adapted syntax of getXXX and setXXX functions to use onGet/onSet for more readable code

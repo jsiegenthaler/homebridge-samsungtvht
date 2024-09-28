@@ -148,7 +148,7 @@ class samsungTvHtPlatform {
 				}
 				// start the regular powerStateMonitor
 				// DISABLE FOR DEBUGGING THE CHANNEL NAME ISSUE
-				//this.checkPowerInterval = setInterval(this.powerStateMonitor.bind(this), this.config.pingInterval * 1000 || POWER_STATE_DEFAULT_POLLING_INTERVAL_MS);
+				this.checkPowerInterval = setInterval(this.powerStateMonitor.bind(this), this.config.pingInterval * 1000 || POWER_STATE_DEFAULT_POLLING_INTERVAL_MS);
 		
 		});
 	}
