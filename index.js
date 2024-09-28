@@ -148,7 +148,7 @@ class samsungTvHtPlatform {
 				}
 				// start the regular powerStateMonitor
 				// DISABLE FOR DEBUGGING THE CHANNEL NAME ISSUE
-				this.checkPowerInterval = setInterval(this.powerStateMonitor.bind(this), this.config.pingInterval * 1000 || POWER_STATE_DEFAULT_POLLING_INTERVAL_MS);
+				//this.checkPowerInterval = setInterval(this.powerStateMonitor.bind(this), this.config.pingInterval * 1000 || POWER_STATE_DEFAULT_POLLING_INTERVAL_MS);
 		
 		});
 	}
@@ -293,7 +293,7 @@ class samsungTvHtDevice {
 		// initial states. Will be updated by code
 		this.currentPowerState; // deliberately leave at undefined to detect a reboot and inital start = Characteristic.Active.INACTIVE;
 		this.targetPowerState = this.currentPowerState;
-		this.currentInputId = 0; // default startup at input 0 (first in list) NO_INPUT_ID;
+		this.currentInputId = 1; // default startup at input 1 (first in list) NO_INPUT_ID;
 		this.currentMediaState = Characteristic.CurrentMediaState.STOP; // default stop
 		this.targetMediaState = this.currentMediaState;
 		this.powerLastKeyPress = new Date("1900-01-01T00:00:00Z"); // set a valid date but many years in the past
@@ -384,7 +384,6 @@ class samsungTvHtDevice {
 		if (this.debugLevel > 0) {
 			this.log.warn('%s: prepareTelevisionService', this.name);
 		}
-		//this.televisionService = new Service.Television(this.name, 'televisionService');
 		//this.televisionService = new Service.Television(null, 'televisionService');
 		this.televisionService = new Service.Television(this.name, 'televisionService');
 		this.televisionService
@@ -392,7 +391,6 @@ class samsungTvHtDevice {
 			.setCharacteristic(Characteristic.SleepDiscoveryMode, Characteristic.SleepDiscoveryMode.ALWAYS_DISCOVERABLE)
 			// extra characteristics added here are accessible in Shortcuts and Automations (both personal and home)
 			.setCharacteristic(Characteristic.StatusFault, Characteristic.StatusFault.NO_FAULT) // NO_FAULT or GENERAL_FAULT
-			//.setCharacteristic(Characteristic.InUse, Characteristic.InUse.NOT_IN_USE) // NOT_IN_USE or IN_USE
 		
 		// power
 		this.televisionService.getCharacteristic(Characteristic.Active)
@@ -401,8 +399,8 @@ class samsungTvHtDevice {
 
 		// active input
 		this.televisionService.getCharacteristic(Characteristic.ActiveIdentifier)
-			.onGet(this.getInput.bind(this))
-			.onSet(this.setInput.bind(this));
+			.onGet(this.getActiveIdentifier.bind(this))
+			.onSet(this.setActiveIdentifier.bind(this));
 
 		// configured name - added to log the calls to get configured name
 		this.televisionService.getCharacteristic(Characteristic.ConfiguredName)
@@ -508,9 +506,11 @@ class samsungTvHtDevice {
 		// HomeKit gets upset when the number of inputs changes. So configure 20 always, set conf and vis states if a deviceconfig exists
 		//this.log.warn('%s: prepareInputSourceServices inputs',this.name, this.deviceConfig.inputs);
 		if (this.deviceConfig.inputs){
+			// i = identifier number starting at 1, so start loop at 1
+			// deviceconfig is zero-based, starting at 0
 			for (let i = 0; i < 4; i++) { // was 20
 
-				this.log('%s: prepareInputSourceServices loading input %s',this.name,i,this.deviceConfig.inputs[i] || 'no config found');
+				this.log('%s: prepareInputSourceServices loading config index %s input %s',this.name,i,i+1,this.deviceConfig.inputs[i] || 'no config found');
 				// show only if the deviceConfig setting exists
 				var configState = Characteristic.IsConfigured.NOT_CONFIGURED;
 				var visState = Characteristic.CurrentVisibilityState.HIDDEN;
@@ -518,12 +518,10 @@ class samsungTvHtDevice {
 					configState = Characteristic.IsConfigured.CONFIGURED;
 					visState = Characteristic.CurrentVisibilityState.SHOWN;
 				}
-				let inputService = new Service.InputSource('input' + i.toString(), 'input' + i.toString()); // displayName, subtype
-				// create 0-based array as ActiveIdentifier is 0-based
-				// note that this.deviceConfig.inputs[] is 1-based
+				let inputService = new Service.InputSource('input' + (i+1).toString(), 'input' + (i+1).toString()); // displayName, subtype
 				inputService
-					.setCharacteristic(Characteristic.Identifier, i)
-					.setCharacteristic(Characteristic.ConfiguredName, (this.deviceConfig.inputs[i] || {}).inputName || 'input' + i.toString()) // Initial configured name is "inputN", Input text is 0-based
+					.setCharacteristic(Characteristic.Identifier, i+1) // must be 1-based, so that input1 is also Identifier1, and so that CurrentActivIdentifier = same as Input number
+					.setCharacteristic(Characteristic.ConfiguredName, (this.deviceConfig.inputs[i] || {}).inputName || 'input' + (i+1).toString()) // Initial configured name is "inputN", Input text is 1-based
 					.setCharacteristic(Characteristic.InputSourceType, (this.deviceConfig.inputs[i] || {}).inputSourceType || Characteristic.InputSourceType.HDMI)
 					.setCharacteristic(Characteristic.InputDeviceType, (this.deviceConfig.inputs[i] || {}).inputDeviceType || Characteristic.InputDeviceType.TV)
 					.setCharacteristic(Characteristic.IsConfigured, configState)
@@ -533,6 +531,7 @@ class samsungTvHtDevice {
 				this.inputServices.push(inputService);
 				this.accessory.addService(inputService);
 				this.televisionService.addLinkedService(inputService);
+				// pushing into the array always creates a zero-based array, each push fills the next index
 				this.inputList.push({inputId: inputService.getCharacteristic(Characteristic.Identifier), inputName: inputService.getCharacteristic(Characteristic.ConfiguredName)});
 
 				// add DisplayOrder, see :
@@ -550,15 +549,17 @@ class samsungTvHtDevice {
 				// length:	Number of following bytes, excluding type and len fields.
 				// value:	A number of <len> bytes. Can be empty if length=0
 				// 0x01 0x01 xx is a valid TLV8 as it contains only 1 data byte.
-				// for displayOrder, the length should be 4 bytes. If shorter, it will not sort properly in iOs18
+				// for displayOrder, the length should be 4 bytes. but short also works, but limited to 255 entries
 				// AQQAAAAAAQQBAAAAAQQCAAAAAQQDAAAAAAA= = 010400000000,010401000000,010402000000,010403000000,0000 (including closing 0000)
-				this.displayOrder.push(0x01, 0x04, i & 0xff, 0x00, 0x00, 0x00)
+				// this.displayOrder.push(0x01, 0x04, i & 0xff, 0x00, 0x00, 0x00)
+				this.displayOrder.push(0x01, 0x01, (i+1) & 0xff)
 
 			}
 			// close off the TLV8 by sending 0x00 0x00
 			this.displayOrder.push(0x00, 0x00); // close off the displayorder array with 0x00 0x00
 
 		}	
+		this.log('%s: prepareInputSourceServices loading complete, this.inputServices',this.name,this.inputServices);
 
 	}
   	//+++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -886,43 +887,45 @@ class samsungTvHtDevice {
 		return
 	}
 
-	// get input
-	async getInput() {
+	// get ActiveIdentifier (input)
+	// ActiveIdentifier is zero-based: 0=input1, 1=input2, etc
+	async getActiveIdentifier() {
 		// fired when the user clicks away from the iOS Device TV Remote Control, regardless of which TV was selected
 		// fired when the icon is clicked in HomeKit and HomeKit requests a refresh
 		// currentInputId is updated by the polling mechanisn
 		// must return a valid index, and must never return null
 		// Input 0 is the first entry in the input list, input 1 the next, and so on
-		this.log.warn('%s: getInput: called, this.currentInputId:', this.name, this.currentInputId);
+		// Active identifier (as retrieved in Shortcuts) 
+		this.log.warn('%s: getActiveIdentifier: called, this.currentInputId:', this.name, this.currentInputId);
 
 		// find the currentInputId in the inputs and return the currentActiveInput once found
 		// this allows HomeKit to show the selected current input
-		// search for input by the subtype, which is configured as "inputN" where N is the index: 0=first, 1=next, and so on
-		//this.log.warn('%s: getInput: this.inputServices:', this.name, this.inputServices);
-		var currentActiveInput = this.inputServices.findIndex(input => input.displayName === 'input' + this.currentInputId); // returns -1 if not found
-		if (currentActiveInput == -1) { currentActiveInput = NO_INPUT_ID } // if nothing found (-1), set to NO_INPUT_ID to clear the name from the Home app tile
+		// search for input by the displayName, which is configured as "inputN" where N is the index: 1=first, 2=next, and so on
+		// currentActiveIdentifierZeroBased is zero-based: 0=input1, 1=input2, etc
+		this.log.warn('%s: getActiveIdentifier this.inputServices', this.name, this.inputServices);
+		var currentActiveIdentifierZeroBased = this.inputServices.findIndex(input => input.displayName === 'input' + this.currentInputId) ; // returns -1 if not found, returns the index (0-based) when found. Index 0 = Input 1
+		if (currentActiveIdentifierZeroBased == -1) { currentActiveIdentifierZeroBased = NO_INPUT_ID -1 } // if nothing found (-1), set to NO_INPUT_ID to clear the name from the Home app tile
+		this.log.warn('%s: getActiveIdentifier currentActiveIdentifierZeroBased', this.name, currentActiveIdentifierZeroBased);
+		this.log.warn('%s: getActiveIdentifier this.inputServices[currentActiveIdentifierZeroBased]', this.name, this.inputServices[currentActiveIdentifierZeroBased]);
 
 		// get name if currentActiveInput is within bounds of the inputServices array
 		var currentInputName; // default empty
-		if ((currentActiveInput >= 0) && (currentActiveInput < this.inputServices.length)) { 
-			currentInputName = this.inputServices[currentActiveInput].getCharacteristic(Characteristic.ConfiguredName).value; 
+		if ((currentActiveIdentifierZeroBased >= 0) && (currentActiveIdentifierZeroBased < this.inputServices.length)) { 
+			currentInputName = this.inputServices[currentActiveIdentifierZeroBased].getCharacteristic(Characteristic.ConfiguredName).value; 
 		}
 
+		// currentActiveIdentifierZeroBased is zero-based. 0=Input1, 1=Input2, etc.
 		if (this.debugLevel > 0) { 
-			this.log.warn('%s: getInput returning currentActiveInput input %s [%s]', this.name, currentActiveInput, currentInputName || NO_INPUT_NAME);
+			this.log.warn('%s: getActiveIdentifier returning currentActiveIdentifier %s = input %s [%s]', this.name, currentActiveIdentifierZeroBased + 1, currentActiveIdentifierZeroBased + 1, currentInputName || NO_INPUT_NAME);
 		}
 
-		return currentActiveInput;
+		return currentActiveIdentifierZeroBased + 1; // first input has ActiveIdentifier 1, 2nd has 2, and so on
 	}
 
-	// set input
-	async setInput(inputId) {
-		// inputId is an integer, 0 is the first entry in the input list, input 1 the next, and so on
-		this.log.warn('%s: setInput inputId:', this.name,inputId);
-		//this.log.warn('%s: setInput input:', this.name,input.value, input.inputName.value);
-		//if ((this.debugLevel > 0) & (inputId !== undefined)) {
-			//this.log.warn('%s: setInput input:', this.name,input.inputId.value, input.inputName.value);
-		//}
+	// set ActiveIdentifier (input, uint32)
+	async setActiveIdentifier(newInputId) {
+		// newInputId is an integer, 1-based. 1 is the first entry in the input list, input 2 the next, and so on
+		this.log.warn('%s: setActiveIdentifier newInputId:', this.name, newInputId);
 		
 		//one day I'll implement the HDMI CEC input control, then I'll need these functions:
 		/*
@@ -934,32 +937,35 @@ class samsungTvHtDevice {
 		*/
 		
 		// get keycode only if we have an input (sometimes not defined)
+		// Remember: newInputId is 1-based, but the array is zero-based, so subtract 1
 		var keyCode = '';
-		if (inputId !== undefined) {
-			keyCode = this.deviceConfig.inputs[inputId].inputKeyCode;
+		if (newInputId !== undefined) {
+			keyCode = this.deviceConfig.inputs[newInputId-1].inputKeyCode;
+			this.log.warn('%s: setActiveIdentifier newActiveIdentifier %s inputs keyCode %s', this.name, newInputId, keyCode );
 		}
 		// send only if a keycode exists
 		if ((keyCode || {}).length > 0) {
 			this.sendKey(keyCode);
 
 			var currentInputName; // default empty
-			if ((inputId >= 0) && (inputId < this.inputServices.length)) { 
-				currentInputName = this.inputServices[inputId].getCharacteristic(Characteristic.ConfiguredName).value; 
+			// Remember: newInputId is 1-based, but the array is zero-based, so subtract 1
+			if ((newInputId > 0) && (newInputId <= this.inputServices.length)) { 
+				currentInputName = this.inputServices[newInputId-1].getCharacteristic(Characteristic.ConfiguredName).value; 
 			}
-			this.log.warn('%s: setInput setting active identifier to: %s [%s]', this.name, inputId, currentInputName );
+			this.log.warn('%s: setActiveIdentifier setting newInputId to: %s [%s]', this.name, newInputId, currentInputName );
 	
-			this.currentInputId = inputId; // persist to homebridge
-			this.televisionService.getCharacteristic(Characteristic.ActiveIdentifier).updateValue(inputId);
+			this.currentInputId = newInputId; // persist to homebridge, InputId is the Identifier value, which is 1-based. ActiveIdentifier is zero-based
+			this.televisionService.getCharacteristic(Characteristic.ActiveIdentifier).updateValue(newInputId);
 		}
 
 		// disabled in v1.1.0, we now allow the persistance of the selected value
 		/*
 		// immediately reset the input back to nothing to clear any scenes and clear the tile display
 		if (this.televisionService.getCharacteristic(Characteristic.ActiveIdentifier).value != NO_INPUT_ID) {
-			this.log.warn('%s: setInput setting ActiveIdentifier to NO_INPUT_ID %s :', this.name, NO_INPUT_ID);
+			this.log.warn('%s: setActiveIdentifier setting ActiveIdentifier to NO_INPUT_ID %s :', this.name, NO_INPUT_ID);
 			this.televisionService.getCharacteristic(Characteristic.ActiveIdentifier).updateValue(NO_INPUT_ID);
 		} else {
-			this.log.debug('%s: setInput: ActiveIdentifier OK, no need to change', this.name);
+			this.log.debug('%s: setActiveIdentifier: ActiveIdentifier OK, no need to change', this.name);
 		}
 		*/
 		return
