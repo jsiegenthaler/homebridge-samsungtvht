@@ -7,9 +7,10 @@ All notable changes to this project will be documented in this file.
 
 
 
-## 1.1.0-beta.3 (2024-09-21)
-TODO: default the input to input 0 (first in list)
-* Adapted behaviour to allow the selected Accessory input to remain selected (issue #23)
+## 1.1.0-beta.3 (2024-09-28)
+* Set default input to identifier 0 (first in list) on startup to ensure HomeKit has a valid value
+* Adapted behaviour of input selection to allow the selected Accessory input to remain selected (issue #23)
+* Adapted syntax of getXXX and setXXX functions to use onGet/onSet for more readable code
 * Added support for Homebridge v2.0
 * Added logging of unknown remote buttons
 * Added StatusFault characteristic so that it appears in Shortcuts

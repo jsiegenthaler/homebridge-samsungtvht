@@ -31,7 +31,7 @@ var PLUGIN_ENV = ''; // controls the development environment, appended to UUID t
 
 
 // general constants
-const NO_INPUT_ID = 999; // default to input 999, no input
+const NO_INPUT_ID = 999 // default to input 999, no input
 const NO_INPUT_NAME = 'UNKNOWN'; // an input name that does not exist
 const POWER_STATE_DEFAULT_POLLING_INTERVAL_MS = 3000; // default polling interval in millisec
 const POWER_STATE_MAX_TRANSITION_TIME_S = 30; // the maximum transition time we allow for a device to come online after a power ON command, default 30 s
@@ -147,6 +147,7 @@ class samsungTvHtPlatform {
 				}
 				}
 				// start the regular powerStateMonitor
+				// DISABLE FOR DEBUGGING THE CHANNEL NAME ISSUE
 				this.checkPowerInterval = setInterval(this.powerStateMonitor.bind(this), this.config.pingInterval * 1000 || POWER_STATE_DEFAULT_POLLING_INTERVAL_MS);
 		
 		});
@@ -292,7 +293,7 @@ class samsungTvHtDevice {
 		// initial states. Will be updated by code
 		this.currentPowerState; // deliberately leave at undefined to detect a reboot and inital start = Characteristic.Active.INACTIVE;
 		this.targetPowerState = this.currentPowerState;
-		this.currentInputId = NO_INPUT_ID;
+		this.currentInputId = 0; // default startup at input 0 (first in list) NO_INPUT_ID;
 		this.currentMediaState = Characteristic.CurrentMediaState.STOP; // default stop
 		this.targetMediaState = this.currentMediaState;
 		this.powerLastKeyPress = new Date("1900-01-01T00:00:00Z"); // set a valid date but many years in the past
@@ -368,7 +369,11 @@ class samsungTvHtDevice {
 			.setCharacteristic(Characteristic.Model, this.deviceConfig.modelName || PLATFORM_NAME)
 			.setCharacteristic(Characteristic.SerialNumber, this.deviceConfig.serialNumber || 'unknown')
 			.setCharacteristic(Characteristic.FirmwareRevision, this.deviceConfig.firmwareRevision || PLUGIN_VERSION) // must be numeric. Non-numeric values are not displayed
+			// optional characteristics
+			// if ConfiguredName is not supplied, the accessory name and input source names may appear as default names (Input Source, Input Source 2, Input Source 3, etc)
+			.setCharacteristic(Characteristic.ConfiguredName, this.name) // required for iOS18
 
+		this.log.warn('%s: prepareAccessoryInformationService: informationService:', this.name, informationService);
 		this.accessory.addService(informationService);
 	}
 
@@ -380,7 +385,7 @@ class samsungTvHtDevice {
 			this.log.warn('%s: prepareTelevisionService', this.name);
 		}
 		//this.televisionService = new Service.Television(this.name, 'televisionService');
-		this//.televisionService = new Service.Television(null, 'televisionService');
+		//this.televisionService = new Service.Television(null, 'televisionService');
 		this.televisionService = new Service.Television(this.name, 'televisionService');
 		this.televisionService
 			.setCharacteristic(Characteristic.ConfiguredName, this.name)
@@ -389,29 +394,34 @@ class samsungTvHtDevice {
 			.setCharacteristic(Characteristic.StatusFault, Characteristic.StatusFault.NO_FAULT) // NO_FAULT or GENERAL_FAULT
 			//.setCharacteristic(Characteristic.InUse, Characteristic.InUse.NOT_IN_USE) // NOT_IN_USE or IN_USE
 		
-		/* // not yet working
-		this.televisionService.getCharacteristic(Characteristic.ConfiguredName)
-			.on('get', this.getDeviceName.bind(this))
-			.on('set', (newName, callback) => { this.setDeviceName(newName, callback); });
-		*/
-
 		// power
 		this.televisionService.getCharacteristic(Characteristic.Active)
-			.on('get', this.getPower.bind(this))
-			.on('set', this.setPower.bind(this));
+			.onGet(this.getPower.bind(this))
+			.onSet(this.setPower.bind(this));
 
 		// active input
 		this.televisionService.getCharacteristic(Characteristic.ActiveIdentifier)
-			.on('get', this.getInput.bind(this))
-			.on('set', (newInputIdentifier, callback) => { this.setInput(this.inputList[newInputIdentifier], callback); });
+			.onGet(this.getInput.bind(this))
+			.onSet(this.setInput.bind(this));
+
+		// configured name - added to log the calls to get configured name
+		this.televisionService.getCharacteristic(Characteristic.ConfiguredName)
+			.onGet(this.getConfiguredName.bind(this))
+			.onSet(this.setConfiguredName.bind(this));
 
 		// remote control keys in the Apple TV Remote app
 		this.televisionService.getCharacteristic(Characteristic.RemoteKey)
-			.on('set', this.setRemoteKey.bind(this));
+			.onSet(this.setRemoteKey.bind(this));
 
 		// the View TV Settings menu item
 		this.televisionService.getCharacteristic(Characteristic.PowerModeSelection)
-			.on('set', this.setPowerModeSelection.bind(this));
+			.onSet(this.setPowerModeSelection.bind(this));
+
+		// display order of the channels
+		this.televisionService.getCharacteristic(Characteristic.DisplayOrder)
+			.onGet(this.getDisplayOrder.bind(this))
+			.onSet(this.setDisplayOrder.bind(this));
+
 
 
 		// Experimenting with removing some unwanted optional characteristics
@@ -453,13 +463,13 @@ class samsungTvHtDevice {
 		this.speakerService = new Service.TelevisionSpeaker(this.name + ' Speaker', 'speakerService');
 		this.speakerService
 			.setCharacteristic(Characteristic.Active, Characteristic.Active.ACTIVE)
-			.setCharacteristic(Characteristic.VolumeControlType, Characteristic.VolumeControlType.RELATIVE);
-		this.speakerService.getCharacteristic(Characteristic.VolumeSelector)  // the volume selector allows the iOS device keys to be used to change volume
-			.on('set', (direction, callback) => { this.setVolume(direction, callback); });
-		this.speakerService.getCharacteristic(Characteristic.Volume)
-			.on('set', this.setVolume.bind(this));
+			.setCharacteristic(Characteristic.VolumeControlType, Characteristic.VolumeControlType.RELATIVE); // only relative is supported for the Apple Remote with Up/Down buttons
+		this.speakerService.getCharacteristic(Characteristic.VolumeSelector)  // the volume selector, increment or decrement, allows the iOS device keys to be used to change volume
+			.onSet(this.setVolume.bind(this));
+		//this.speakerService.getCharacteristic(Characteristic.Volume) // percentage, 0-100
+		//	.onSet(this.setVolume.bind(this));
 		this.speakerService.getCharacteristic(Characteristic.Mute)
-			.on('set', this.setMute.bind(this));
+			.onSet(this.setMute.bind(this));
 
 		this.accessory.addService(this.speakerService);
 		this.televisionService.addLinkedService(this.speakerService);
@@ -479,11 +489,14 @@ class samsungTvHtDevice {
 
 		//this.inputList.push({inputId: '0', inputName: 'Dummy'});
 		// add dummy entry at index 999 for the inputList
+		/*
 		var defaultEntry = {
 			inputId: NO_INPUT_ID,
 			inputName: NO_INPUT_NAME 
 		}
 		this.inputList.push(defaultEntry);
+		*/
+		this.inputList = [];
 		//this.log(defaultEntry);
 		this.displayOrder = [];
 
@@ -495,8 +508,9 @@ class samsungTvHtDevice {
 		// HomeKit gets upset when the number of inputs changes. So configure 20 always, set conf and vis states if a deviceconfig exists
 		//this.log.warn('%s: prepareInputSourceServices inputs',this.name, this.deviceConfig.inputs);
 		if (this.deviceConfig.inputs){
-			for (let i = 0; i < 20; i++) {
-				this.log.debug('%s: prepareInputSourceServices loading input %s',this.name,i+1,this.deviceConfig.inputs[i] || 'no config found');
+			for (let i = 0; i < 4; i++) { // was 20
+
+				this.log('%s: prepareInputSourceServices loading input %s',this.name,i,this.deviceConfig.inputs[i] || 'no config found');
 				// show only if the deviceConfig setting exists
 				var configState = Characteristic.IsConfigured.NOT_CONFIGURED;
 				var visState = Characteristic.CurrentVisibilityState.HIDDEN;
@@ -504,10 +518,12 @@ class samsungTvHtDevice {
 					configState = Characteristic.IsConfigured.CONFIGURED;
 					visState = Characteristic.CurrentVisibilityState.SHOWN;
 				}
-				let inputService = new Service.InputSource(1, "input" + (i+1).toString() );
+				let inputService = new Service.InputSource('input' + i.toString(), 'input' + i.toString()); // displayName, subtype
+				// create 0-based array as ActiveIdentifier is 0-based
+				// note that this.deviceConfig.inputs[] is 1-based
 				inputService
-					.setCharacteristic(Characteristic.Identifier, i+1)
-					.setCharacteristic(Characteristic.ConfiguredName, (this.deviceConfig.inputs[i] || {}).inputName || 'input' + (i+1).toString())
+					.setCharacteristic(Characteristic.Identifier, i)
+					.setCharacteristic(Characteristic.ConfiguredName, (this.deviceConfig.inputs[i] || {}).inputName || 'input' + i.toString()) // Initial configured name is "inputN", Input text is 0-based
 					.setCharacteristic(Characteristic.InputSourceType, (this.deviceConfig.inputs[i] || {}).inputSourceType || Characteristic.InputSourceType.HDMI)
 					.setCharacteristic(Characteristic.InputDeviceType, (this.deviceConfig.inputs[i] || {}).inputDeviceType || Characteristic.InputDeviceType.TV)
 					.setCharacteristic(Characteristic.IsConfigured, configState)
@@ -522,18 +538,21 @@ class samsungTvHtDevice {
 				// add DisplayOrder, see :
 				// https://github.com/homebridge/HAP-NodeJS/issues/644
 				// https://github.com/ebaauw/homebridge-zp/blob/master/lib/ZpService.js  line 916: this.displayOrder.push(0x01, 0x04, identifier & 0xff, 0x00, 0x00, 0x00)
-				//this.displayOrder.push(0x01, 0x04, i & 0xff, 0x00, 0x00, 0x00);
-				//                       type  len   inputId  empty empty empty
+
+				// store in a displayOrder[] array with same index number
+				// this.displayOrder.push(0x01, 0x04, i & 0xff, 0x00, 0x00, 0x00);
+				//                        type  len   inputId  empty empty empty
 				//this.displayOrder.push(0x01, 0x04,       i, 0x00, 0x00, 0x00);
 				// inputId is the inputIdentifier (not the index), starting index 0 = identifier 1
 				// types:
 				// 	0x00 end of TLV item
 				// 	0x01 identifier...new TLV item for displayOrder
-				// length:	Number of following bytes, excluding type and len fields
+				// length:	Number of following bytes, excluding type and len fields.
 				// value:	A number of <len> bytes. Can be empty if length=0
 				// 0x01 0x01 xx is a valid TLV8 as it contains only 1 data byte.
-				// the data must be a single 8-bit byte, hence the logical AND with 0xff
-				this.displayOrder.push(0x01, 0x01, i & 0xff); // 0x01 0x01 0xXX
+				// for displayOrder, the length should be 4 bytes. If shorter, it will not sort properly in iOs18
+				// AQQAAAAAAQQBAAAAAQQCAAAAAQQDAAAAAAA= = 010400000000,010401000000,010402000000,010403000000,0000 (including closing 0000)
+				this.displayOrder.push(0x01, 0x04, i & 0xff, 0x00, 0x00, 0x00)
 
 			}
 			// close off the TLV8 by sending 0x00 0x00
@@ -731,19 +750,19 @@ class samsungTvHtDevice {
   	//+++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 	// get power state
-	async getPower(callback) {
-		// fired when the user clicks away from the Remote Control, regardless of which TV was selected
+	async getPower() {
+			// fired when the user clicks away from the Remote Control, regardless of which TV was selected
 		// fired when HomeKit wants to refresh the TV tile in HomeKit. Refresh occurs when tile is displayed.
 		// currentPowerState is updated by the polling mechanisn
 		//this.log('getPowerState current power state:', currentPowerState);
 		if (this.debugLevel > 1) { 
 			this.log.warn('%s: getPower returning %s [%s]', this.name, this.currentPowerState || Characteristic.Active.INACTIVE, powerStateName[this.currentPowerState || Characteristic.Active.INACTIVE]); 
 		}
-		callback(null, this.currentPowerState || Characteristic.Active.INACTIVE); // return current state: 0=off, 1=on. Default to OFF if null.
+		return this.currentPowerState || Characteristic.Active.INACTIVE; // return current state: 0=off, 1=on. Default to OFF if null.
 	}
 
 	// set power state
-	async setPower(targetPowerState, callback) {
+	async setPower(targetPowerState) {
 		// fired when the user clicks the power button in the TV accessory in HomeKit
 		// fired when the user clicks the TV tile in HomeKit
 		// fired when the first key is pressed after opening the Remote Control
@@ -778,20 +797,43 @@ class samsungTvHtDevice {
 			// if current is already same as target
 			this.log.debug("%s: Current power state is already %s [%s], doing nothing", this.name, this.currentPowerState, powerStateName[this.currentPowerState]);
 		}
-		callback(); 
+		return
 	}
 
+	// get configured name
+	async getConfiguredName() {
+		// trial to see if this is called during bootup
+		if (this.debugLevel > 1) { 
+			this.log.warn('%s: getConfiguredName called', this.name); 
+		}
+		var currentConfiguredName = this.televisionService.getCharacteristic(Characteristic.ConfiguredName).value; 		
+		this.log.warn("%s: getConfiguredName returning '%s'", this.name, currentConfiguredName); 
+		return currentConfiguredName
+	}
+
+	// set configured name
+	async setConfiguredName(newName) {
+		// trial to see if this is called during bootup
+		if (this.debugLevel > 1) { 
+			this.log.warn('%s: setConfiguredName: newName %s', this.name, newName); 
+		}
+		return
+	}
+
+
 	// set mute state
-	async setMute(muteState, callbackMute) {
+	async setMute(muteState) {
 		// sends the mute command
 		// works for TVs that accept a mute toggle command
+		// muteState = Boolean = True (muted) or false (notMuted)
 		if (this.debugLevel > 0) {
 			this.log.warn('%s: setMute: muteState:', this.name, muteState);
 		}
-
+		/*
 		if (callbackMute && typeof(callbackMute) === 'function') { 
 			callbackMute();
 		}
+			*/
  
 		// mute state is a boolean, either true or false
 		// const NOT_MUTED = 0, MUTED = 1;
@@ -801,17 +843,17 @@ class samsungTvHtDevice {
 		if (keyCode.length > 0) {
 			this.sendKey(keyCode);
 		}
+		return
 	}
 
 
 	// set volume
-	async setVolume(volumeSelectorValue, callback) {
+	async setVolume(volumeSelectorValue) {
 		// set the volume of the TV using bash scripts
 		// so volume must be handled over a different method
 		// here we send execute a bash command on the raspberry pi using the samsungctl command
 		// to control the authors samsung stereo at 192.168.0.152
 		if (this.debugLevel > 0) { this.log.warn('%s: setVolume: volumeSelectorValue:', this.name, volumeSelectorValue); }
-		callback(null); // for rapid response
 
 		// volumeSelectorValue: only 2 values possible: INCREMENT: 0, DECREMENT: 1,
 		this.log.debug('%s: setVolume: Set volume: %s', (volumeSelectorValue === Characteristic.VolumeSelector.DECREMENT) ? 'Down' : 'Up');
@@ -841,50 +883,46 @@ class samsungTvHtDevice {
 		if ((keyCode || {}).length > 0) {
 			this.sendKey(keyCode);
 		}
+		return
 	}
 
 	// get input
-	async getInput(callback) {
+	async getInput() {
 		// fired when the user clicks away from the iOS Device TV Remote Control, regardless of which TV was selected
 		// fired when the icon is clicked in HomeKit and HomeKit requests a refresh
 		// currentInputId is updated by the polling mechanisn
 		// must return a valid index, and must never return null
+		// Input 0 is the first entry in the input list, input 1 the next, and so on
 		this.log.warn('%s: getInput: called, this.currentInputId:', this.name, this.currentInputId);
 
 		// find the currentInputId in the inputs and return the currentActiveInput once found
 		// this allows HomeKit to show the selected current input
-		
-		// reenabled for v1.1.0
-		var currentInputName = NO_INPUT_NAME;
-		var currentActiveInput = this.inputServices.findIndex(input => input.inputId === this.currentInputId);
-		this.log.warn('%s: getInput: called, this.inputServices:', this.name, this.inputServices);
-		this.log.warn('%s: getInput: called, this.inputServices[1].characteristics', this.name, this.inputServices[1].characteristics);
-
-		this.log.warn('%s: getInput: called, currentActiveInput:', this.name, currentActiveInput);
+		// search for input by the subtype, which is configured as "inputN" where N is the index: 0=first, 1=next, and so on
+		//this.log.warn('%s: getInput: this.inputServices:', this.name, this.inputServices);
+		var currentActiveInput = this.inputServices.findIndex(input => input.displayName === 'input' + this.currentInputId); // returns -1 if not found
 		if (currentActiveInput == -1) { currentActiveInput = NO_INPUT_ID } // if nothing found (-1), set to NO_INPUT_ID to clear the name from the Home app tile
-		if ((currentActiveInput > -1) && (currentActiveInput != NO_INPUT_ID)) { 
+
+		// get name if currentActiveInput is within bounds of the inputServices array
+		var currentInputName; // default empty
+		if ((currentActiveInput >= 0) && (currentActiveInput < this.inputServices.length)) { 
 			currentInputName = this.inputServices[currentActiveInput].getCharacteristic(Characteristic.ConfiguredName).value; 
 		}
-		
-		// return the fixed no input always. This prevents the input name from being displayed on the home tile
-		// disabled in v1.1.0, we now allow the persistance of the selected value
-		/*
-		const currentActiveInput = NO_INPUT_ID;
-		const currentInputName = NO_INPUT_NAME;
-		*/
 
 		if (this.debugLevel > 0) { 
-			this.log.warn('%s: getInput returning input %s [%s]', this.name, currentActiveInput, currentInputName);
+			this.log.warn('%s: getInput returning currentActiveInput input %s [%s]', this.name, currentActiveInput, currentInputName || NO_INPUT_NAME);
 		}
 
-		callback(null, currentActiveInput);
+		return currentActiveInput;
 	}
 
 	// set input
-	async setInput(input, callback) {
-		if ((this.debugLevel > 0) & (input !== undefined)) {
-			this.log.warn('%s: setInput input:', this.name,input.inputId.value, input.inputName.value, this.deviceConfig.inputs[input.inputId.value-1].inputKeyCode);
-		}
+	async setInput(inputId) {
+		// inputId is an integer, 0 is the first entry in the input list, input 1 the next, and so on
+		this.log.warn('%s: setInput inputId:', this.name,inputId);
+		//this.log.warn('%s: setInput input:', this.name,input.value, input.inputName.value);
+		//if ((this.debugLevel > 0) & (inputId !== undefined)) {
+			//this.log.warn('%s: setInput input:', this.name,input.inputId.value, input.inputName.value);
+		//}
 		
 		//one day I'll implement the HDMI CEC input control, then I'll need these functions:
 		/*
@@ -897,15 +935,21 @@ class samsungTvHtDevice {
 		
 		// get keycode only if we have an input (sometimes not defined)
 		var keyCode = '';
-		if (input !== undefined) {
-			keyCode = this.deviceConfig.inputs[input.inputId.value-1].inputKeyCode;
+		if (inputId !== undefined) {
+			keyCode = this.deviceConfig.inputs[inputId].inputKeyCode;
 		}
 		// send only if a keycode exists
 		if ((keyCode || {}).length > 0) {
 			this.sendKey(keyCode);
-			this.log.warn('%s: setInput setting active identifier to:', this.name, input.inputId.value);
-			this.currentInputId = input.inputId.value; // persist to homebridge
-			this.televisionService.getCharacteristic(Characteristic.ActiveIdentifier).updateValue(input.inputId.value);
+
+			var currentInputName; // default empty
+			if ((inputId >= 0) && (inputId < this.inputServices.length)) { 
+				currentInputName = this.inputServices[inputId].getCharacteristic(Characteristic.ConfiguredName).value; 
+			}
+			this.log.warn('%s: setInput setting active identifier to: %s [%s]', this.name, inputId, currentInputName );
+	
+			this.currentInputId = inputId; // persist to homebridge
+			this.televisionService.getCharacteristic(Characteristic.ActiveIdentifier).updateValue(inputId);
 		}
 
 		// disabled in v1.1.0, we now allow the persistance of the selected value
@@ -918,25 +962,20 @@ class samsungTvHtDevice {
 			this.log.debug('%s: setInput: ActiveIdentifier OK, no need to change', this.name);
 		}
 		*/
-		// start an async service to reset after 500ms
-		//this.log('processing wait of %s ms', delay);
-		//await waitprom(500);
-		//this.log('wait done');
-
-		callback();
+		return
 	}
 
 	// set input name
-	async setInputName(inputName, callback) {
+	async setInputName(inputName) {
 		// fired by the user changing an input name in Home app accessory setup
 		if (this.debugLevel > 0) {
 			this.log.warn('%s: setInputName inputName:', this.name, inputName);
 		}
-		callback();
+		return
 	};
 
 	// set power mode selection (View TV Settings menu option)
-	async setPowerModeSelection(state, callback) {
+	async setPowerModeSelection(state) {
 		// fired by the View TV Settings command in the HomeKit TV accessory Settings
 		if (this.debugLevel > 0) {
 			this.log.warn('%s: setPowerModeSelection state:', this.name, state);
@@ -948,32 +987,32 @@ class samsungTvHtDevice {
 		} else {
 			this.log('%s: Power is Off. View TV Settings command not sent', this.name);
 		}
-		callback();
+		return
 	}
 
 	// get current media state
-	async getCurrentMediaState(callback) {
+	async getCurrentMediaState() {
 		// fired by ??
 		// cannot be controlled by Apple Home app, but could be controlled by other HomeKit apps
 		if (this.debugLevel > 0) {
 			this.log.warn('%s: getCurrentMediaState returning %s [%s]', this.name, this.currentMediaState, mediaStateName[this.currentMediaState]);
 		}
-		callback(null, this.currentMediaState);
+		return this.currentMediaState;
 	}
 
 	// get target media state
-	async getTargetMediaState(callback) {
+	async getTargetMediaState() {
 		// fired by ??
 		// cannot be controlled by Apple Home app, but could be controlled by other HomeKit apps
 		// must never return null, so send STOP as default value
 		if (this.debugLevel > 0) {
 			this.log.warn('%s: getTargetMediaState returning %s [%s]', this.name, this.targetMediaState, mediaStateName[this.targetMediaState]);
 		}
-		callback(null, this.currentMediaState);
+		return this.currentMediaState;
 	}
 
 	// set target media state
-	async setTargetMediaState(targetState, callback) {
+	async setTargetMediaState(targetState) {
 		// fired by ??
 		// cannot be controlled by Apple Home app, but could be controlled by other HomeKit apps
 		if (this.debugLevel > 1) { this.log.warn('%s: setTargetMediaState this.targetMediaState:',this.name, targetState, mediaStateName[targetState]); }
@@ -992,30 +1031,34 @@ class samsungTvHtDevice {
 				this.setMediaState(this.currentInputId, 0)
 				break;
 			}
+		return
 	}
 
 	// get display order
-	async getDisplayOrder(callback) {
+	async getDisplayOrder() {
 		// fired when the user clicks away from the iOS Device TV Remote Control, regardless of which TV was selected
 		// fired when the icon is clicked in HomeKit and HomeKit requests a refresh
 		// log the display order
-		let dispOrder = this.televisionService.getCharacteristic(Characteristic.DisplayOrder).value;
-		if (this.config.debugLevel > 1) { this.log.warn("%s: getDisplayOrder returning '%s'", this.name, dispOrder); }
-		callback(null, dispOrder);
+		// Buffer.from(this.displayOrder).toString('base64')
+		let displayOrder = this.televisionService.getCharacteristic(Characteristic.DisplayOrder).value;
+		if (this.config.debugLevel > 1) { 
+			this.log.warn("%s: getDisplayOrder returning '%s'", this.name, displayOrder); 
+			this.log.warn("%s: getDisplayOrder buffer is '%s'", this.name, Buffer.from(this.displayOrder).toString('base64')); 
+		}
+		return displayOrder;
 	}
 
 	// set display order
-	async setDisplayOrder(displayOrder, callback) {
+	async setDisplayOrder(displayOrder) {
 		// fired when the user clicks away from the iOS Device TV Remote Control, regardless of which TV was selected
 		// fired when the icon is clicked in HomeKit and HomeKit requests a refresh
 		if (this.config.debugLevel > 1) { this.log.warn('%s: setDisplayOrder displayOrder',this.name, displayOrder); }
-		callback();
+		return
 	}
 
 	// set remote key
-	async setRemoteKey(remoteKey, callback) {
+	async setRemoteKey(remoteKey) {
 		if (this.config.debugLevel > 1) { this.log.warn('%s: setRemoteKey: remoteKey:', this.name, remoteKey); }
-		callback(); // for rapid response
 
 		// remoteKey is the key pressed on the Apple TV Remote in the Control Center
 		// keys 0...15 exist, but keys 12, 13 & 14 are not defined by Apple
@@ -1221,6 +1264,7 @@ class samsungTvHtDevice {
 			}
 		}
 		this.lastRemoteKeyPressed = remoteKey; // store the current key as last key pressed
+		return
 	}	
 
   	//+++++++++++++++++++++++++++++++++++++++++++++++++++++
