@@ -20,7 +20,7 @@ All notable changes to this project will be documented in this file.
 * Updated iOS and Homebridge version references in README.md
 * Updated comments for Mute and Power buttons for iOS18 in README.md
 * Bumped engines: "homebridge": "^1.9.0||^2.0.0-beta"
-* Bumped engines: "node": "^20.18.0"
+* Bumped engines: "node": "^22.14.0"
 * Still contains some debug info in the beta version
 
 ## 1.0.14 (2024-05-22)
