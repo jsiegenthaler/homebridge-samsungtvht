@@ -439,7 +439,7 @@ Example configuration as used on the author's Samsung TV and Samsung HT:
                             
 
 #### Supported Key Codes
-Commonly used remote control key codes are supplied as defaults, but you can customise the key codes as you wish. See the [samsung-tvht wiki](https://github.com/jsiegenthaler/homebridge-samsungtvht/wiki) for full details of all key codes.
+Commonly used remote control key codes are supplied as defaults, but you can customise the key codes as you wish. See the Wiki [Key Codes](https://github.com/jsiegenthaler/homebridge-samsungtvht/wiki/Key-Codes) page for full details of all key codes.
 
 
 
