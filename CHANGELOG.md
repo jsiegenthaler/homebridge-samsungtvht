@@ -6,6 +6,25 @@ All notable changes to this project will be documented in this file.
 ### Bug Fixes and Improvements
 
 
+
+## 1.1.0 (2025-02-13)
+* Added support for Homebridge v2.0
+* Adapted behaviour of input selection to allow the selected Accessory input to remain selected (issue #23)
+* Adapted default input to identifier 1 (first in list) on startup to ensure HomeKit has a valid value
+* Added logging of unknown remote buttons
+* Added StatusFault characteristic so that it appears in Shortcuts as a preparation for future features
+* Fixed some issues with Input Identifier
+* Fixed bug where the Name characteristic was not displayed in Shortcuts
+* Fixed bug where input name was not properly displayed in logs for updateDeviceState 
+* Fixed small typos in config.json
+* Improved code around getXXX and setXXX functions to use onGet/onSet for better readability
+* Improved some text in README.md
+* Updated iOS and Homebridge version references in README.md
+* Updated comments for Mute and Power buttons for iOS18 in README.md
+* Bumped engines: "homebridge": "^1.9.0||^2.0.0-beta"
+* Bumped engines: "node": "^22.14.0"
+
+
 ## 1.0.14 (2024-05-22)
 * Updated iOS version references in README.md
 

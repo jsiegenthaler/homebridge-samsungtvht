@@ -113,7 +113,7 @@
                     "type": {
                         "title": "Device Type",
                         "type": "string",
-                        "description": "Controls the icon displayed on the tile in Home app. Default: Television",
+                        "description": "Controls the icon displayed on the tile in the Home app. Default: Television",
                         "default": "television",
                         "oneOf": [
                             { "title": "Television", "enum": ["television"] },
@@ -236,9 +236,6 @@
                     },
 
                             
-
-
-
                     "arrowUpButton": {
                         "title": "Arrow Up (single tap)",
                         "type": "string",

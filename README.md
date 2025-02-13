@@ -21,7 +21,7 @@ Supported TVs and HTs are:
 * ES-series and EH-series from 2012
 * F-series from 2013
 
-| iOS/iPadOS 16/17 Accessory Tiles | Older iOS/iPadOS Accessory Tiles |
+| iOS/iPadOS 16/17/18 Accessory Tiles | Older iOS/iPadOS Accessory Tiles |
 | :---         |     :---:      |
 | <img src="https://github.com/jsiegenthaler/homebridge-samsungtvht/blob/master/pics/AccessoryTilesTVHT.png" alt="AccessoryTilesTVHT" height="60" align="center"> | <img src="https://github.com/jsiegenthaler/homebridge-samsungtvht/blob/master/pics/AccessoryTilesTVHTiOS15.png" alt="AccessoryTilesTVHTiOS15" height="80" align="center"> |
 
@@ -32,7 +32,7 @@ This plugin displays your Samsung device as a TV or Audio Receiver Accessory wit
 Supports multiple devices, allowing you to create an accessory for each TV or Home Theater system (should you have more than one).
 Supports HT devices such as HT-D5500, HT-D5530, HT-D5550, HT-D6500.
 
-Works with Samesung C, D, E, F series TVs using Orsay OS. Does not work with Samsung TVs using the Tizen OS. Tizen = TVs made from 2015.
+Works with Samsung C, D, E, F series TVs using Orsay OS. Does not work with Samsung TVs using the Tizen OS. Tizen = TVs made from 2015.
 
 If you like this plugin, consider buying me a coffee!<br>
 <a target="blank" href="https://ko-fi.com/jsiegenthaler"><img src="https://img.shields.io/badge/Ko--Fi-Buy%20me%20a%20coffee-29abe0.svg?logo=ko-fi"/></a>
@@ -41,8 +41,8 @@ If you like this plugin, consider buying me a coffee!<br>
 This plugin was written and tested on the author's Samsung D-series TV and D-series Home Theater system in Switzerland.
 
 ## Requirements
-* An Apple iPhone or iPad with iOS/iPadOS 14.0 (or later). Developed on iOS/iPadOS 14.1...17.5, earlier versions not tested.
-* [Homebridge](https://homebridge.io/) v1.7.0 (or later). Developed on Homebridge 1.1.116....1.7.0, earlier versions not tested.
+* An Apple iPhone or iPad with iOS/iPadOS 14.0 (or later). Developed on iOS/iPadOS 14.1...18.4, earlier versions not tested.
+* [Homebridge](https://homebridge.io/) v1.9.0 (or later). Developed on Homebridge 1.1.116....1.9.0, earlier versions not tested.
 * An Orsay (non-Tizen) Samsung TV or Home Theater system from C-series (2010), D-series (2011), E-series (2012), F-series (2013) models. Orsay started in 2011, Tizen started in 2015, so TVs and HTs from 2011 to 2015 generally work with this plugin. May also work on some later models as well.
 * The TV or Home Theater system must be connected to your home network via Ethernet LAN cable, or WiFi.
 * The TV or Home Theater system must have Network Remote Control turned on.
@@ -81,11 +81,13 @@ If adding a Home Theater, the icon displayed will be an Audio Receiver and some 
 Your new accessory will appear shortly in the room that you selected. It may show **Updating...** for a while. You can force a Home app refresh by displaying a different room and then going back again to the previous room.
 
 ## Remote Control Supported Keys
-To access the **Apple TV Remote**, open your **Control Center** by swiping down from the top (newer iPhones) or up from the bottom of the screen (older iPhones). If you do not see the remote control icon, you will need to activate it in **Settings > Control Centre** and ensure that the **Apple TV Remote** is in the list of **INCLUDED CONTROLS**.
+To access the **Apple TV Remote**, open your **Control Center** by swiping down from the top or up from the bottom of the screen (older iPhones). If you do not see the remote control icon, you will need to activate it in **Settings > Control Centre** and ensure that the **Apple TV Remote** is in the list of **INCLUDED CONTROLS**.
 
 The following keys are supported by in the **Apple TV Remote** in the Control Center:
 <img src="https://github.com/jsiegenthaler/homebridge-samsungtvht/blob/master/pics/RemoteControl.png" alt="RemoteControl" height="300" align="right">
 
+* Mute
+* Power
 * Navigation (Up/Down/Left/Right)	
 * OK
 * Play/Pause
@@ -96,10 +98,8 @@ The following keys are supported by in the **Apple TV Remote** in the Control Ce
 
 All remote control buttons are fully configurable and can send any [key code](https://github.com/jsiegenthaler/homebridge-samsungtvht/wiki/Key-Codes).
 
-The following keys are visible in the **Apple TV Remote** as of iOS 17, but they cannot be used (they remain disabled):
+Note: in iOS 16 and 17, the Mute and Power keys are visible in the **Apple TV Remote** but they are disabled and cannot be used. In iOs 18, the buttons are visible and can be used.
 
-* Mute
-* Power
 
 ## Accessory Supported Functions
 ### Power
@@ -114,7 +114,7 @@ You can configure up to 20 inputs in the plugin config. The inputs can send any 
 The Accessory settings icon command **View TV Settings** will open the TV or Home Theater's menu.
 
 ### Multi Key Sequences (Macros) Supported
-The plugin can send multiple key codes, separate the key codes with spaces. Keys are sent at intervals of 100ms, but can be changed by inserting a wait(ms) in the key code sequence. To select TV channel 12 by sending TV, waiting 200ms, then sending keys 1, 2 and Enter, use: `KEY_TV wait(200) KEY_1 KEY_2 KEY_ENTER`
+The plugin can send multiple key codes, separate the key codes with spaces. Keys are sent at intervals of 100ms, but can be changed by inserting a wait(ms) in the key code sequence. To select TV channel 12 by sending TV, waiting 200ms, then sending keys 1, 2 and Enter, use: `KEY_TV wait(200) KEY_1 KEY_2 KEY_ENTER`. See the [Multi Key Sequences (Macros)](https://github.com/jsiegenthaler/homebridge-samsungtvht/wiki/Key-Codes#multi-key-sequences-macros) section of the [Key Codes](https://github.com/jsiegenthaler/homebridge-samsungtvht/wiki/Key-Codes) wiki page.
 
 ## Configuration
 ### Config via Settings
@@ -439,7 +439,7 @@ Example configuration as used on the author's Samsung TV and Samsung HT:
                             
 
 #### Supported Key Codes
-Commonly used remote control key codes are supplied as defaults, but you can customise the key codes as you wish. See the [samsung-tvht wiki](https://github.com/jsiegenthaler/homebridge-samsungtvht/wiki) for full details of all key codes.
+Commonly used remote control key codes are supplied as defaults, but you can customise the key codes as you wish. See the [Key Codes](https://github.com/jsiegenthaler/homebridge-samsungtvht/wiki/Key-Codes) wiki page for full details of all key codes.
 
 
 
