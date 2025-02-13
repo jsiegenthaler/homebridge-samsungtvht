@@ -32,7 +32,7 @@ This plugin displays your Samsung device as a TV or Audio Receiver Accessory wit
 Supports multiple devices, allowing you to create an accessory for each TV or Home Theater system (should you have more than one).
 Supports HT devices such as HT-D5500, HT-D5530, HT-D5550, HT-D6500.
 
-Works with Samesung C, D, E, F series TVs using Orsay OS. Does not work with Samsung TVs using the Tizen OS. Tizen = TVs made from 2015.
+Works with Samsung C, D, E, F series TVs using Orsay OS. Does not work with Samsung TVs using the Tizen OS. Tizen = TVs made from 2015.
 
 If you like this plugin, consider buying me a coffee!<br>
 <a target="blank" href="https://ko-fi.com/jsiegenthaler"><img src="https://img.shields.io/badge/Ko--Fi-Buy%20me%20a%20coffee-29abe0.svg?logo=ko-fi"/></a>
@@ -81,7 +81,7 @@ If adding a Home Theater, the icon displayed will be an Audio Receiver and some 
 Your new accessory will appear shortly in the room that you selected. It may show **Updating...** for a while. You can force a Home app refresh by displaying a different room and then going back again to the previous room.
 
 ## Remote Control Supported Keys
-To access the **Apple TV Remote**, open your **Control Center** by swiping down from the top (newer iPhones) or up from the bottom of the screen (older iPhones). If you do not see the remote control icon, you will need to activate it in **Settings > Control Centre** and ensure that the **Apple TV Remote** is in the list of **INCLUDED CONTROLS**.
+To access the **Apple TV Remote**, open your **Control Center** by swiping down from the top or up from the bottom of the screen (older iPhones). If you do not see the remote control icon, you will need to activate it in **Settings > Control Centre** and ensure that the **Apple TV Remote** is in the list of **INCLUDED CONTROLS**.
 
 The following keys are supported by in the **Apple TV Remote** in the Control Center:
 <img src="https://github.com/jsiegenthaler/homebridge-samsungtvht/blob/master/pics/RemoteControl.png" alt="RemoteControl" height="300" align="right">
@@ -114,7 +114,7 @@ You can configure up to 20 inputs in the plugin config. The inputs can send any 
 The Accessory settings icon command **View TV Settings** will open the TV or Home Theater's menu.
 
 ### Multi Key Sequences (Macros) Supported
-The plugin can send multiple key codes, separate the key codes with spaces. Keys are sent at intervals of 100ms, but can be changed by inserting a wait(ms) in the key code sequence. To select TV channel 12 by sending TV, waiting 200ms, then sending keys 1, 2 and Enter, use: `KEY_TV wait(200) KEY_1 KEY_2 KEY_ENTER`
+The plugin can send multiple key codes, separate the key codes with spaces. Keys are sent at intervals of 100ms, but can be changed by inserting a wait(ms) in the key code sequence. To select TV channel 12 by sending TV, waiting 200ms, then sending keys 1, 2 and Enter, use: `KEY_TV wait(200) KEY_1 KEY_2 KEY_ENTER`. See the [Multi Key Sequences (Macros) section of the Key Codes](https://github.com/jsiegenthaler/homebridge-samsungtvht/wiki/Key-Codes) wiki page.
 
 ## Configuration
 ### Config via Settings
