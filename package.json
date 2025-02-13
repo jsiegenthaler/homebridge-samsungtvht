@@ -6,7 +6,7 @@
   "displayName": "Homebridge Samsung TV HT",
   "description": "Add your Samsung TV (UE40D5000 and similar models) and Home Theater (HT-D5500 and similar models) to HomeKit",
   "author": "jsiegenthaler (https://github.com/jsiegenthaler/)",
-  "version": "1.1.0-beta.12",
+  "version": "1.1.0",
   "platformname": "samsungtvht",
   "dependencies": {
     "samsung-remote": "^1.6.2" 
