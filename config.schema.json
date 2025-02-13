@@ -236,7 +236,12 @@
                     },
 
                             
-
+                    "disableRemoteControl": {
+                        "title": "Disable Remote Control",
+                        "type": "boolean",
+                        "description": "The Apple Remote Control can be disabled (hidden) for this device. Default: Enable",
+                        "required": false
+                    },
 
 
                     "arrowUpButton": {
@@ -552,6 +557,7 @@
                         "title": "Remote Control, Volume Control and Menu Commands",
                         "expandable": true,
                         "items": [
+                            "devices[].disableRemoteControl",
                             {
                                 "key": "devices[]",
                                 "type": "section",
