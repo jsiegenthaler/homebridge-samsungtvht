@@ -7,9 +7,9 @@ All notable changes to this project will be documented in this file.
 
 
 
-## 1.1.0-beta.11 (2025-02-13)
+## 1.1.0-beta.12 (2025-02-13)
 * Fixed issues with Input Identifier
-* Set default input to identifier 1 (first in list) on startup to ensure HomeKit has a valid value
+* Adapted default input to identifier 1 (first in list) on startup to ensure HomeKit has a valid value
 * Adapted behaviour of input selection to allow the selected Accessory input to remain selected (issue #23)
 * Adapted syntax of getXXX and setXXX functions to use onGet/onSet for more readable code
 * Added support for Homebridge v2.0
