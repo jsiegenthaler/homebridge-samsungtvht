@@ -22,7 +22,7 @@ All notable changes to this project will be documented in this file.
 * Bumped engines: "homebridge": "^1.9.0||^2.0.0-beta"
 * Bumped engines: "node": "^22.14.0"
 
-* Still contains some debug info in the beta version -> removed in beta 9
+* Still contains some debug info in the beta version -> removed in beta 9, 10
 
 ## 1.0.14 (2024-05-22)
 * Updated iOS version references in README.md
