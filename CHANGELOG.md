@@ -7,7 +7,7 @@ All notable changes to this project will be documented in this file.
 
 
 
-## 1.1.0-beta.8 (2025-02-13)
+## 1.1.0-beta.9 (2025-02-13)
 * Fixed issues with Input Identifier
 * Set default input to identifier 1 (first in list) on startup to ensure HomeKit has a valid value
 * Adapted behaviour of input selection to allow the selected Accessory input to remain selected (issue #23)
@@ -21,7 +21,8 @@ All notable changes to this project will be documented in this file.
 * Updated comments for Mute and Power buttons for iOS18 in README.md
 * Bumped engines: "homebridge": "^1.9.0||^2.0.0-beta"
 * Bumped engines: "node": "^22.14.0"
-* Still contains some debug info in the beta version
+
+* Still contains some debug info in the beta version -> removed in beta 9
 
 ## 1.0.14 (2024-05-22)
 * Updated iOS version references in README.md
