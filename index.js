@@ -9,13 +9,16 @@ const PLUGIN_NAME = packagejson.name;
 const PLATFORM_NAME = packagejson.platformname;
 const PLUGIN_VERSION = packagejson.version;
 
-
 // required node modules
-//const fs = require('fs'); -- removed in 1.0.4, not needed
+// fs and path are in work, removed for release of 1.1.0
+// const fs = require('fs'); // needed for persisting configured names to disc
+// const path = require('path'); // needed for persisting configured names to disc
+
 //const fsPromises = require('fs').promises; -- removed in 1.0.4, not needed
-//const path = require('path'); -- removed in 1.0.4, not needed
 //import SamsungRemote from 'samsung-remote'; // https://github.com/natalan/samsung-remote
 const SamsungRemote = require('samsung-remote'); // https://github.com/natalan/samsung-remote
+
+
 
 
 
@@ -289,6 +292,15 @@ class samsungTvHtDevice {
 
 		//setup variables
 		this.accessoryConfigured = false;	// true when the accessory is configured
+
+		//filename and json used for the storage of device settings to persist after homebridge restarts
+		//in work, removed for release of 1.1.0
+		/*
+		this.persistFile = path.join(this.api.user.storagePath(), 'persist', 'AccessoryInfo.' + PLATFORM_NAME + '.' + this.deviceConfig.ipAddress.replaceAll('.', '_') + '.json');
+		console.log('persistFile set to ' + this.persistFile)
+		this.persistJson = ''
+		*/
+
 
 		// initial states. Will be updated by code
 		this.currentPowerState; // deliberately leave at undefined to detect a reboot and inital start = Characteristic.Active.INACTIVE;
@@ -807,6 +819,48 @@ class samsungTvHtDevice {
 		if (this.debugLevel > 1) { 
 			this.log.warn('%s: getConfiguredName called', this.name); 
 		}
+
+		//in work, removed for release of 1.1.0
+		/*
+		//create a constant filename for the storage of device settings to persist after homebridge restarts
+		//const filename = path.join(this.api.user.storagePath(), 'persist', 'AccessoryInfo.' + PLATFORM_NAME + '.' + this.deviceConfig.ipAddress.replaceAll('.', '_') + '.json');
+		//this.log("getConfiguredName filename", filename)
+
+		this.persistJson = JSON.parse('{"DeviceConfiguredName":"John"}');
+		this.log.warn('%s: getConfiguredName this.persistFile', this.name, this.persistFile); 
+		this.log.warn('%s: getConfiguredName this.persistJson', this.name, this.persistJson); 
+		const data = JSON.stringify(this.persistJson)
+		this.log.warn('%s: getConfiguredName data', this.name, data); 
+		fs.writeFile(this.persistFile, data, err => {
+		  if (err) {
+			this.log.warn('%s: getConfiguredName writeFile error', this.name); 
+			console.error("Error writing persistJson file:", err);
+		  } else {
+			this.log.warn('%s: getConfiguredName writeFile ok', this.name); 
+			// file written successfully
+		  }
+		});
+		
+
+		fs.readFile(this.persistFile, 'utf8', function (err, data) {
+			//console.log("Data: " + data )
+			console.log("Error: " + err )
+			if(!err) {
+				//Handle Success
+				console.log("Success" + data);
+				// Parse Data to JSON OR
+				//var jsonObj = JSON.parse(data)
+				//Send back as Response
+				//console.log( data );
+			} else {
+				//Handle Error
+				console.log("file read error", filename)
+				console.log("Error: " + err )
+			}
+		});
+		console.log(data);
+		*/
+
 		var currentConfiguredName = this.televisionService.getCharacteristic(Characteristic.ConfiguredName).value; 		
 		this.log.warn("%s: getConfiguredName returning '%s'", this.name, currentConfiguredName); 
 		return currentConfiguredName
@@ -818,6 +872,30 @@ class samsungTvHtDevice {
 		if (this.debugLevel > 1) { 
 			this.log.warn('%s: setConfiguredName: newName %s', this.name, newName); 
 		}
+
+		//in work, removed for release of 1.1.0
+		/*
+		// perist to Homwbridge persist folder
+		// storage path, constant
+		this.log("this.api.user.storagePath()", this.api.user.storagePath())
+		this.log("this.deviceConfig.ipAddress", this.deviceConfig.ipAddress)
+		const filename = path.join(this.api.user.storagePath(), 'persist', 'AccessoryInfo.' + PLATFORM_NAME + '.json');
+		this.log("filename", filename)
+
+		//this.log("jsonData", jsonData)
+		//let accConfName = 
+		//var jsonString = JSON.stringify(newName);
+		//this.log("jsonString", jsonString)
+
+
+		// write to file
+		fs.writeFile(filename, jsonString, function(err) {
+			if (err) {
+				this.log('persistConfig', err);
+			}
+		});
+		*/
+
 		return
 	}
 
@@ -1044,12 +1122,9 @@ class samsungTvHtDevice {
 	async getDisplayOrder() {
 		// fired when the user clicks away from the iOS Device TV Remote Control, regardless of which TV was selected
 		// fired when the icon is clicked in HomeKit and HomeKit requests a refresh
-		// log the display order
-		// Buffer.from(this.displayOrder).toString('base64')
 		let displayOrder = this.televisionService.getCharacteristic(Characteristic.DisplayOrder).value;
 		if (this.config.debugLevel > 1) { 
 			this.log.warn("%s: getDisplayOrder returning '%s'", this.name, displayOrder); 
-			this.log.warn("%s: getDisplayOrder buffer is '%s'", this.name, Buffer.from(this.displayOrder).toString('base64')); 
 		}
 		return displayOrder;
 	}
