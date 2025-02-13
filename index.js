@@ -862,7 +862,9 @@ class samsungTvHtDevice {
 		*/
 
 		var currentConfiguredName = this.televisionService.getCharacteristic(Characteristic.ConfiguredName).value; 		
-		this.log.warn("%s: getConfiguredName returning '%s'", this.name, currentConfiguredName); 
+		if (this.debugLevel > 1) { 
+			this.log.warn("%s: getConfiguredName returning '%s'", this.name, currentConfiguredName); 
+		}
 		return currentConfiguredName
 	}
 
