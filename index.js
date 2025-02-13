@@ -385,7 +385,7 @@ class samsungTvHtDevice {
 			// if ConfiguredName is not supplied, the accessory name and input source names may appear as default names (Input Source, Input Source 2, Input Source 3, etc)
 			.setCharacteristic(Characteristic.ConfiguredName, this.name) // required for iOS18
 
-		this.log.warn('%s: prepareAccessoryInformationService: informationService:', this.name, informationService);
+		//this.log.warn('%s: prepareAccessoryInformationService: informationService:', this.name, informationService);
 		this.accessory.addService(informationService);
 	}
 
@@ -974,7 +974,7 @@ class samsungTvHtDevice {
 		// must return a valid index, and must never return null
 		// Input 0 is the first entry in the input list, input 1 the next, and so on
 		// Active identifier (as retrieved in Shortcuts) 
-		this.log.warn('%s: getActiveIdentifier: called, this.currentInputId:', this.name, this.currentInputId);
+		//this.log.warn('%s: getActiveIdentifier: called, this.currentInputId:', this.name, this.currentInputId);
 
 		// find the currentInputId in the inputs and return the currentActiveInput once found
 		// this allows HomeKit to show the selected current input
