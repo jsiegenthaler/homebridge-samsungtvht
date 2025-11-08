@@ -118,7 +118,7 @@ The plugin can send multiple key codes, separate the key codes with spaces. Keys
 
 ## Configuration
 ### Config via Settings
-It is easiest to configure the plugin via Homebridge: Plugins > Homebridge Samsung TV HT > SETTINGS.
+It is easiest to configure the plugin via Homebridge: Plugins > Homebridge Samsung TV HT > Plugin Config.
 
 ### Manual Config
 You can also configure manually. 
