@@ -7,9 +7,9 @@ All notable changes to this project will be documented in this file.
 
 
 
-## 1.1.1 (2025-05-15)
+## 1.1.1 (2025-11-08)
 * Updated iOS version references in README.md
-* Bumped engines: "node": "^22.15.0"
+* Bumped engines: "node": "^22.21.1"
 
 
 ## 1.1.0 (2025-02-13)
