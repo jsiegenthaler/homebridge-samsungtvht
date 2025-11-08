@@ -9,12 +9,12 @@
   "version": "1.1.1",
   "platformname": "samsungtvht",
   "dependencies": {
-    "samsung-remote": "^1.6.2" 
+    "samsung-remote": "^1.6.2"
   },
   "deprecated": false,
     "engines": {
-    "homebridge": "^1.9.0||^2.0.0-beta",
-    "node": "^22.15.0"
+    "homebridge": "^1.11.1||^2.0.0-beta",
+    "node": "^24.11.0"
   },
   "homepage": "https://github.com/jsiegenthaler/homebridge-samsungtvht#readme",
   "keywords": [
