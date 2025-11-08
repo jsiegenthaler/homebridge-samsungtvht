@@ -9,6 +9,7 @@ All notable changes to this project will be documented in this file.
 
 ## 1.1.1 (2025-11-08)
 * Updated iOS version references in README.md
+* Corrected Homebridge references in README.md
 * Bumped engines: "homebridge": "^1.11.1||^2.0.0-beta"
 * Bumped engines: "node": "^24.11.0"
 
