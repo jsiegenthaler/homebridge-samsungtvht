@@ -117,7 +117,7 @@ The Accessory settings icon command **View TV Settings** will open the TV or Hom
 The plugin can send multiple key codes, separate the key codes with spaces. Keys are sent at intervals of 100ms, but can be changed by inserting a wait(ms) in the key code sequence. To select TV channel 12 by sending TV, waiting 200ms, then sending keys 1, 2 and Enter, use: `KEY_TV wait(200) KEY_1 KEY_2 KEY_ENTER`. See the [Multi Key Sequences (Macros)](https://github.com/jsiegenthaler/homebridge-samsungtvht/wiki/Key-Codes#multi-key-sequences-macros) section of the [Key Codes](https://github.com/jsiegenthaler/homebridge-samsungtvht/wiki/Key-Codes) wiki page.
 
 ## Configuration
-### Config via Settings
+### Config via Plugin Config
 It is easiest to configure the plugin via Homebridge: Plugins > Homebridge Samsung TV HT > Plugin Config.
 
 ### Manual Config
