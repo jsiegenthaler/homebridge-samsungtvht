@@ -7,6 +7,11 @@ All notable changes to this project will be documented in this file.
 
 
 
+## 1.1.1 (2025-05-15)
+* Updated iOS version references in README.md
+* Bumped engines: "node": "^22.15.0"
+
+
 ## 1.1.0 (2025-02-13)
 * Added support for Homebridge v2.0
 * Adapted behaviour of input selection to allow the selected Accessory input to remain selected (issue #23)
