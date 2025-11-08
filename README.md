@@ -21,7 +21,7 @@ Supported TVs and HTs are:
 * ES-series and EH-series from 2012
 * F-series from 2013
 
-| iOS/iPadOS 16/17/18 Accessory Tiles | Older iOS/iPadOS Accessory Tiles |
+| iOS/iPadOS 16...26 Accessory Tiles | Older iOS/iPadOS Accessory Tiles |
 | :---         |     :---:      |
 | <img src="https://github.com/jsiegenthaler/homebridge-samsungtvht/blob/master/pics/AccessoryTilesTVHT.png" alt="AccessoryTilesTVHT" height="60" align="center"> | <img src="https://github.com/jsiegenthaler/homebridge-samsungtvht/blob/master/pics/AccessoryTilesTVHTiOS15.png" alt="AccessoryTilesTVHTiOS15" height="80" align="center"> |
 
@@ -41,8 +41,8 @@ If you like this plugin, consider buying me a coffee!<br>
 This plugin was written and tested on the author's Samsung D-series TV and D-series Home Theater system in Switzerland.
 
 ## Requirements
-* An Apple iPhone or iPad with iOS/iPadOS 14.0 (or later). Developed on iOS/iPadOS 14.1...18.5, earlier versions not tested.
-* [Homebridge](https://homebridge.io/) v1.9.0 (or later). Developed on Homebridge 1.1.116....1.9.0, earlier versions not tested.
+* An Apple iPhone or iPad with iOS/iPadOS 14.0 (or later). Developed on iOS/iPadOS 14.1...26.1, earlier versions not tested.
+* [Homebridge](https://homebridge.io/) v1.9.0 (or later). Developed on Homebridge 1.1.116...1.11.1, earlier versions not tested.
 * An Orsay (non-Tizen) Samsung TV or Home Theater system from C-series (2010), D-series (2011), E-series (2012), F-series (2013) models. Orsay started in 2011, Tizen started in 2015, so TVs and HTs from 2011 to 2015 generally work with this plugin. May also work on some later models as well.
 * The TV or Home Theater system must be connected to your home network via Ethernet LAN cable, or WiFi.
 * The TV or Home Theater system must have Network Remote Control turned on.
@@ -98,7 +98,7 @@ The following keys are supported by in the **Apple TV Remote** in the Control Ce
 
 All remote control buttons are fully configurable and can send any [key code](https://github.com/jsiegenthaler/homebridge-samsungtvht/wiki/Key-Codes).
 
-Note: in iOS 16 and 17, the Mute and Power keys are visible in the **Apple TV Remote** but they are disabled and cannot be used. In iOS 18, the buttons are visible and can be used.
+Note: in iOS 16 and 17, the Mute and Power keys are visible in the **Apple TV Remote** but they are disabled and cannot be used. In iOS 18 and later, the buttons are visible and can be used.
 
 
 ## Accessory Supported Functions
