@@ -1,8 +1,6 @@
 <p align="center">
     <img src="https://github.com/jsiegenthaler/homebridge-samsungtvht/blob/master/pics/Samsung-D5000.jpg" alt="TV D-5000" height="200" align="center">
     <img src="https://github.com/jsiegenthaler/homebridge-samsungtvht/blob/master/pics/Samsung-HT-D5500.jpg" alt="HT HT-D5500" height="200" align="center">
-
-  </a>
 </p>
 
 # homebridge-samsungtvht
@@ -41,13 +39,14 @@ If you like this plugin, consider buying me a coffee!<br>
 This plugin was written and tested on the author's Samsung D-series TV and D-series Home Theater system in Switzerland.
 
 ## Requirements
-* An Apple iPhone or iPad with iOS/iPadOS 14.0 (or later). Developed on iOS/iPadOS 14.1...26.1, earlier versions not tested.
-* [Homebridge](https://homebridge.io/) v1.9.0 (or later). Developed on Homebridge 1.1.116...1.11.1, earlier versions not tested.
+* An Apple iPhone or iPad with iOS/iPadOS 14.0 (or later). Developed on iOS/iPadOS 14.1...26.4, earlier versions not tested.
+* [Homebridge](https://homebridge.io/) v1.9.0 (or later). Developed on Homebridge 1.1.116...2.0.1, earlier versions not tested.
 * An Orsay (non-Tizen) Samsung TV or Home Theater system from C-series (2010), D-series (2011), E-series (2012), F-series (2013) models. Orsay started in 2011, Tizen started in 2015, so TVs and HTs from 2011 to 2015 generally work with this plugin. May also work on some later models as well.
 * The TV or Home Theater system must be connected to your home network via Ethernet LAN cable, or WiFi.
 * The TV or Home Theater system must have Network Remote Control turned on.
 
 ## Decode your Samsung TV Model Number
+Not sure if your TV is compatible? Use Samsung's guide to decode your model number and identify the series and year:
 https://www.samsung.com/levant/support/tv-audio-video/what-do-samsung-tv-model-number-means-and-why-they-are-long/
 
 
@@ -66,15 +65,15 @@ Each Samsung TV or HT device is exposed as a separate external accessory and eac
 
 1. Open the **Home** app on your device.
 2. Tap **+** in the top right corner of the screen and then **Add Accessory** to start the process of adding a new accessory.
-4. **Add Accessory**: tap **More options...** to add the accessory manually.
-5. **Select an Accessory to Add to \<HomeName\>**: Select the accessory you want to add. You should see your Samsung device here. If not, check your Homebridge config.
-6. Accept the **Uncertified Accessory** warning by tapping **Add Anyway**.
-7. **Enter HomeKit Setup Code**: Enter the **HomeKit Setup Code** (displayed in Homebridge under the QR code, format XXXX-XXXX), or use the device's camera to scan the QR code in Homebridge and tap **Continue**.
-8. **TV Location**: Select a room for your Samsung accessory and tap **Continue**.
-9. **TV Name**: Give your Samsung device a different name if you wish (you can change this in the Home app later) and tap **Continue**.
-10. **Name TV Input Sources**: Name your TV input sources if you wish (you can change these in the Home app later) and tap **Continue**.
-11. **TV Automations**: Switch on any suggested automations if you wish (you can change these in the Home app later) and tap **Continue**.
-12. **TV Added to \<HomeName\>**: Tap **Done** to finish the setup.
+3. **Add Accessory**: tap **More options...** to add the accessory manually.
+4. **Select an Accessory to Add to \<HomeName\>**: Select the accessory you want to add. You should see your Samsung device here. If not, check your Homebridge config.
+5. Accept the **Uncertified Accessory** warning by tapping **Add Anyway**.
+6. **Enter HomeKit Setup Code**: Enter the **HomeKit Setup Code** (displayed in Homebridge under the QR code, format XXXX-XXXX), or use the device's camera to scan the QR code in Homebridge and tap **Continue**.
+7. **TV Location**: Select a room for your Samsung accessory and tap **Continue**.
+8. **TV Name**: Give your Samsung device a different name if you wish (you can change this in the Home app later) and tap **Continue**.
+9. **Name TV Input Sources**: Name your TV input sources if you wish (you can change these in the Home app later) and tap **Continue**.
+10. **TV Automations**: Switch on any suggested automations if you wish (you can change these in the Home app later) and tap **Continue**.
+11. **TV Added to \<HomeName\>**: Tap **Done** to finish the setup.
 
 If adding a Home Theater, the icon displayed will be an Audio Receiver and some text in the setup screens will show Audio Receiver instead of TV.
 
@@ -83,7 +82,7 @@ Your new accessory will appear shortly in the room that you selected. It may sho
 ## Remote Control Supported Keys
 To access the **Apple TV Remote**, open your **Control Center** by swiping down from the top or up from the bottom of the screen (older iPhones). If you do not see the remote control icon, you will need to activate it in **Settings > Control Centre** and ensure that the **Apple TV Remote** is in the list of **INCLUDED CONTROLS**.
 
-The following keys are supported by in the **Apple TV Remote** in the Control Center:
+The following keys are supported in the **Apple TV Remote** in the Control Center:
 <img src="https://github.com/jsiegenthaler/homebridge-samsungtvht/blob/master/pics/RemoteControl.png" alt="RemoteControl" height="300" align="right">
 
 * Mute
@@ -94,7 +93,7 @@ The following keys are supported by in the **Apple TV Remote** in the Control Ce
 * Back
 * Info (i) (Menu)
 * Volume Up
-* Volume Down (triple-press for Mute)
+* Volume Down
 
 All remote control buttons are fully configurable and can send any [key code](https://github.com/jsiegenthaler/homebridge-samsungtvht/wiki/Key-Codes).
 
@@ -153,68 +152,68 @@ Example configuration as used on the author's Samsung TV and Samsung HT:
                         {
                             "inputName": "HDMI1 (Cable STB)",
                             "inputKeyCode": "KEY_EXT20",
-                            "inputSourceType": "3",
-                            "inputDeviceType": "1"
+                            "inputSourceType": 3,
+                            "inputDeviceType": 1
                         },
                         {
                             "inputName": "HDMI2 (Blu-ray)",
                             "inputKeyCode": "KEY_AUTO_ARC_PIP_WIDE",
-                            "inputSourceType": "3",
-                            "inputDeviceType": "1"
+                            "inputSourceType": 3,
+                            "inputDeviceType": 1
                         },
                         {
                             "inputName": "HDMI3 PC",
                             "inputKeyCode": "KEY_AUTO_ARC_PIP_RIGHT_BOTTOM",
-                            "inputSourceType": "3",
-                            "inputDeviceType": "1"
+                            "inputSourceType": 3,
+                            "inputDeviceType": 1
                         },
                         {
                             "inputName": "Mute",
                             "inputKeyCode": "KEY_MUTE",
-                            "inputSourceType": "0",
-                            "inputDeviceType": "0"
+                            "inputSourceType": 0,
+                            "inputDeviceType": 0
                         },
                         {
                             "inputName": "Volume Up",
                             "inputKeyCode": "KEY_VOLUP wait(200) KEY_VOLUP wait(200) KEY_VOLUP",
-                            "inputSourceType": "0",
-                            "inputDeviceType": "0"
+                            "inputSourceType": 0,
+                            "inputDeviceType": 0
                         },
                         {
                             "inputName": "Volume Down",
                             "inputKeyCode": "KEY_VOLDOWN wait(200) KEY_VOLDOWN wait(200) KEY_VOLDOWN",
-                            "inputSourceType": "0",
-                            "inputDeviceType": "0"
+                            "inputSourceType": 0,
+                            "inputDeviceType": 0
                         },
                         {
                             "inputName": "Source",
                             "inputKeyCode": "KEY_SOURCE",
-                            "inputSourceType": "3",
-                            "inputDeviceType": "1"
+                            "inputSourceType": 3,
+                            "inputDeviceType": 1
                         },
                         {
                             "inputName": "Up",
                             "inputKeyCode": "KEY_UP",
-                            "inputSourceType": "3",
-                            "inputDeviceType": "1"
+                            "inputSourceType": 3,
+                            "inputDeviceType": 1
                         },
                         {
                             "inputName": "Down",
                             "inputKeyCode": "KEY_DOWN",
-                            "inputSourceType": "3",
-                            "inputDeviceType": "1"
+                            "inputSourceType": 3,
+                            "inputDeviceType": 1
                         },
                         {
                             "inputName": "Enter",
                             "inputKeyCode": "KEY_ENTER",
-                            "inputSourceType": "3",
-                            "inputDeviceType": "1"
+                            "inputSourceType": 3,
+                            "inputDeviceType": 1
                         },
                         {
                             "inputName": "Energy Saving High",
                             "inputKeyCode": "KEY_TOOLS KEY_DOWN KEY_DOWN KEY_RIGHT KEY_RIGHT KEY_ENTER",
-                            "inputSourceType": "0",
-                            "inputDeviceType": "0"
+                            "inputSourceType": 0,
+                            "inputDeviceType": 0
                         }
                     ],
                     "arrowUpButton": "KEY_UP",
@@ -243,7 +242,6 @@ Example configuration as used on the author's Samsung TV and Samsung HT:
                     "infoButtonTripleTap": "KEY_TOOLS",
                     "volupButton": "KEY_VOLUP",
                     "voldownButton": "KEY_VOLDOWN",
-                    "voldownButtonTriplePress": "KEY_MUTE",
                     "muteButton": "KEY_MUTE"
                 },
                 {
@@ -261,80 +259,80 @@ Example configuration as used on the author's Samsung TV and Samsung HT:
                         {
                             "inputName": "Volume Up",
                             "inputKeyCode": "KEY_VOLUP",
-                            "inputSourceType": "3",
-                            "inputDeviceType": "1"
+                            "inputSourceType": 3,
+                            "inputDeviceType": 1
                         },
                         {
                             "inputName": "Volume Down",
                             "inputKeyCode": "KEY_VOLDOWN",
-                            "inputSourceType": "3",
-                            "inputDeviceType": "1"
+                            "inputSourceType": 3,
+                            "inputDeviceType": 1
                         },
                         {
                             "inputName": "Mute",
                             "inputKeyCode": "KEY_MUTE",
-                            "inputSourceType": "3",
-                            "inputDeviceType": "1"
+                            "inputSourceType": 3,
+                            "inputDeviceType": 1
                         },
                         {
                             "inputName": "Left",
                             "inputKeyCode": "KEY_LEFT",
-                            "inputSourceType": "3",
-                            "inputDeviceType": "1"
+                            "inputSourceType": 3,
+                            "inputDeviceType": 1
                         },
                         {
                             "inputName": "Right",
                             "inputKeyCode": "KEY_RIGHT",
-                            "inputSourceType": "3",
-                            "inputDeviceType": "1"
+                            "inputSourceType": 3,
+                            "inputDeviceType": 1
                         },
                         {
                             "inputName": "Up",
                             "inputKeyCode": "KEY_UP",
-                            "inputSourceType": "3",
-                            "inputDeviceType": "1"
+                            "inputSourceType": 3,
+                            "inputDeviceType": 1
                         },
                         {
                             "inputName": "Down",
                             "inputKeyCode": "KEY_DOWN",
-                            "inputSourceType": "3",
-                            "inputDeviceType": "1"
+                            "inputSourceType": 3,
+                            "inputDeviceType": 1
                         },
                         {
                             "inputName": "Enter",
                             "inputKeyCode": "KEY_ENTER",
-                            "inputSourceType": "3",
-                            "inputDeviceType": "1"
+                            "inputSourceType": 3,
+                            "inputDeviceType": 1
                         },
                         {
                             "inputName": "Sub Level",
                             "inputKeyCode": "KEY_VCHIP",
-                            "inputSourceType": "3",
-                            "inputDeviceType": "1"
+                            "inputSourceType": 3,
+                            "inputDeviceType": 1
                         },
                         {
                             "inputName": "Dolby PLII",
                             "inputKeyCode": "KEY_LIVE",
-                            "inputSourceType": "3",
-                            "inputDeviceType": "1"
+                            "inputSourceType": 3,
+                            "inputDeviceType": 1
                         },
                         {
                             "inputName": "KEY_CH_LIST",
                             "inputKeyCode": "KEY_CH_LIST",
-                            "inputSourceType": "3",
-                            "inputDeviceType": "1"
+                            "inputSourceType": 3,
+                            "inputDeviceType": 1
                         },
                         {
                             "inputName": "KEY_SUB_TITLE",
                             "inputKeyCode": "KEY_SUB_TITLE",
-                            "inputSourceType": "3",
-                            "inputDeviceType": "1"
+                            "inputSourceType": 3,
+                            "inputDeviceType": 1
                         },
                         {
                             "inputName": "Interactive",
                             "inputKeyCode": "KEY_INTERACTIVE",
-                            "inputSourceType": "3",
-                            "inputDeviceType": "1"
+                            "inputSourceType": 3,
+                            "inputDeviceType": 1
                         }
                     ],
                     "arrowUpButton": "KEY_UP",
@@ -363,7 +361,6 @@ Example configuration as used on the author's Samsung TV and Samsung HT:
                     "infoButtonTripleTap": "KEY_TOOLS",
                     "volupButton": "KEY_VOLUP",
                     "voldownButton": "KEY_VOLDOWN",
-                    "voldownButtonTriplePress": "KEY_MUTE",
                     "muteButton": "KEY_MUTE"
                 }
             ],
@@ -380,7 +377,7 @@ Example configuration as used on the author's Samsung TV and Samsung HT:
 
 * **name**: The displayed name of your device. Default is the plugin name. Mandatory.
 
-* **pingCommand**: the ping command to be used to ping the device to determine it's power state. For Linux, use "ping -c 2 -w 10" (the default>). For Windows, use "ping -n 2 -w 20". The ping options used are: Linux: -c 2 = ping twice only; -w 10 = wait 10 milliseconds before timing out.  Windows: -w 20 = wait 20 milliseconds before timing out. . See the [Power-Control](https://github.com/jsiegenthaler/homebridge-samsungtvht/wiki/Power-Control) wiki page for more information.
+* **pingCommand**: the ping command to be used to ping the device to determine its power state. For Linux, use "ping -c 2 -w 10" (the default>). For Windows, use "ping -n 2 -w 20". The ping options used are: Linux: -c 2 = ping twice only; -w 10 = wait 10 milliseconds before timing out.  Windows: -w 20 = wait 20 milliseconds before timing out. . See the [Power-Control](https://github.com/jsiegenthaler/homebridge-samsungtvht/wiki/Power-Control) wiki page for more information.
 
 * **pingInterval**: the interval in seconds between each ping. Shorter intervals generate more network traffic but show a more responsive tile in the Home app. 3 seconds is a good balance between traffic and responsiveness. Default 3. Mandatory.
 
@@ -392,7 +389,7 @@ Example configuration as used on the author's Samsung TV and Samsung HT:
 
 * **doublePressDelayTime**: the time in ms to wait for another key press to detect a double key press. Must be greater than doublePressTime. Default 300 ms. Mandatory.
 
-* **debugLevel**: the level of debug info displayed by this plugin, integer, one of 0 (none), 1 (Minimum), 2 (Enhanced), 3 (Verbose). Default 0. Optional.
+* **debugLevel**: the level of debug info displayed by this plugin, integer, one of 0 (None), 1 (Minimum), 2 (Enhanced), 3 (Verbose). Default 0. Optional.
 
 * **devices**: an array for each device's config, see below.
 
@@ -404,9 +401,11 @@ Example configuration as used on the author's Samsung TV and Samsung HT:
 
 * **type**: The device type, which sets the Home tile icon. Either Television ("television") or Audio Receiver ("receiver"). Default is television. Mandatory.
 
+* **defaultInputId**: The input to show when the device is turned on. Default = empty. Optional.
+
 * **manufacturer**: You can set a manufacturer of your choice. Default = Samsung. Optional.
 
-* **modelName**: You can set a firmware revision of your choice. Default = platform name. Optional.
+* **modelName**: You can set a model name of your choice. Default = platform name. Optional.
 
 * **serialNumber**: You can set a serial number of your choice. Default = unknown. Optional.
 
@@ -420,11 +419,11 @@ Example configuration as used on the author's Samsung TV and Samsung HT:
 
 * **inputs**: an array for each device's inputs, see below.
 
-* **xxxButton**: The key code to send when button xxx is tapped in the iOS remote control. See the example for supported button names.
+* **xxxButton**: The key code to send when button xxx is tapped in the iOS remote control. See the example for supported button names. Optional. If not provided, a default is used.
 
-* **xxxButtonDoubleTap**: The key code to send when button xxx is tapped in the iOS remote control. See the example for supported button names.
+* **xxxButtonDoubleTap**: The key code to send when button xxx is tapped in the iOS remote control. See the example for supported button names. Optional. If not provided, a default is used.
 
-* **xxxButtonTripleTap**: The key code to send when button xxx is tapped in the iOS remote control. See the example for supported button names.
+* **xxxButtonTripleTap**: The key code to send when button xxx is tapped in the iOS remote control. See the example for supported button names. Optional. If not provided, a default is used.
 
 #### Input Config (array per device)
 
@@ -445,11 +444,11 @@ Commonly used remote control key codes are supplied as defaults, but you can cus
 
 
 ## Thanks to
-* [samsung-remote](https://github.com/natalan/samsung-remote), the inspiration for this project
+* [samsung-remote](https://github.com/natalan/samsung-remote) — the inspiration for this project
 
-* [homebridge-yamaha-avr](https://github.com/ACDR/homebridge-yamaha-avr)
+* [homebridge-yamaha-avr](https://github.com/ACDR/homebridge-yamaha-avr) — referenced for plugin architecture
 
-* https://openbase.io/js/homebridge-denon-tv/documentation
+* https://openbase.io/js/homebridge-denon-tv/documentation — referenced for TV accessory implementation
 
 * All the people that documented the Samsung key codes
 
